@@ -10,19 +10,10 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/nav_message"
-        android:icon="@drawable/ic_baseline_message_24"
-        android:title="Message" />
+        android:id="@+id/nav_history"
+        android:icon="@drawable/ic_baseline_history_24"
+        android:title="History" />
 
-    <item
-        android:id="@+id/nav_sync"
-        android:icon="@drawable/ic_baseline_sync_24"
-        android:title="Sync" />
-
-    <item
-        android:id="@+id/nav_trash"
-        android:icon="@drawable/ic_baseline_delete_24"
-        android:title="Trash" />
 
     <item
         android:id="@+id/nav_setting"

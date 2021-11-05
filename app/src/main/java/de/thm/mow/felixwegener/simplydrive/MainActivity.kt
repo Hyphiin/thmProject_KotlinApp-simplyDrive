@@ -6,11 +6,15 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var toggle: ActionBarDrawerToggle
+
+    private lateinit var latHisAdapter: LatHisAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,9 +34,7 @@ class MainActivity : AppCompatActivity() {
 
             when(it.itemId){
                 R.id.nav_home -> Toast.makeText(applicationContext, "Clicked Home", Toast.LENGTH_SHORT).show()
-                R.id.nav_message -> Toast.makeText(applicationContext, "Clicked Message", Toast.LENGTH_SHORT).show()
-                R.id.nav_sync -> Toast.makeText(applicationContext, "Clicked Sync", Toast.LENGTH_SHORT).show()
-                R.id.nav_trash -> Toast.makeText(applicationContext, "Clicked Trash", Toast.LENGTH_SHORT).show()
+                R.id.nav_history -> Toast.makeText(applicationContext, "Clicked History", Toast.LENGTH_SHORT).show()
                 R.id.nav_setting -> Toast.makeText(applicationContext, "Clicked Settings", Toast.LENGTH_SHORT).show()
                 R.id.nav_login -> Toast.makeText(applicationContext, "Clicked Login", Toast.LENGTH_SHORT).show()
                 R.id.nav_share -> Toast.makeText(applicationContext, "Clicked Share", Toast.LENGTH_SHORT).show()
@@ -40,6 +42,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             true
+        }
+
+        latHisAdapter = LatHisAdapter(mutableListOf())
+
+        rvLatestHistory.adapter = latHisAdapter
+        rvLatestHistory.layoutManager = LinearLayoutManager(this)
+
+        bShowHistory.setOnClickListener{
+            val date = "23.08.2021"
+            val time = "18:55"
+            val route = "Wetzlar Bahnhof - Frankfurt Hbf"
+
+            val newRoute = Route(date, time, route)
+            latHisAdapter.addHistory(newRoute)
         }
     }
 
