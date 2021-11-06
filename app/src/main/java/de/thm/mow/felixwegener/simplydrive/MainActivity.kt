@@ -3,6 +3,8 @@ package de.thm.mow.felixwegener.simplydrive
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
@@ -16,6 +18,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var latHisAdapter: LatHisAdapter
 
+    lateinit var dateInput: EditText
+    lateinit var timeInput: EditText
+    lateinit var routeInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -77,6 +82,10 @@ class MainActivity : AppCompatActivity() {
         bShowHistory.setOnClickListener {
             addDBEntry()
         }
+
+        clearHistory.setOnClickListener {
+            clearDB()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,12 +98,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addDBEntry() {
-        val date = "23.08.2021"
-        val time = "18:55"
-        val route = "Wetzlar Bahnhof - Frankfurt Hbf"
+
+        dateInput = findViewById<View>(R.id.DateInput) as EditText
+        timeInput = findViewById<View>(R.id.TimeInput) as EditText
+        routeInput = findViewById<View>(R.id.RouteInput) as EditText
+
+        val date = dateInput.text.toString()
+        val time = timeInput.text.toString()
+        val route = routeInput.text.toString()
 
         val newRoute = Route(date, time, route)
         latHisAdapter.addHistory(newRoute)
+    }
+
+    private fun clearDB() {
+        latHisAdapter.clearDB()
     }
 
 }
