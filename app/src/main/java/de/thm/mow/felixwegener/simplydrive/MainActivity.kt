@@ -8,24 +8,22 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
+import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var toggle: ActionBarDrawerToggle
-
-    private lateinit var latHisAdapter: LatHisAdapter
-
-    lateinit var dateInput: EditText
-    lateinit var timeInput: EditText
-    lateinit var routeInput: EditText
+    private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawerLayout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -39,16 +37,8 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener {
 
             when (it.itemId) {
-                R.id.nav_home -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Home",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_history -> Toast.makeText(
-                    applicationContext,
-                    "Clicked History",
-                    Toast.LENGTH_SHORT
-                ).show()
+                R.id.nav_home -> replaceFragment(Fragment1())
+                R.id.nav_history -> replaceFragment(Fragment2())
                 R.id.nav_setting -> Toast.makeText(
                     applicationContext,
                     "Clicked Settings",
@@ -70,23 +60,17 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
             true
         }
-
-        latHisAdapter = LatHisAdapter(mutableListOf())
-
-        rvLatestHistory.adapter = latHisAdapter
-        rvLatestHistory.layoutManager = LinearLayoutManager(this)
-
-        bShowHistory.setOnClickListener {
-            addDBEntry()
-        }
-
-        clearHistory.setOnClickListener {
-            clearDB()
-        }
     }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val fragmentManager =  supportFragmentManager
+        val fragmentTransaction =  fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.fragmentContainer, fragment)
+        fragmentTransaction.commit()
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -97,22 +81,5 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun addDBEntry() {
-
-        dateInput = findViewById<View>(R.id.DateInput) as EditText
-        timeInput = findViewById<View>(R.id.TimeInput) as EditText
-        routeInput = findViewById<View>(R.id.RouteInput) as EditText
-
-        val date = dateInput.text.toString()
-        val time = timeInput.text.toString()
-        val route = routeInput.text.toString()
-
-        val newRoute = Route(date, time, route)
-        latHisAdapter.addHistory(newRoute)
-    }
-
-    private fun clearDB() {
-        latHisAdapter.clearDB()
-    }
 
 }
