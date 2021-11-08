@@ -1,7 +1,9 @@
 package de.thm.mow.felixwegener.simplydrive
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -10,7 +12,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.nav_header.*
 
 class MainActivity : AppCompatActivity() {
 

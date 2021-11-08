@@ -16,7 +16,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/user_name"
+        android:id="@+id/user_id"
         android:paddingTop="8dp"
         android:textSize="20dp"
         android:text="Maxe Musti"
@@ -24,15 +24,22 @@
         android:textStyle="bold"/>
 
     <TextView
+        android:id="@+id/user_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:text="maxemusti@gmail.com"/>
+        android:text="maxemusti@gmail.com"
+        android:textSize="16dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="30dp"
         android:background="@color/underline"/>
+
+    <Button
+        android:id="@+id/logOutBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logout" />
 
 </LinearLayout>
