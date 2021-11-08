@@ -3,16 +3,12 @@ package de.thm.mow.felixwegener.simplydrive
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener {
 
             when (it.itemId) {
-                R.id.nav_home -> replaceFragment(Fragment1())
+                R.id.nav_home -> replaceFragment(HistoryFragment())
                 R.id.nav_history -> replaceFragment(Fragment2())
                 R.id.nav_setting -> Toast.makeText(
                     applicationContext,
@@ -67,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager =  supportFragmentManager
         val fragmentTransaction =  fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragmentContainer, fragment)
+        fragmentTransaction.replace(R.id.fragmentContainer, fragment, "history_fragment")
         fragmentTransaction.commit()
     }
 

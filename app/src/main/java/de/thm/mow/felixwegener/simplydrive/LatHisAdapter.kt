@@ -11,10 +11,11 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.item_latest_history.view.*
 
 class LatHisAdapter(
-    private val routes: MutableList<Route>
+    private val routes: MutableList<Route>, val clickListener: ClickListener
 ) : RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
 
     class LatHisViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
         return LatHisViewHolder(
@@ -69,22 +70,22 @@ class LatHisAdapter(
                         tvLHtime.text = document.data.getValue("time").toString()
                         tvLHroute.text = document.data.getValue("route").toString()
                     }
+                    val tempRoute = Route(
+                        document.data.getValue("date").toString(),
+                        document.data.getValue("time").toString(),
+                        document.data.getValue("route").toString())
+                    holder.itemView.setOnClickListener{
+                        clickListener.onItemClick(tempRoute)
+                    }
                 }
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents.", exception)
             }
+    }
 
-        /*
-        val rTable = routes[position]
-        holder.itemView.apply {
-            tvLHdate.text = rTable.date
-            tvLHtime.text = rTable.time
-            tvLHroute.text = rTable.route
-        }
-        */
-
-
+    interface ClickListener {
+        fun onItemClick (route: Route)
     }
 
     override fun getItemCount(): Int {
