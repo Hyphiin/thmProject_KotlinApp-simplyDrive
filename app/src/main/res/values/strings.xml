@@ -2,4 +2,7 @@
     <string name="app_name">SimplyDrive</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_history_fragment">Hello History fragment</string>
+    <string name="hello_settings_fragment">Hello Settings fragment</string>
 </resources>
