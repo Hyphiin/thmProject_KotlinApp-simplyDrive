@@ -9,9 +9,10 @@
     android:background="@color/white">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_Img"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/maxe"/>
+        android:src="@drawable/maxe" />
 
     <TextView
         android:layout_width="match_parent"
@@ -40,6 +41,7 @@
         android:id="@+id/logOutBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:text="Logout" />
 
 </LinearLayout>
