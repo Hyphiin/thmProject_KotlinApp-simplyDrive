@@ -14,9 +14,7 @@ import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
-import de.thm.mow.felixwegener.simplydrive.fragments.HistoryFragment
-import de.thm.mow.felixwegener.simplydrive.fragments.HomeFragment
-import de.thm.mow.felixwegener.simplydrive.fragments.SettingsFragment
+import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private val homeFragment = HomeFragment()
     private val settingsFragment = SettingsFragment()
     private val historyFragment = HistoryFragment()
+    private val editFragment = EditFragment()
+    private val scanFragment = ScanFragment()
 
     //FAB Button(s)
     private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.rotate_open_anim) }
@@ -63,11 +63,11 @@ class MainActivity : AppCompatActivity() {
         fab_main.setOnClickListener {
             onAddButtonClicked()
         }
-        fab_search.setOnClickListener {
-            Toast.makeText(this, "Search Button Clicked", Toast.LENGTH_SHORT).show()
+        fab_scan.setOnClickListener {
+            replaceFragment(scanFragment)
         }
         fab_edit.setOnClickListener {
-            Toast.makeText(this, "Edit Button Clicked", Toast.LENGTH_SHORT).show()
+            replaceFragment(editFragment)
         }
 
 
@@ -91,10 +91,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setVisibility(clicked: Boolean) {
         if(!clicked){
-            fab_search.visibility = View.VISIBLE
+            fab_scan.visibility = View.VISIBLE
             fab_edit.visibility = View.VISIBLE
         } else {
-            fab_search.visibility = View.INVISIBLE
+            fab_scan.visibility = View.INVISIBLE
             fab_edit.visibility = View.INVISIBLE
         }
     }
@@ -102,19 +102,19 @@ class MainActivity : AppCompatActivity() {
     private fun setAnimation(clicked: Boolean) {
         if(!clicked){
             fab_edit.startAnimation(fromBottom)
-            fab_search.startAnimation(fromBottom)
+            fab_scan.startAnimation(fromBottom)
         } else {
             fab_edit.startAnimation(toBottom)
-            fab_search.startAnimation(toBottom)
+            fab_scan.startAnimation(toBottom)
         }
     }
 
     private fun setClickable (clicked: Boolean){
         if(!clicked){
-            fab_search.isClickable= true
+            fab_scan.isClickable= true
             fab_edit.isClickable= true
         }else{
-            fab_search.isClickable= false
+            fab_scan.isClickable= false
             fab_edit.isClickable= false
         }
     }

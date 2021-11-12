@@ -47,7 +47,7 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_edit"
+        android:id="@+id/fab_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -61,7 +61,7 @@
         app:maxImageSize="30dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_search"
+        android:id="@+id/fab_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -70,7 +70,7 @@
         android:translationY="-35dp"
         android:visibility="invisible"
         app:fabCustomSize="70dp"
-        app:layout_anchor="@id/fab_edit"
+        app:layout_anchor="@id/fab_scan"
         app:layout_anchorGravity="center_horizontal"
         app:maxImageSize="30dp" />
 
