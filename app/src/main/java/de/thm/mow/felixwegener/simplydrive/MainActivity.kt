@@ -1,5 +1,6 @@
 package de.thm.mow.felixwegener.simplydrive
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_profile.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -89,6 +91,13 @@ class MainActivity : AppCompatActivity() {
             clearDB()
         }
 
+        user_LogoutBtn.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+
+            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+            finish()
+        }
+
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
             // Name, email address, and profile photo Url
@@ -104,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             // FirebaseUser.getToken() instead.
             val uid = user.uid
 
-            home__uId.text = "User-ID:: ${uid}"
+            home__uMail.text = "Willkommen ${email} !"
 
             Log.d("uid", uid)
 
@@ -122,16 +131,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun addDBEntry() {
 
-        dateInput = findViewById<View>(R.id.DateInput) as EditText
-        timeInput = findViewById<View>(R.id.TimeInput) as EditText
-        routeInput = findViewById<View>(R.id.RouteInput) as EditText
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = user.uid
 
-        val date = dateInput.text.toString()
-        val time = timeInput.text.toString()
-        val route = routeInput.text.toString()
+            dateInput = findViewById<View>(R.id.DateInput) as EditText
+            timeInput = findViewById<View>(R.id.TimeInput) as EditText
+            routeInput = findViewById<View>(R.id.RouteInput) as EditText
 
-        val newRoute = Route(date, time, route)
-        latHisAdapter.addHistory(newRoute)
+            val date = dateInput.text.toString()
+            val time = timeInput.text.toString()
+            val route = routeInput.text.toString()
+
+            val newRoute = Route(date, time, route, uid)
+            latHisAdapter.addHistory(newRoute)
+        }
     }
 
     private fun clearDB() {

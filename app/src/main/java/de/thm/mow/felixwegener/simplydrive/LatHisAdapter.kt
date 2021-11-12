@@ -57,6 +57,7 @@ class LatHisAdapter(
     // next step -> just show local routes Array, then on initial load, get all routes of user
     // oder immer nur letztes Item bekommen und anzeigen
     override fun onBindViewHolder(holder: LatHisViewHolder, position: Int) {
+        /*
         val db = Firebase.firestore
         db.collection("routes")
             .get()
@@ -74,15 +75,15 @@ class LatHisAdapter(
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents.", exception)
             }
+        */
 
-        /*
         val rTable = routes[position]
         holder.itemView.apply {
             tvLHdate.text = rTable.date
             tvLHtime.text = rTable.time
             tvLHroute.text = rTable.route
         }
-        */
+
 
 
     }

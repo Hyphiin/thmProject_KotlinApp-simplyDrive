@@ -33,23 +33,25 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/home__uId"
+                        android:id="@+id/home__uMail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:textColor="@color/purple_700" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/user_Img2"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
                         android:src="@drawable/maxe" />
+
+                    <Button
+                        android:id="@+id/user_LogoutBtn"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Logout"
+                        android:textSize="12sp"
+                        app:cornerRadius="6dp" />
                 </LinearLayout>
 
             </LinearLayout>
