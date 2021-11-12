@@ -7,13 +7,21 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
+import de.thm.mow.felixwegener.simplydrive.fragments.HistoryFragment
+import de.thm.mow.felixwegener.simplydrive.fragments.HomeFragment
+import de.thm.mow.felixwegener.simplydrive.fragments.SettingsFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var binding: ActivityMainBinding
+
+    private val homeFragment = HomeFragment()
+    private val settingsFragment = SettingsFragment()
+    private val historyFragment = HistoryFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -21,61 +29,27 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawerLayout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        bottomNavigationView.background = null
+        bottomNavigationView.menu.getItem(4).isEnabled = false
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
+        replaceFragment(homeFragment)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        navView.setNavigationItemSelectedListener {
-
+        bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.nav_home -> replaceFragment(HistoryFragment())
-                R.id.nav_history -> replaceFragment(Fragment2())
-                R.id.nav_setting -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Settings",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_login -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Login",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_share -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Share",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_rate_us -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Rate us",
-                    Toast.LENGTH_SHORT
-                ).show()
+                R.id.nav_home -> replaceFragment(homeFragment)
+                R.id.nav_setting -> replaceFragment(settingsFragment)
+                R.id.nav_history -> replaceFragment(historyFragment)
             }
             true
         }
     }
 
     private fun replaceFragment(fragment: Fragment) {
-        val fragmentManager =  supportFragmentManager
-        val fragmentTransaction =  fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragmentContainer, fragment, "history_fragment")
-        fragmentTransaction.commit()
-    }
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if (toggle.onOptionsItemSelected(item)) {
-            return true
+        if (fragment != null) {
+            val fragmentTransaction =  supportFragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainer, fragment, "history_fragment")
+            fragmentTransaction.commit()
         }
-
-        return super.onOptionsItemSelected(item)
     }
-
 
 }

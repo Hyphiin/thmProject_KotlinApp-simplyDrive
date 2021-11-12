@@ -1,4 +1,4 @@
-package de.thm.mow.felixwegener.simplydrive
+package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,9 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_history.*
+import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
+import de.thm.mow.felixwegener.simplydrive.R
+import de.thm.mow.felixwegener.simplydrive.Route
 import kotlinx.android.synthetic.main.fragment_history.view.*
 
 class HistoryFragment :Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
