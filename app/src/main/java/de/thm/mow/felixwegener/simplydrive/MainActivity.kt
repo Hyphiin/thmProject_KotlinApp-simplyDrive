@@ -59,9 +59,11 @@
             }
             fab_scan.setOnClickListener {
                 replaceFragment(scanFragment)
+                onAddButtonClicked()
             }
             fab_edit.setOnClickListener {
                 replaceFragment(editFragment)
+                onAddButtonClicked()
             }
 
 

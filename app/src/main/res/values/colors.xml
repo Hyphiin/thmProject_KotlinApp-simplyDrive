@@ -10,4 +10,10 @@
     <color name="underline">#BDB8B8</color>
     <color name="fragment1">#673AB7</color>
     <color name="fragment2">#8BC34A</color>
+
+    <color name="primary">#65FADD</color>
+    <color name="primaryLight">#AFFAEB</color>
+    <color name="primaryDark">#5AE0C5</color>
+    <color name="textDark">#465258</color>
+    <color name="textWhite">#FFFFFF</color>
 </resources>
