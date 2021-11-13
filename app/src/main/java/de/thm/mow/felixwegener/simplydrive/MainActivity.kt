@@ -6,89 +6,83 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
+import de.thm.mow.felixwegener.simplydrive.fragments.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var binding: ActivityMainBinding
 
-    private lateinit var latHisAdapter: LatHisAdapter
+    //Fragments
+    private val homeFragment = HomeFragment()
+    private val settingsFragment = SettingsFragment()
+    private val historyFragment = HistoryFragment()
+    private val editFragment = EditFragment()
+    private val scanFragment = ScanFragment()
 
-    lateinit var dateInput: EditText
-    lateinit var timeInput: EditText
-    lateinit var routeInput: EditText
+    //FAB Button(s)
+    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.rotate_open_anim) }
+    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.rotate_close_anim) }
+    private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.from_bottom_anim) }
+    private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim) }
+    //private val icAdd =
+
+    private var clicked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawerLayout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        bottomNavigationView.background = null
+        bottomNavigationView.menu.getItem(4).isEnabled = false
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        //Fragments
+        replaceFragment(homeFragment)
 
-        navView.setNavigationItemSelectedListener {
-
+        bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.nav_home -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Home",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_history -> Toast.makeText(
-                    applicationContext,
-                    "Clicked History",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_setting -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Settings",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_login -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Login",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_share -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Share",
-                    Toast.LENGTH_SHORT
-                ).show()
-                R.id.nav_rate_us -> Toast.makeText(
-                    applicationContext,
-                    "Clicked Rate us",
-                    Toast.LENGTH_SHORT
-                ).show()
+                R.id.nav_home -> replaceFragment(homeFragment)
+                R.id.nav_setting -> replaceFragment(settingsFragment)
+                R.id.nav_history -> replaceFragment(historyFragment)
             }
-
             true
         }
 
-        latHisAdapter = LatHisAdapter(mutableListOf())
-
-        rvLatestHistory.adapter = latHisAdapter
-        rvLatestHistory.layoutManager = LinearLayoutManager(this)
-
-        bShowHistory.setOnClickListener {
-            addDBEntry()
+        //FAB Button(s)
+        fab_main.setOnClickListener {
+            onAddButtonClicked()
+        }
+        fab_scan.setOnClickListener {
+            replaceFragment(scanFragment)
+        }
+        fab_edit.setOnClickListener {
+            replaceFragment(editFragment)
         }
 
-        clearHistory.setOnClickListener {
-            clearDB()
+
+    }
+
+
+    private fun replaceFragment(fragment: Fragment) {
+        if (fragment != null) {
+            val fragmentTransaction =  supportFragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainer, fragment, "history_fragment")
+            fragmentTransaction.commit()
         }
 
         user_LogoutBtn.setOnClickListener {
@@ -120,13 +114,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    private fun onAddButtonClicked() {
+        setVisibility(clicked)
+        setAnimation(clicked)
+        setClickable(clicked)
+        clicked = !clicked
+    }
 
-        if (toggle.onOptionsItemSelected(item)) {
-            return true
+    private fun setVisibility(clicked: Boolean) {
+        if(!clicked){
+            fab_scan.visibility = View.VISIBLE
+            fab_edit.visibility = View.VISIBLE
+        } else {
+            fab_scan.visibility = View.INVISIBLE
+            fab_edit.visibility = View.INVISIBLE
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun addDBEntry() {
@@ -148,8 +150,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun clearDB() {
-        latHisAdapter.clearDB()
+     private fun setAnimation(clicked: Boolean) {
+        if(!clicked){
+            fab_edit.startAnimation(fromBottom)
+            fab_scan.startAnimation(fromBottom)
+        } else {
+            fab_edit.startAnimation(toBottom)
+            fab_scan.startAnimation(toBottom)
+        }
+     }    
+
+    private fun setClickable (clicked: Boolean){
+        if(!clicked){
+            fab_scan.isClickable= true
+            fab_edit.isClickable= true
+        }else{
+            fab_scan.isClickable= false
+            fab_edit.isClickable= false
+        }
     }
 
 }
