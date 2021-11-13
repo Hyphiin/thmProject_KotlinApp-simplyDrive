@@ -10,9 +10,10 @@
         android:id="@+id/register__TextLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:elevation="6dp"
         android:text="SimplyDrive"
-        android:textColor="@color/teal_700"
+        android:textColor="@color/textDark"
         android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/login__layout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -73,20 +74,20 @@
                     android:layout_marginLeft="50dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="2dp"
-                    android:backgroundTint="@color/teal_700"
+                    android:backgroundTint="@color/primary"
                     android:text="Registrieren"
                     android:textSize="12sp"
                     app:cornerRadius="6dp" />
 
                 <Button
                     android:id="@+id/register__google"
-                    android:layout_width="200dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
+                    android:layout_marginLeft="75dp"
                     android:layout_marginBottom="2dp"
-                    android:backgroundTint="@color/underline"
+                    android:backgroundTint="@color/primaryLight"
                     android:text="Google"
-                    android:textColor="@color/teal_700"
+                    android:textColor="@color/textDark"
                     app:cornerRadius="6dp" />
             </LinearLayout>
 
@@ -115,7 +116,7 @@
             android:layout_marginLeft="25px"
             android:layout_weight="1"
             android:text="Hier Einloggen!"
-            android:textColor="@color/teal_700" />
+            android:textColor="@color/primaryDark" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
