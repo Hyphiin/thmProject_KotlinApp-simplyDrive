@@ -79,16 +79,14 @@
                     android:textSize="12sp"
                     app:cornerRadius="6dp" />
 
-                <Button
+                <com.google.android.gms.common.SignInButton
                     android:id="@+id/register__google"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="75dp"
-                    android:layout_marginBottom="2dp"
-                    android:backgroundTint="@color/primaryLight"
-                    android:text="Google"
-                    android:textColor="@color/textDark"
-                    app:cornerRadius="6dp" />
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="2dp" />
+
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
