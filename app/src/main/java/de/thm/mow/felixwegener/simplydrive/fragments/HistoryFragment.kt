@@ -13,6 +13,9 @@
     import de.thm.mow.felixwegener.simplydrive.R
     import de.thm.mow.felixwegener.simplydrive.Route
     import kotlinx.android.synthetic.main.fragment_history.view.*
+    import kotlinx.android.synthetic.main.fragment_history_detail_view.view.*
+    import kotlinx.android.synthetic.main.item_latest_history.*
+    import kotlinx.android.synthetic.main.item_latest_history.view.*
 
     class HistoryFragment :Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
 
@@ -21,6 +24,7 @@
         lateinit var dateInput: EditText
         lateinit var timeInput: EditText
         lateinit var routeInput: EditText
+        private lateinit var newRoute: Route
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -36,6 +40,7 @@
             view.clearHistory.setOnClickListener { view ->
                 clearDB()
             }
+
 
             return view
         }
@@ -65,8 +70,9 @@
             val time = timeInput.text.toString()
             val route = routeInput.text.toString()
 
-            val newRoute = Route(date, time, route, uid)
+            newRoute = Route(date, time, route, uid)
             latHisAdapter.addHistory(newRoute)}
+
         }
 
         private fun clearDB() {
@@ -76,8 +82,8 @@
         override fun onItemClick(route: Route) {
            val fragment: Fragment = HistoryDetailView.newInstance(route.route!!)
            val transaction = activity?.supportFragmentManager!!.beginTransaction()
-           transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("history_fragment")!!)
-           transaction.add(R.id.fragmentContainer, fragment)
+           //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
+           transaction.replace(R.id.fragmentContainer, fragment)
            transaction.addToBackStack(null)
            transaction.commit()
 

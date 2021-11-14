@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
 
     <androidx.cardview.widget.CardView
@@ -13,8 +13,10 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="40dp"
+        android:layout_marginBottom="20dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -69,7 +71,7 @@
                     android:layout_height="100dp"
                     android:layout_marginEnd="20dp"
                     android:layout_weight="1"
-                    android:src="@drawable/maxe"
+                    android:src="@drawable/hanau_hbf"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -77,15 +79,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
-                android:id="@+id/lhHome2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
 
-
-
-            </LinearLayout>
 
         </LinearLayout>
 

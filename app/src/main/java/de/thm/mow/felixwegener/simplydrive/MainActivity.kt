@@ -1,5 +1,7 @@
     package de.thm.mow.felixwegener.simplydrive
 
+    import android.annotation.SuppressLint
+    import android.content.Intent
     import androidx.appcompat.app.AppCompatActivity
     import android.os.Bundle
     import android.view.View
@@ -9,6 +11,10 @@
     import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
     import de.thm.mow.felixwegener.simplydrive.fragments.*
     import kotlinx.android.synthetic.main.activity_main.*
+
+
+
+
 
 
     class MainActivity : AppCompatActivity() {
@@ -31,6 +37,7 @@
 
         private var clicked = false
 
+        @SuppressLint("UseCompatLoadingForDrawables")
         override fun onCreate(savedInstanceState: Bundle?) {
 
             super.onCreate(savedInstanceState)
@@ -56,24 +63,39 @@
             //FAB Button(s)
             fab_main.setOnClickListener {
                 onAddButtonClicked()
+                fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_add, this.theme));
             }
             fab_scan.setOnClickListener {
                 replaceFragment(scanFragment)
-                onAddButtonClicked()
+                fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_scanner, this.theme));
+
             }
             fab_edit.setOnClickListener {
                 replaceFragment(editFragment)
-                onAddButtonClicked()
+                fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_search, this.theme));
             }
 
+            //PROFILE
+            profilePic.setOnClickListener {
+                val intent = Intent(this@MainActivity, ProfileActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
 
         }
 
 
+
+
         private fun replaceFragment(fragment: Fragment) {
+            fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_add, this.theme));
+            if (clicked){
+                onAddButtonClicked()
+            }
             if (fragment != null) {
                 val fragmentTransaction =  supportFragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentContainer, fragment, "history_fragment")
+                fragmentTransaction.replace(R.id.fragmentContainer, fragment)
                 fragmentTransaction.commit()
             }
         }

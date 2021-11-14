@@ -75,7 +75,7 @@
                 android:layout_height="100dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="1"
-                android:src="@drawable/maxe"
+                android:src="@drawable/hanau_hbf"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="20dp"
-                android:text="Hanau HBF - Wetzlar Bahnhof"
+                android:text="Wetzlar Bahnhof - Hanau HBF"
                 android:textColor="@color/textDark"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -142,7 +142,7 @@
                 android:layout_height="100dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="1"
-                android:src="@drawable/maxe"
+                android:src="@drawable/wetzlar_bh"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -209,7 +209,7 @@
                 android:layout_height="100dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="1"
-                android:src="@drawable/maxe"
+                android:src="@drawable/hanau_hbf"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
