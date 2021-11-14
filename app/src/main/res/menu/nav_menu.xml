@@ -6,40 +6,29 @@
 
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/ic_baseline_home_24"
+        android:icon="@drawable/ic_home"
         android:title="Home" />
 
     <item
+        android:id="@+id/nav_setting"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+
+    <item
         android:id="@+id/nav_history"
-        android:icon="@drawable/ic_baseline_history_24"
+        android:icon="@drawable/ic_history"
         android:title="History" />
+
+    <item
+        android:id="@+id/nav_map"
+        android:icon="@drawable/ic_map"
+        android:title="Map" />
+
 
 
     <item
-        android:id="@+id/nav_setting"
-        android:icon="@drawable/ic_baseline_settings_24"
-        android:title="Settings" />
+        android:id="@+id/nav_placeholder"
+        android:title="placeholder" />
 
-    <item android:title="Profile">
-        <menu>
-            <item
-                android:id="@+id/nav_login"
-                android:icon="@drawable/ic_baseline_login_24"
-                android:title="Login" />
-        </menu>
-    </item>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_baseline_share_24"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_rate_us"
-                android:icon="@drawable/ic_baseline_rate_review_24"
-                android:title="Rate us" />
-        </menu>
-    </item>
 
 </menu>

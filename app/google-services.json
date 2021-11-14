@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "957162577294",
+    "project_id": "simplydrive-84e4e",
+    "storage_bucket": "simplydrive-84e4e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:957162577294:android:8549dfd981be0a534158df",
+        "android_client_info": {
+          "package_name": "de.thm.mow.felixwegener.simplydrive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "957162577294-eh1nplorecq33hgoi7amsja4mp1qlhru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8XgLXOkaKrp1WDX0SUi7nkl-CfCGuRyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "957162577294-eh1nplorecq33hgoi7amsja4mp1qlhru.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
