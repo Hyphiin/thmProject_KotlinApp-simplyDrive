@@ -1,6 +1,8 @@
     package de.thm.mow.felixwegener.simplydrive.fragments
 
+    import android.content.ContentValues
     import android.os.Bundle
+    import android.util.Log
     import android.view.LayoutInflater
     import android.view.View
     import android.view.ViewGroup
@@ -9,6 +11,8 @@
     import androidx.recyclerview.widget.LinearLayoutManager
     import androidx.recyclerview.widget.RecyclerView
     import com.google.firebase.auth.FirebaseAuth
+    import com.google.firebase.firestore.ktx.firestore
+    import com.google.firebase.ktx.Firebase
     import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
     import de.thm.mow.felixwegener.simplydrive.R
     import de.thm.mow.felixwegener.simplydrive.Route
@@ -50,8 +54,33 @@
         private fun initRecyclerView(view: View) {
             val recyclerView = view.findViewById<RecyclerView>(R.id.rvLatestHistory)
             recyclerView.layoutManager = LinearLayoutManager(activity)
-            latHisAdapter = LatHisAdapter(mutableListOf(), this)
-            recyclerView.adapter = latHisAdapter
+
+            val user = FirebaseAuth.getInstance().currentUser
+            user?.let {
+                val uid = user.uid
+            val routes = getHistoryEntries(uid)
+            latHisAdapter = LatHisAdapter(routes, this)
+            recyclerView.adapter = latHisAdapter}
+        }
+
+        private fun getHistoryEntries (uid: String): MutableList<Route> {
+            val rTable = mutableListOf<Route>()
+            val db = Firebase.firestore
+            db.collection("routes")
+                .whereEqualTo("uid", uid)
+                .get()
+                .addOnSuccessListener { result ->
+                    for (document in result) {
+                        Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
+                        val r = Route(document.data.getValue("date").toString(), document.data.getValue("time").toString(), document.data.getValue("route").toString(), uid)
+                        rTable.add(r)
+
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents.", exception)
+                }
+            return rTable
         }
 
 

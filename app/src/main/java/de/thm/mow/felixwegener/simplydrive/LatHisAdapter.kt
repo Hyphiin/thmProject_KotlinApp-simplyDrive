@@ -1,13 +1,18 @@
 package de.thm.mow.felixwegener.simplydrive
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.item_latest_history.view.*
 
 class LatHisAdapter(
@@ -15,7 +20,6 @@ class LatHisAdapter(
 ) : RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
 
     class LatHisViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
         return LatHisViewHolder(
@@ -84,7 +88,6 @@ class LatHisAdapter(
                 Log.w(TAG, "Error getting documents.", exception)
             }
         */
-        
         val rTable = routes[position]
         holder.itemView.apply {
             tvLHdate.text = rTable.date
