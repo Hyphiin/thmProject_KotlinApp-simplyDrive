@@ -1,6 +1,5 @@
     package de.thm.mow.felixwegener.simplydrive.fragments
 
-    import android.content.ContentValues
     import android.os.Bundle
     import android.util.Log
     import android.view.LayoutInflater
@@ -8,22 +7,21 @@
     import android.view.ViewGroup
     import android.widget.EditText
     import android.widget.TextView
+    import android.widget.Toast
     import androidx.fragment.app.Fragment
     import androidx.recyclerview.widget.LinearLayoutManager
     import androidx.recyclerview.widget.RecyclerView
     import com.firebase.ui.database.FirebaseRecyclerAdapter
     import com.firebase.ui.database.FirebaseRecyclerOptions
     import com.google.firebase.auth.FirebaseAuth
-    import com.google.firebase.database.DatabaseReference
-    import com.google.firebase.database.FirebaseDatabase
-    import com.google.firebase.firestore.ktx.firestore
-    import com.google.firebase.ktx.Firebase
+    import com.google.firebase.database.*
     import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
     import de.thm.mow.felixwegener.simplydrive.R
     import de.thm.mow.felixwegener.simplydrive.Route
     import kotlinx.android.synthetic.main.fragment_history.*
 
-    class HistoryFragment :Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
+
+    class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
 
         private lateinit var latHisAdapter: LatHisAdapter
 
@@ -32,7 +30,8 @@
         lateinit var routeInput: EditText
         private lateinit var newRoute: Route
 
-        private lateinit var databaseReference: DatabaseReference
+        private lateinit var databaseRef: DatabaseReference
+        private lateinit var usersRef: DatabaseReference
         private lateinit var mAuth: FirebaseAuth
         private lateinit var currentUserID: String
 
@@ -56,10 +55,9 @@
             rvLatestHistory.layoutManager = LinearLayoutManager(activity)
 
             mAuth = FirebaseAuth.getInstance()
-            currentUserID = mAuth.currentUser.uid
+            currentUserID = mAuth.currentUser?.uid ?: "Moin"
 
-            databaseReference = FirebaseDatabase.getInstance().getReference().child("routes")
-
+            databaseRef = FirebaseDatabase.getInstance().reference.child("routes")
 
             return view
         }
@@ -67,19 +65,53 @@
         override fun onStart() {
             super.onStart()
 
-            val options = FirebaseRecyclerOptions.Builder<Route>().setQuery(databaseReference, Route::class.java).build()
+            val options = FirebaseRecyclerOptions.Builder<Route>().setQuery(databaseRef, Route::class.java).build()
 
-            val adapter: FirebaseRecyclerAdapter<Route, LatHisAdapter.LatHisViewHolder> =
-                FirebaseRecyclerAdapter <Route, latHisAdapter>()
+            val adapter: FirebaseRecyclerAdapter<Route?, RouteViewHolder?> =
+                object : FirebaseRecyclerAdapter<Route?, RouteViewHolder?>(options) {
+                    override fun onBindViewHolder(
+                        holder: RouteViewHolder,
+                        position: Int,
+                        model: Route
+                    ) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        user?.let {
+                            val uid = user.uid
 
+                            databaseRef.child(uid).addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(dataSnapshot: DataSnapshot){
+                                    val date = dataSnapshot.child("date").value.toString()
+                                    val time = dataSnapshot.child("time").value.toString()
+                                    val route = dataSnapshot.child("route").value.toString()
 
+                                    holder.tvLHdate.text = date
+                                    holder.tvLHtime.text = time
+                                    holder.tvLHroute.text = route
 
+                                }
+                                override fun onCancelled(error: DatabaseError) {
+                                    // Failed to read value
+                                    Toast.makeText(
+                                        activity,
+                                        "Fail!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            })
+                        }
+                    }
 
+                    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
+                        // Create a new instance of the ViewHolder, in this case we are using a custom
+                        // layout called R.layout.message for each item
+                        val view: View = LayoutInflater.from(parent.context)
+                            .inflate(R.layout.item_latest_history, parent, false)
+                        return RouteViewHolder(view)
+                    }
+                }
 
-
-
-
-
+            rvLatestHistory.adapter = adapter
+            adapter.startListening()
         }
 
         public class RouteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -106,7 +138,7 @@
 
 
 
-        private fun initRecyclerView(view: View) {
+        /*private fun initRecyclerView(view: View) {
             val recyclerView = view.findViewById<RecyclerView>(R.id.rvLatestHistory)
             recyclerView.layoutManager = LinearLayoutManager(activity)
 
@@ -165,7 +197,7 @@
 
         private fun clearDB() {
             latHisAdapter.clearDB()
-        }
+        }*/
 
         override fun onItemClick(route: Route) {
            val fragment: Fragment = HistoryDetailView.newInstance(route.route!!)
