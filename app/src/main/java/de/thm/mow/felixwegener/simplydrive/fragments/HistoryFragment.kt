@@ -7,19 +7,21 @@
     import android.view.View
     import android.view.ViewGroup
     import android.widget.EditText
+    import android.widget.TextView
     import androidx.fragment.app.Fragment
     import androidx.recyclerview.widget.LinearLayoutManager
     import androidx.recyclerview.widget.RecyclerView
+    import com.firebase.ui.database.FirebaseRecyclerAdapter
+    import com.firebase.ui.database.FirebaseRecyclerOptions
     import com.google.firebase.auth.FirebaseAuth
+    import com.google.firebase.database.DatabaseReference
+    import com.google.firebase.database.FirebaseDatabase
     import com.google.firebase.firestore.ktx.firestore
     import com.google.firebase.ktx.Firebase
     import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
     import de.thm.mow.felixwegener.simplydrive.R
     import de.thm.mow.felixwegener.simplydrive.Route
-    import kotlinx.android.synthetic.main.fragment_history.view.*
-    import kotlinx.android.synthetic.main.fragment_history_detail_view.view.*
-    import kotlinx.android.synthetic.main.item_latest_history.*
-    import kotlinx.android.synthetic.main.item_latest_history.view.*
+    import kotlinx.android.synthetic.main.fragment_history.*
 
     class HistoryFragment :Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
 
@@ -30,23 +32,76 @@
         lateinit var routeInput: EditText
         private lateinit var newRoute: Route
 
+        private lateinit var databaseReference: DatabaseReference
+        private lateinit var mAuth: FirebaseAuth
+        private lateinit var currentUserID: String
+
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-            val view = inflater.inflate(R.layout.fragment_history, container, false)
+            /*val view = inflater.inflate(R.layout.fragment_history, container, false)
             initRecyclerView(view)
+
 
             view.bShowHistory.setOnClickListener { view ->
                 addDBEntry()
             }
             view.clearHistory.setOnClickListener { view ->
                 clearDB()
-            }
+            }*/
+
+            val view = inflater.inflate(R.layout.fragment_history, container, false)
+            rvLatestHistory.layoutManager = LinearLayoutManager(activity)
+
+            mAuth = FirebaseAuth.getInstance()
+            currentUserID = mAuth.currentUser.uid
+
+            databaseReference = FirebaseDatabase.getInstance().getReference().child("routes")
 
 
             return view
+        }
+
+        override fun onStart() {
+            super.onStart()
+
+            val options = FirebaseRecyclerOptions.Builder<Route>().setQuery(databaseReference, Route::class.java).build()
+
+            val adapter: FirebaseRecyclerAdapter<Route, LatHisAdapter.LatHisViewHolder> =
+                FirebaseRecyclerAdapter <Route, latHisAdapter>()
+
+
+
+
+
+
+
+
+
+        }
+
+        public class RouteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+            val tvLHdate = itemView.findViewById(R.id.tvLHdate) as TextView
+            val tvLHtime = itemView.findViewById(R.id.tvLHtime) as TextView
+            val tvLHroute = itemView.findViewById(R.id.tvLHroute) as TextView
+
+            public fun RoutesViewHolder(itemView: View){
+                super.itemView
+            }
+        }
+
+
+
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            rvLatestHistory.apply {
+                layoutManager = LinearLayoutManager (activity)
+                adapter = latHisAdapter
+            }
         }
 
 
@@ -59,13 +114,17 @@
             user?.let {
                 val uid = user.uid
             val routes = getHistoryEntries(uid)
-            latHisAdapter = LatHisAdapter(routes, this)
-            recyclerView.adapter = latHisAdapter}
+            recyclerView.setHasFixedSize(true)
+
+            latHisAdapter = LatHisAdapter(routes, this) }
+            recyclerView.adapter = latHisAdapter
+
         }
 
         private fun getHistoryEntries (uid: String): MutableList<Route> {
             val rTable = mutableListOf<Route>()
             val db = Firebase.firestore
+
             db.collection("routes")
                 .whereEqualTo("uid", uid)
                 .get()
