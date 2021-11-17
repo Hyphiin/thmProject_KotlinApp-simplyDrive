@@ -1,5 +1,6 @@
     package de.thm.mow.felixwegener.simplydrive.fragments
 
+    import android.content.ContentValues
     import android.os.Bundle
     import android.util.Log
     import android.view.LayoutInflater
@@ -15,43 +16,39 @@
     import com.firebase.ui.database.FirebaseRecyclerOptions
     import com.google.firebase.auth.FirebaseAuth
     import com.google.firebase.database.*
+    import com.google.firebase.firestore.ktx.firestore
+    import com.google.firebase.ktx.Firebase
     import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
     import de.thm.mow.felixwegener.simplydrive.R
     import de.thm.mow.felixwegener.simplydrive.Route
     import kotlinx.android.synthetic.main.fragment_history.*
+    import kotlinx.android.synthetic.main.fragment_history.view.*
 
 
-    class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
+    class HistoryFragment : Fragment(R.layout.fragment_history) {
 
-        private lateinit var latHisAdapter: LatHisAdapter
-
-        lateinit var dateInput: EditText
-        lateinit var timeInput: EditText
-        lateinit var routeInput: EditText
-        private lateinit var newRoute: Route
+        private lateinit var historyView: View
+        private lateinit var rvLatestHistory: RecyclerView
+        private lateinit var adapter: FirebaseRecyclerAdapter<Route?, RouteViewHolder?>
 
         private lateinit var databaseRef: DatabaseReference
-        private lateinit var usersRef: DatabaseReference
         private lateinit var mAuth: FirebaseAuth
         private lateinit var currentUserID: String
+
+        private lateinit var dateInput: EditText
+        private lateinit var timeInput: EditText
+        private lateinit var routeInput: EditText
+
 
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-            /*val view = inflater.inflate(R.layout.fragment_history, container, false)
-            initRecyclerView(view)
 
+            historyView = inflater.inflate(R.layout.fragment_history, container, false)
 
-            view.bShowHistory.setOnClickListener { view ->
-                addDBEntry()
-            }
-            view.clearHistory.setOnClickListener { view ->
-                clearDB()
-            }*/
-
-            val view = inflater.inflate(R.layout.fragment_history, container, false)
+            rvLatestHistory = historyView.findViewById(R.id.rvLatestHistory)
             rvLatestHistory.layoutManager = LinearLayoutManager(activity)
 
             mAuth = FirebaseAuth.getInstance()
@@ -59,86 +56,116 @@
 
             databaseRef = FirebaseDatabase.getInstance().reference.child("routes")
 
-            return view
+            /*
+               historyView.bShowHistory.setOnClickListener {
+                   addDBEntry()
+               }
+
+               historyView.clearHistory.setOnClickListener {
+                   clearDB()
+                }
+            */
+
+            return historyView
         }
 
         override fun onStart() {
             super.onStart()
 
-            val options = FirebaseRecyclerOptions.Builder<Route>().setQuery(databaseRef, Route::class.java).build()
+            val options =
+                FirebaseRecyclerOptions.Builder<Route>().setQuery(databaseRef, Route::class.java)
+                    .build()
 
-            val adapter: FirebaseRecyclerAdapter<Route?, RouteViewHolder?> =
-                object : FirebaseRecyclerAdapter<Route?, RouteViewHolder?>(options) {
-                    override fun onBindViewHolder(
-                        holder: RouteViewHolder,
-                        position: Int,
-                        model: Route
-                    ) {
-                        val user = FirebaseAuth.getInstance().currentUser
-                        user?.let {
-                            val uid = user.uid
+            adapter = object : FirebaseRecyclerAdapter<Route?, RouteViewHolder?>(options) {
+                override fun onCreateViewHolder(
+                    parent: ViewGroup,
+                    viewType: Int
+                ): RouteViewHolder {
+                    // Create a new instance of the ViewHolder, in this case we are using a custom
+                    // layout called R.layout.message for each item
+                    val view: View = LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_latest_history, parent, false)
+                    return RouteViewHolder(view)
+                }
 
-                            databaseRef.child(uid).addValueEventListener(object : ValueEventListener {
-                                override fun onDataChange(dataSnapshot: DataSnapshot){
-                                    val date = dataSnapshot.child("date").value.toString()
-                                    val time = dataSnapshot.child("time").value.toString()
-                                    val route = dataSnapshot.child("route").value.toString()
+                override fun onBindViewHolder(
+                    holder: RouteViewHolder,
+                    position: Int,
+                    model: Route
+                ) {
+                    databaseRef.child(currentUserID)
+                        .addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                val date = dataSnapshot.child("date").value.toString()
+                                val time = dataSnapshot.child("time").value.toString()
+                                val route = dataSnapshot.child("route").value.toString()
 
-                                    holder.tvLHdate.text = date
-                                    holder.tvLHtime.text = time
-                                    holder.tvLHroute.text = route
+                                holder.tvLHdate.text = date
+                                holder.tvLHtime.text = time
+                                holder.tvLHroute.text = route
 
-                                }
-                                override fun onCancelled(error: DatabaseError) {
-                                    // Failed to read value
-                                    Toast.makeText(
-                                        activity,
-                                        "Fail!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            })
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                // Failed to read value
+                                Toast.makeText(
+                                    activity,
+                                    "Fail!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        })
+                }
+
+                fun addHistory(route: Route) {
+                    val db = Firebase.firestore
+                    db.collection("routes")
+                        .add(route)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(ContentValues.TAG, "Error adding document", e)
+                        }
+                }
+
+                fun clearDB() {
+                    val db = Firebase.firestore
+                    db.collection("routes").get().addOnSuccessListener { result ->
+                        for (document in result) {
+                            document.reference.delete()
                         }
                     }
-
-                    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
-                        // Create a new instance of the ViewHolder, in this case we are using a custom
-                        // layout called R.layout.message for each item
-                        val view: View = LayoutInflater.from(parent.context)
-                            .inflate(R.layout.item_latest_history, parent, false)
-                        return RouteViewHolder(view)
-                    }
                 }
+            }
 
             rvLatestHistory.adapter = adapter
             adapter.startListening()
         }
 
-        public class RouteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        class RouteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
             val tvLHdate = itemView.findViewById(R.id.tvLHdate) as TextView
             val tvLHtime = itemView.findViewById(R.id.tvLHtime) as TextView
             val tvLHroute = itemView.findViewById(R.id.tvLHroute) as TextView
 
-            public fun RoutesViewHolder(itemView: View){
+            fun RoutesViewHolder(itemView: View) {
                 super.itemView
             }
         }
 
 
-
-
+        /*
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             rvLatestHistory.apply {
                 layoutManager = LinearLayoutManager (activity)
-                adapter = latHisAdapter
             }
         }
 
 
 
-        /*private fun initRecyclerView(view: View) {
+        private fun initRecyclerView(view: View) {
             val recyclerView = view.findViewById<RecyclerView>(R.id.rvLatestHistory)
             recyclerView.layoutManager = LinearLayoutManager(activity)
 
@@ -172,33 +199,33 @@
                     Log.w(ContentValues.TAG, "Error getting documents.", exception)
                 }
             return rTable
-        }
+        }*/
 
-
-
+    /*
         private fun addDBEntry() {
-
             val user = FirebaseAuth.getInstance().currentUser
             user?.let {
                 val uid = user.uid
 
-            dateInput = view?.findViewById(R.id.DateInput) as EditText
-            timeInput = view?.findViewById(R.id.TimeInput) as EditText
-            routeInput = view?.findViewById(R.id.RouteInput) as EditText
+                dateInput = view?.findViewById(R.id.DateInput) as EditText
+                timeInput = view?.findViewById(R.id.TimeInput) as EditText
+                routeInput = view?.findViewById(R.id.RouteInput) as EditText
 
-            val date = dateInput.text.toString()
-            val time = timeInput.text.toString()
-            val route = routeInput.text.toString()
+                val date = dateInput.text.toString()
+                val time = timeInput.text.toString()
+                val route = routeInput.text.toString()
 
-            newRoute = Route(date, time, route, uid)
-            latHisAdapter.addHistory(newRoute)}
-
+                val newRoute = Route(date, time, route, uid)
+                adapter.addHistory(newRoute)
+            }
         }
 
+
         private fun clearDB() {
-            latHisAdapter.clearDB()
+            adapter.clearDB()
         }*/
 
+        /*
         override fun onItemClick(route: Route) {
            val fragment: Fragment = HistoryDetailView.newInstance(route.route!!)
            val transaction = activity?.supportFragmentManager!!.beginTransaction()
@@ -209,4 +236,11 @@
 
         }
 
-    }
+         */
+}
+
+
+
+
+
+
