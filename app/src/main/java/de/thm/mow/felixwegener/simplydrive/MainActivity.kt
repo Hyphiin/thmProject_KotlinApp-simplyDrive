@@ -88,7 +88,7 @@
         }
 
         private fun replaceMapActivity() {
-            startActivity(Intent(this@MainActivity, GpsActivity::class.java))
+            startActivity(Intent(this@MainActivity, GpsActivity2::class.java))
             finish()
 
         }

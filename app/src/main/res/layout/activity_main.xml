@@ -56,15 +56,14 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="643dp"
         android:layout_gravity="bottom" />
 
-
-
-        <com.google.android.material.bottomappbar.BottomAppBar
+    <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bottomAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
