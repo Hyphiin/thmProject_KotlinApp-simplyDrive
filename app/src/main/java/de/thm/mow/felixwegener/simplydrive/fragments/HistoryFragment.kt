@@ -19,6 +19,7 @@
     import com.google.firebase.database.*
     import com.google.firebase.firestore.ktx.firestore
     import com.google.firebase.ktx.Firebase
+    import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
     import de.thm.mow.felixwegener.simplydrive.R
     import de.thm.mow.felixwegener.simplydrive.Route
     import kotlinx.android.synthetic.main.fragment_history.*
@@ -27,18 +28,22 @@
 
     class HistoryFragment : Fragment(R.layout.fragment_history) {
 
-        private lateinit var historyView: View
-        private lateinit var rvLatestHistory: RecyclerView
+        /*
         private lateinit var adapter: FirebaseRecyclerAdapter<Route?, RouteViewHolder?>
-
-        private lateinit var databaseRef: DatabaseReference
         private lateinit var mAuth: FirebaseAuth
         private lateinit var currentUserID: String
+        */
 
         private lateinit var dateInput: EditText
         private lateinit var timeInput: EditText
         private lateinit var routeInput: EditText
 
+
+        private lateinit var historyView: View
+        private lateinit var databaseRef: DatabaseReference
+        private lateinit var rvLatestHistory: RecyclerView
+        private lateinit var routesArrayList: ArrayList<Route>
+        private lateinit var routesAdapter: LatHisAdapter
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -52,26 +57,82 @@
 
             rvLatestHistory = historyView.findViewById(R.id.rvLatestHistory)
             rvLatestHistory.layoutManager = LinearLayoutManager(activity)
+            rvLatestHistory.setHasFixedSize(true)
 
-            mAuth = FirebaseAuth.getInstance()
-            currentUserID = mAuth.currentUser?.uid ?: "Moin"
+            routesArrayList = arrayListOf<Route>()
 
-            databaseRef = FirebaseDatabase.getInstance().reference.child("routes")
+            getUserData()
 
+
+            /*
+             mAuth = FirebaseAuth.getInstance()
+             currentUserID = mAuth.currentUser?.uid ?: "Moin"
+            */
 
            historyView.bShowHistory.setOnClickListener {
-               addDBEntry(adapter)
-           }
+                addDBEntry()
+            }
 
-           historyView.clearHistory.setOnClickListener {
-               clearDB(adapter)
-           }
+            historyView.clearHistory.setOnClickListener {
+                clearDB()
+            }
 
 
             return historyView
         }
 
+        private fun getUserData() {
+            Log.d("TAG", "##########getUserData")
+            databaseRef = FirebaseDatabase.getInstance().reference.child("routes")
+            databaseRef.addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()){
+                        for (routeSnapshot in snapshot.children){
+                            val route = routeSnapshot.getValue(Route::class.java)
+                            routesArrayList.add(route!!)
+                        }
+                        routesAdapter = LatHisAdapter(routesArrayList)
+                        rvLatestHistory.adapter = routesAdapter
+
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+        }
+
         override fun onStart() {
+            super.onStart()
+
+        }
+
+
+
+        private fun addDBEntry() {
+            val user = FirebaseAuth.getInstance().currentUser
+            user?.let {
+                val uid = user.uid
+
+                dateInput = view?.findViewById(R.id.DateInput) as EditText
+                timeInput = view?.findViewById(R.id.TimeInput) as EditText
+                routeInput = view?.findViewById(R.id.RouteInput) as EditText
+
+                val date = dateInput.text.toString()
+                val time = timeInput.text.toString()
+                val route = routeInput.text.toString()
+
+                val newRoute = Route(date, time, route, uid)
+                routesAdapter.addHistory(newRoute)
+            }
+        }
+
+
+        private fun clearDB() {
+            routesAdapter.clearDB()
+        }
+
+        /*override fun onStart() {
             super.onStart()
             Log.d("TAG", "##########OnStart")
 
@@ -120,26 +181,7 @@
                         })
                 }
 
-                fun addHistory(route: Route) {
-                    val db = Firebase.firestore
-                    db.collection("routes")
-                        .add(route)
-                        .addOnSuccessListener { documentReference ->
-                            Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w(ContentValues.TAG, "Error adding document", e)
-                        }
-                }
 
-                fun clearDB() {
-                    val db = Firebase.firestore
-                    db.collection("routes").get().addOnSuccessListener { result ->
-                        for (document in result) {
-                            document.reference.delete()
-                        }
-                    }
-                }
             }
 
 
@@ -157,39 +199,17 @@
             fun RoutesViewHolder(itemView: View) {
                 super.itemView
             }
-        }
-
-        private fun addDBEntry(adapter: FirebaseRecyclerAdapter<Route?, RouteViewHolder?>) {
-            val user = FirebaseAuth.getInstance().currentUser
-            user?.let {
-                val uid = user.uid
-
-                dateInput = view?.findViewById(R.id.DateInput) as EditText
-                timeInput = view?.findViewById(R.id.TimeInput) as EditText
-                routeInput = view?.findViewById(R.id.RouteInput) as EditText
-
-                val date = dateInput.text.toString()
-                val time = timeInput.text.toString()
-                val route = routeInput.text.toString()
-
-                val newRoute = Route(date, time, route, uid)
-                adapter.addHistory()
-            }
-        }
-
-
-        private fun clearDB(adapter: FirebaseRecyclerAdapter<Route?, RouteViewHolder?>) {
-            adapter.clearDB()
-        }
+        }*/
 
 
 
+        /*
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             Log.d("TAG", "##########OnViewCreated")
 
         }
-        /*
+
         private fun initRecyclerView(view: View) {
             val recyclerView = view.findViewById<RecyclerView>(R.id.rvLatestHistory)
             recyclerView.layoutManager = LinearLayoutManager(activity)

@@ -1,5 +1,6 @@
 package de.thm.mow.felixwegener.simplydrive
 
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.util.Log
@@ -15,19 +16,90 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.item_latest_history.view.*
+import org.w3c.dom.Text
 
-class LatHisAdapter(
-    private val routes: MutableList<Route>, val clickListener: ClickListener
-) : RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
-
+class LatHisAdapter(private val routesList: ArrayList<Route>) : RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
-        val v = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_latest_history, parent, false)
-        return LatHisAdapter.LatHisViewHolder(v)
+
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_latest_history, parent, false)
+        return LatHisViewHolder(itemView)
+
+    }
+
+    override fun onBindViewHolder(holder: LatHisViewHolder, position: Int) {
+
+        val currentItem = routesList[position]
+
+        holder.tvLHdate.text = currentItem.date
+        holder.tvLHtime.text = currentItem.time
+        holder.tvLHroute.text = currentItem.route
+
+    }
+
+    override fun getItemCount(): Int {
+        return routesList.size
+    }
+
+    fun addHistory(route: Route) {
+        val db = Firebase.firestore
+        db.collection("routes")
+            .add(route)
+            .addOnSuccessListener { documentReference ->
+                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+    fun clearDB() {
+        val db = Firebase.firestore
+        db.collection("routes").get().addOnSuccessListener { result ->
+            for (document in result) {
+                document.reference.delete()
+            }
+        }
+    }
+
+    class LatHisViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
+
+        val tvLHdate : TextView = itemView.findViewById(R.id.tvLHdate)
+        val tvLHtime : TextView = itemView.findViewById(R.id.tvLHtime)
+        val tvLHroute : TextView = itemView.findViewById(R.id.tvLHroute)
+
     }
 
 
+
+    /*
+    fun addHistory(route: Route) {
+        val db = Firebase.firestore
+
+        routes.add(route)
+        notifyItemInserted(routes.size - 1)
+
+        db.collection("routes")
+            .add(route)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+
+            }
+    }
+
+    fun clearDB() {
+        val db = Firebase.firestore
+
+        db.collection("routes").get().addOnSuccessListener { result ->
+            for (document in result) {
+                document.reference.delete()
+            }
+        }
+    }
 
     // next step -> just show local routes Array, then on initial load, get all routes of user
     // oder immer nur letztes Item bekommen und anzeigen
@@ -66,33 +138,7 @@ class LatHisAdapter(
         }
     }
 
-    fun addHistory(route: Route) {
-        val db = Firebase.firestore
 
-        routes.add(route)
-        notifyItemInserted(routes.size - 1)
-
-        db.collection("routes")
-            .add(route)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding document", e)
-
-            }
-    }
-
-    fun clearDB() {
-        val db = Firebase.firestore
-
-        db.collection("routes").get().addOnSuccessListener { result ->
-            for (document in result) {
-                document.reference.delete()
-            }
-        }
-    }
 
     interface ClickListener {
         fun onItemClick (route: Route)
@@ -107,5 +153,5 @@ class LatHisAdapter(
         val tvLHtime : TextView = itemView.findViewById(R.id.tvLHtime)
         val tvLHroute : TextView = itemView.findViewById(R.id.tvLHroute)
     }
-
+    */
 }
