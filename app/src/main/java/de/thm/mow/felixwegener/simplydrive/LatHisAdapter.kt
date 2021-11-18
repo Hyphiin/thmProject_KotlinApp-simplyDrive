@@ -1,26 +1,23 @@
 package de.thm.mow.felixwegener.simplydrive
 
-import android.content.ContentValues
+
 import android.content.ContentValues.TAG
-import android.content.Intent
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_profile.*
-import kotlinx.android.synthetic.main.item_latest_history.view.*
-import org.w3c.dom.Text
 
-class LatHisAdapter(private val routesList: ArrayList<Route>) : RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
+
+class LatHisAdapter(private val routesList: MutableList<Route>) : RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
+
+        Log.d("::::::::::::::::::>", parent.context.toString())
 
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_latest_history, parent, false)
         return LatHisViewHolder(itemView)
@@ -28,6 +25,8 @@ class LatHisAdapter(private val routesList: ArrayList<Route>) : RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: LatHisViewHolder, position: Int) {
+
+        Log.d("::::::::::::::::::>", routesList.toString())
 
         val currentItem = routesList[position]
 
@@ -46,10 +45,10 @@ class LatHisAdapter(private val routesList: ArrayList<Route>) : RecyclerView.Ada
         db.collection("routes")
             .add(route)
             .addOnSuccessListener { documentReference ->
-                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
             }
             .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error adding document", e)
+                Log.w(TAG, "Error adding document", e)
             }
     }
 
