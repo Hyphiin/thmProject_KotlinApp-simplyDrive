@@ -7,6 +7,7 @@
     import android.view.View
     import android.view.animation.Animation
     import android.view.animation.AnimationUtils
+    import android.widget.Toast
     import androidx.fragment.app.Fragment
     import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
     import de.thm.mow.felixwegener.simplydrive.fragments.*
@@ -28,12 +29,12 @@
         private val editFragment = EditFragment()
         private val scanFragment = ScanFragment()
 
+
         //FAB Button(s)
         private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.rotate_open_anim) }
         private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.rotate_close_anim) }
         private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.from_bottom_anim) }
         private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim) }
-        //private val icAdd =
 
         private var clicked = false
 
@@ -56,6 +57,7 @@
                     R.id.nav_home -> replaceFragment(homeFragment)
                     R.id.nav_setting -> replaceFragment(settingsFragment)
                     R.id.nav_history -> replaceFragment(historyFragment)
+                    R.id.nav_map -> replaceMapActivity()
                 }
                 true
             }
@@ -85,7 +87,11 @@
 
         }
 
+        private fun replaceMapActivity() {
+            startActivity(Intent(this@MainActivity, GpsActivity2::class.java))
+            finish()
 
+        }
 
 
         private fun replaceFragment(fragment: Fragment) {
