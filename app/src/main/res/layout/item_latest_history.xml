@@ -32,38 +32,54 @@
                 android:layout_height="match_parent">
 
 
-                <TextView
-                    android:id="@+id/tvLHdate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:text="21.10.2021"
-                    android:textColor="@color/textDark"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvLHtime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:text="14:55 - 15:16"
-                    android:textColor="@color/textDark"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
+                    <TextView
+                        android:id="@+id/tvLHdate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:text="21.10.2021"
+                        android:textColor="@color/textDark" />
 
-                <TextView
-                    android:id="@+id/tvLHroute"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:text="Hanau HBF - Wetzlar Bahnhof"
-                    android:textColor="@color/textDark"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    <TextView
+                        android:id="@+id/tvLHtime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:text="14:55 - 15:16"
+                        android:textColor="@color/textDark" />
+
+                    <TextView
+                        android:id="@+id/tvLHrouteStart"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="10dp"
+                        android:text="Start"
+                        android:textColor="@color/textDark" />
+
+                    <TextView
+                        android:id="@+id/tvLHrouteEnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="10dp"
+                        android:text="End"
+                        android:textColor="@color/textDark" />
+
+                    <TextView
+                        android:id="@+id/tvLHrouteLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="20dp"
+                        android:text="Line"
+                        android:textColor="@color/textDark" />
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/ivCardViewOne"
