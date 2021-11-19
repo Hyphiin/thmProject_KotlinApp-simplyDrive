@@ -7,7 +7,6 @@
     import android.view.View
     import android.view.animation.Animation
     import android.view.animation.AnimationUtils
-    import android.widget.Toast
     import androidx.fragment.app.Fragment
     import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
     import de.thm.mow.felixwegener.simplydrive.fragments.*
@@ -88,7 +87,7 @@
         }
 
         private fun replaceMapActivity() {
-            startActivity(Intent(this@MainActivity, GpsActivity2::class.java))
+            startActivity(Intent(this@MainActivity, GpsActivity::class.java))
             finish()
 
         }

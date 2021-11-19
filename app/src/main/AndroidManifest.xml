@@ -17,9 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimplyDrive">
         <activity
-            android:name=".GpsActivity2"
+            android:name=".GpsActivity"
             android:exported="false"
-            android:label="@string/title_activity_gps2"
+            android:label="@string/title_activity_gps"
             android:theme="@style/Theme.SimplyDrive.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -37,10 +37,6 @@
             android:name=".MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
-        <activity
-            android:name=".GpsActivity"
-            android:exported="false"
-            android:label="GpsActivity" />
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />
