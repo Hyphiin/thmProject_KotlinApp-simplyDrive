@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -20,30 +21,33 @@ class HomeFragment : Fragment() {
     private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUserID: String
 
+    private lateinit var homeView: View
     private lateinit var databaseRef: FirebaseFirestore
+    private lateinit var rvLatestHistory: RecyclerView
     private lateinit var routesArrayList: MutableList<Route>
+    private lateinit var routesAdapter: LatHisAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getUserData()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        homeView = inflater.inflate(R.layout.fragment_home, container, false)
 
-        view.cvHomeOne.setOnClickListener { view ->
-            onHomeCardClicked()
-        }
-        view.cvHomeTwo.setOnClickListener { view ->
-            onHomeCardClicked()
-        }
+        rvLatestHistory = homeView.findViewById(R.id.rvLatestHistory)
+        rvLatestHistory.layoutManager = LinearLayoutManager(activity)
+        rvLatestHistory.setHasFixedSize(true)
 
-        view.cvHomeThree.setOnClickListener { view ->
-            onHomeCardClicked()
-        }
+        routesArrayList = mutableListOf<Route>()
 
-        return view
+        return homeView
     }
 
-    private fun onHomeCardClicked(){
+    /*private fun onHomeCardClicked(){
         val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof")
         val transaction = activity?.supportFragmentManager!!.beginTransaction()
         //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
@@ -51,9 +55,9 @@ class HomeFragment : Fragment() {
         transaction.addToBackStack(null)
         transaction.commit()
     }
+     */
 
-    private fun getUserData(): MutableList<Route> {
-        routesArrayList = mutableListOf()
+    private fun getUserData() {
         databaseRef = FirebaseFirestore.getInstance()
 
         mAuth = FirebaseAuth.getInstance()
@@ -63,7 +67,8 @@ class HomeFragment : Fragment() {
             currentUserID = firebaseUser.uid
         }
 
-        databaseRef.collection("routes").whereEqualTo("uid", currentUserID).orderBy("date", Query.Direction.DESCENDING).limit(3)
+        databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
+            .orderBy("date", Query.Direction.DESCENDING).orderBy("time", Query.Direction.DESCENDING).limit(3)
             .addSnapshotListener(object : EventListener<QuerySnapshot> {
                 override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
                     if (error != null) {
@@ -78,10 +83,13 @@ class HomeFragment : Fragment() {
                     }
                     Log.d("==========>", routesArrayList.toString())
 
+                    routesAdapter = LatHisAdapter(routesArrayList)
+                    rvLatestHistory.adapter = routesAdapter
+
+                    routesAdapter.notifyDataSetChanged()
+
                 }
             })
-
-        return routesArrayList
 
     }
 
