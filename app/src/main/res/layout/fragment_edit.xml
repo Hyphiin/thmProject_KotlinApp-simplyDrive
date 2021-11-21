@@ -52,7 +52,7 @@
             app:layout_constraintTop_toBottomOf="@+id/departureInput" />
 
         <EditText
-            android:id="@+id/RouteInput"
+            android:id="@+id/lineInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -62,20 +62,30 @@
             app:layout_constraintTop_toBottomOf="@+id/destinationInput" />
 
         <Button
-            android:id="@+id/btnSearch"
+            android:id="@+id/btnInsert"
             android:layout_width="180dp"
             android:layout_height="60dp"
             android:backgroundTint="@color/primary"
-            android:text="Search"
+            android:text="Insert"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/RouteInput"
+            app:layout_constraintTop_toBottomOf="@+id/lineInput"
             app:layout_constraintVertical_bias="0.26" />
+
+        <Button
+            android:id="@+id/clearHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/primary"
+            android:text="Clear"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnInsert" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
