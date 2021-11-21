@@ -12,11 +12,6 @@
     import de.thm.mow.felixwegener.simplydrive.fragments.*
     import kotlinx.android.synthetic.main.activity_main.*
 
-
-
-
-
-
     class MainActivity : AppCompatActivity() {
 
         private lateinit var binding: ActivityMainBinding
