@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimplyDrive">
         <activity
+            android:name=".MapActivity1"
+            android:exported="false" />
+        <activity
             android:name=".GpsActivity"
             android:exported="false"
             android:label="@string/title_activity_gps"
