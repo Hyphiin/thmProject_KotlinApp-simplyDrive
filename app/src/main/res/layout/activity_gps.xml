@@ -204,7 +204,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_labelsensor" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/tv_wayPointsCounts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -213,7 +213,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_sensor" />
 
     <Button
-        android:id="@+id/newWaypointBtn"
+        android:id="@+id/btnNewWaypoint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -223,24 +223,24 @@
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
     <Button
-        android:id="@+id/waypointListBtn"
+    android:id="@+id/btnWaypointList"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="SHOW WAYPOINT LIST"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/btnNewWaypoint" />
+    <Button
+        android:id="@+id/btnShowMap"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="NEW WAYPOINT"
+        android:text="SHOW MAP"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newWaypointBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/btnWaypointList" />
 
-    <Button
-        android:id="@+id/"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="SHOW WAYPOINT LIST"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/waypointListBtn" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,10 +22,11 @@ class GpsActivity : AppCompatActivity() {
     private val permissionsFineLocation = 99
 
     private lateinit var locationRequest : LocationRequest
-
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-
     private lateinit var locationCallBack: LocationCallback
+
+    private lateinit var currentLocation: Location
+    private lateinit var savedLocations: MutableList<Location>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +55,25 @@ class GpsActivity : AppCompatActivity() {
 
 
         //Functions
+
+        btnNewWaypoint.setOnClickListener {
+            val myApplication = applicationContext as MyApplication
+            savedLocations = myApplication.getMyLocations() as MutableList<Location>
+            savedLocations.add(currentLocation)
+        }
+
+        btnWaypointList.setOnClickListener {
+            startActivity(Intent(this@GpsActivity, ShowSavedLocationsListActivity::class.java))
+            finish()
+        }
+
+        btnShowMap.setOnClickListener {
+            startActivity(Intent(this@GpsActivity, MapsActivity::class.java))
+            finish()
+        }
+
+
+
         sw_gps.setOnClickListener {
             if (sw_gps.isChecked) {
                 locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -71,7 +91,6 @@ class GpsActivity : AppCompatActivity() {
                 stopLocationUpdates()
             }
         }
-
 
 
         updateGPS()
@@ -140,6 +159,7 @@ class GpsActivity : AppCompatActivity() {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location : Location? ->
                 if (location != null) {
                     updateUIValues(location)
+                    currentLocation = location
                 }
             }
         } else {
@@ -175,6 +195,10 @@ class GpsActivity : AppCompatActivity() {
         catch (e : Exception) {
             tv_address.text = "Unable to get street address"
         }
+
+        val myApplication = applicationContext as MyApplication
+        savedLocations = myApplication.getMyLocations() as MutableList<Location>
+        tv_wayPointsCounts.text = savedLocations.size.toString()
 
     }
 }
