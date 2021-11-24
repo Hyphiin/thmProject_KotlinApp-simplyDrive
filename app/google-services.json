@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "957162577294-p1seu5a3o2515rb7hadl0rcakql5j77h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.thm.mow.felixwegener.simplydrive",
+            "certificate_hash": "82f93afb021f82a3c64117c8efc8bbd5f7f073c1"
+          }
+        },
+        {
           "client_id": "957162577294-eh1nplorecq33hgoi7amsja4mp1qlhru.apps.googleusercontent.com",
           "client_type": 3
         }

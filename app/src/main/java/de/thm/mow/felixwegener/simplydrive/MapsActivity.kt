@@ -1,5 +1,6 @@
 package de.thm.mow.felixwegener.simplydrive
 
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
@@ -16,6 +17,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
+    private lateinit var savedLocations: MutableList<Location>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,6 +29,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val myApplication = applicationContext as MyApplication
+        savedLocations = myApplication.getMyLocations() as MutableList<Location>
+
     }
 
     /**
@@ -42,7 +49,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        //mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        for (location in savedLocations){
+            val latLng = LatLng(location.latitude, location.longitude)
+            val markerOptions = MarkerOptions()
+            markerOptions.position(latLng)
+            markerOptions.title("Lat:"+ location.latitude + " Lon:" + location.longitude)
+            mMap.addMarker(markerOptions)
+        }
     }
 }

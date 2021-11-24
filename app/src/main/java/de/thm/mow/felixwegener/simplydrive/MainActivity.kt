@@ -12,11 +12,6 @@
     import de.thm.mow.felixwegener.simplydrive.fragments.*
     import kotlinx.android.synthetic.main.activity_main.*
 
-
-
-
-
-
     class MainActivity : AppCompatActivity() {
 
         private lateinit var binding: ActivityMainBinding
@@ -54,7 +49,7 @@
             bottomNavigationView.setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.nav_home -> replaceFragment(homeFragment)
-                    R.id.nav_setting -> replaceFragment(settingsFragment)
+                    R.id.nav_setting -> replaceGpsActivity()
                     R.id.nav_history -> replaceFragment(historyFragment)
                     R.id.nav_map -> replaceMapActivity()
                 }
@@ -86,10 +81,13 @@
 
         }
 
-        private fun replaceMapActivity() {
+        private fun replaceGpsActivity() {
             startActivity(Intent(this@MainActivity, GpsActivity::class.java))
             finish()
-
+        }
+        private fun replaceMapActivity() {
+            startActivity(Intent(this@MainActivity, MapsActivity::class.java))
+            finish()
         }
 
 
