@@ -70,7 +70,7 @@ class RegisterActivity : AppCompatActivity() {
                                     startActivity(
                                         Intent(
                                             this@RegisterActivity,
-                                            ProfileActivity::class.java
+                                            MainActivity::class.java
                                         )
                                     )
                                     finish()
@@ -120,7 +120,7 @@ class RegisterActivity : AppCompatActivity() {
                                 ).show()
 
                                 val intent =
-                                    Intent(this@RegisterActivity, ProfileActivity::class.java)
+                                    Intent(this@RegisterActivity, MainActivity::class.java)
                                 intent.flags =
                                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 intent.putExtra(
@@ -167,7 +167,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun checkUser() {
         val firebaseUser = firebaseAuth.currentUser
         if (firebaseUser != null) {
-            startActivity(Intent(this@RegisterActivity, ProfileActivity::class.java))
+            startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
             finish()
         }
     }
@@ -220,7 +220,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
 
                 //start ProfileActivity
-                startActivity(Intent(this@RegisterActivity, ProfileActivity::class.java))
+                startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
                 finish()
             }
             .addOnFailureListener { e ->
