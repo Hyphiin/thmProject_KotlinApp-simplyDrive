@@ -13,7 +13,7 @@
         android:layout_marginTop="50dp"
         android:elevation="6dp"
         android:text="SimplyDrive"
-        android:textColor="@color/textDark"
+        android:textColor="@color/primaryDark"
         android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/login__layout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +48,6 @@
                     android:id="@+id/registerEmailInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="#00FFFFFF"
                     android:ems="10"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
@@ -60,61 +59,52 @@
                     android:id="@+id/registerPasswordInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="#00FFFFFF"
                     android:ems="10"
                     android:hint="Passwort"
                     android:inputType="textPassword"
                     android:paddingLeft="25px"
                     android:textSize="14sp" />
 
-                <Button
-                    android:id="@+id/registerRegisterBtn"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="2dp"
-                    android:backgroundTint="@color/primary"
-                    android:text="Registrieren"
-                    android:textSize="12sp"
-                    app:cornerRadius="6dp" />
-
-                <com.google.android.gms.common.SignInButton
-                    android:id="@+id/register__google"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="2dp" />
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
+        <Button
+            android:id="@+id/registerLoginBtn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/primary"
+            android:text="Login"
+            android:textColor="@color/textWhite"
+            android:textSize="12sp"
+            app:cornerRadius="6dp" />
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/registerRegisterBtn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginBottom="2dp"
+            android:backgroundTint="@color/primary"
+            android:text="Registrieren"
+            android:textColor="@color/textWhite"
+            android:textSize="12sp"
+            app:cornerRadius="6dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:id="@+id/registerInfoField"
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/register__google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="25px"
-            android:text="Haben Sie bereits einen Account?" />
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginBottom="2dp"
+            app:buttonSize="icon_only"
+            app:colorScheme="auto" />
 
-        <TextView
-            android:id="@+id/registerLoginField"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="25px"
-            android:layout_weight="1"
-            android:text="Hier Einloggen!"
-            android:textColor="@color/primaryDark" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -36,7 +36,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun checkUser() {
         val firebaseUser = firebaseAuth.currentUser
         if (firebaseUser == null) {
-            startActivity(Intent(this@ProfileActivity, LoginActivity::class.java))
+            startActivity(Intent(this@ProfileActivity, RegisterActivity::class.java))
             finish()
         }
         else {

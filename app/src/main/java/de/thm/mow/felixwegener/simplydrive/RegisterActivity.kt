@@ -17,6 +17,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -24,7 +25,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var firebaseAuth: FirebaseAuth
 
-    private companion object{
+    private companion object {
         private const val RC__Sign__IN = 100
         private const val Tag = "Google_Sign_In-Tag"
     }
@@ -35,16 +36,24 @@ class RegisterActivity : AppCompatActivity() {
 
         registerRegisterBtn.setOnClickListener {
             when {
-                TextUtils.isEmpty(registerEmailInput.text.toString().trim { it <= ' '}) -> {
-                    Toast.makeText(this@RegisterActivity, "Bitte Email eingeben.", Toast.LENGTH_SHORT).show()
+                TextUtils.isEmpty(registerEmailInput.text.toString().trim { it <= ' ' }) -> {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Bitte Email eingeben.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
-                TextUtils.isEmpty(registerPasswordInput.text.toString().trim { it <= ' '}) -> {
-                    Toast.makeText(this@RegisterActivity, "Bitte Passwort eingeben.", Toast.LENGTH_SHORT).show()
+                TextUtils.isEmpty(registerPasswordInput.text.toString().trim { it <= ' ' }) -> {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Bitte Passwort eingeben.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 else -> {
-                    val email: String = registerEmailInput.text.toString().trim { it <= ' '}
-                    val password: String = registerPasswordInput.text.toString().trim { it <= ' '}
+                    val email: String = registerEmailInput.text.toString().trim { it <= ' ' }
+                    val password: String = registerPasswordInput.text.toString().trim { it <= ' ' }
 
                     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(
@@ -52,15 +61,83 @@ class RegisterActivity : AppCompatActivity() {
                                 if (task.isSuccessful) {
                                     val firebaseUser: FirebaseUser = task.result!!.user!!
 
-                                    Toast.makeText(this@RegisterActivity, "Erfolgreich registriert!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        this@RegisterActivity,
+                                        "Erfolgreich registriert!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
-                                    startActivity(Intent(this@RegisterActivity, ProfileActivity::class.java))
+                                    startActivity(
+                                        Intent(
+                                            this@RegisterActivity,
+                                            ProfileActivity::class.java
+                                        )
+                                    )
                                     finish()
                                 } else {
-                                    Toast.makeText(this@RegisterActivity, task.exception!!.message.toString(), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        this@RegisterActivity,
+                                        task.exception!!.message.toString(),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                         )
+                }
+            }
+        }
+
+        registerLoginBtn.setOnClickListener {
+            when {
+                TextUtils.isEmpty(registerEmailInput.text.toString().trim { it <= ' ' }) -> {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Bitte Email eingeben.",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+
+                TextUtils.isEmpty(
+                    registerPasswordInput.text.toString().trim { it <= ' ' }) -> {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Bitte Passwort eingeben.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> {
+                    val email: String = registerEmailInput.text.toString().trim { it <= ' ' }
+                    val password: String = registerPasswordInput.text.toString().trim { it <= ' ' }
+
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    "Erfolgreich eingeloggt!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                val intent =
+                                    Intent(this@RegisterActivity, ProfileActivity::class.java)
+                                intent.flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                intent.putExtra(
+                                    "user_id",
+                                    FirebaseAuth.getInstance().currentUser!!.uid
+                                )
+                                intent.putExtra("email_id", email)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    task.exception!!.message.toString(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 }
             }
         }
@@ -79,11 +156,12 @@ class RegisterActivity : AppCompatActivity() {
             startActivityForResult(intent, RC__Sign__IN)
 
         }
-
+        /*
         registerLoginField.setOnClickListener {
             startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
             finish()
         }
+         */
     }
 
     private fun checkUser() {
@@ -102,8 +180,7 @@ class RegisterActivity : AppCompatActivity() {
             try {
                 val account = accountTask.getResult(ApiException::class.java)
                 firebaseAuthWithGoogleAccount(account)
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.d(TAG, "OnActivityResult: ${e.message}")
             }
         }
@@ -128,19 +205,31 @@ class RegisterActivity : AppCompatActivity() {
 
                 if (authResult.additionalUserInfo!!.isNewUser) {
                     Log.d(TAG, "firebaseAuthWithGoogleAccount: Account created... n\$email")
-                    Toast.makeText(this@RegisterActivity, "Account created... n$email", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Account created... n$email",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     Log.d(TAG, "firebaseAuthWithGoogleAccount: Existing user... n\$email")
-                    Toast.makeText(this@RegisterActivity, "Welcome back... n$email", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Welcome back... n$email",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 //start ProfileActivity
                 startActivity(Intent(this@RegisterActivity, ProfileActivity::class.java))
                 finish()
             }
-            .addOnFailureListener{ e ->
+            .addOnFailureListener { e ->
                 Log.d(TAG, "firebaseAuthWithGoogleAccount: Login failed due to ${e.message}")
-                Toast.makeText(this@RegisterActivity, "Login failed due to ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@RegisterActivity,
+                    "Login failed due to ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 }
