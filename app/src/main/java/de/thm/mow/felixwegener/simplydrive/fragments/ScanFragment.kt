@@ -2,12 +2,15 @@ package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -18,7 +21,12 @@ import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.R
+import de.thm.mow.felixwegener.simplydrive.Route
+import java.util.*
 
 
 class ScanFragment : Fragment() {
@@ -54,7 +62,7 @@ class ScanFragment : Fragment() {
             activity.runOnUiThread {
                 //scanText.text = it.text
                 createDialog(it.text)
-                Toast.makeText(activity, it.text, Toast.LENGTH_LONG).show()
+                //Toast.makeText(activity, it.text, Toast.LENGTH_LONG).show()
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
@@ -114,12 +122,67 @@ class ScanFragment : Fragment() {
     private fun createDialog(text: String) {
         val builder = AlertDialog.Builder(contextF)
 
+        val delimiter = ";"
+
+        val list = text.split(delimiter)
+
+        Log.d(".......XXX", list.toString())
+
         builder.setMessage(text)
-            .setPositiveButton("Fahrt starten!", {dialogInterface, i -> dialogInterface.dismiss()})
-            .setNegativeButton("Abbrechen", {dialogInterface, i -> dialogInterface.dismiss()})
+            .setPositiveButton("Fahrt starten!") { _, _ -> addHistory(list) }
+            .setNegativeButton("Abbrechen") { dialogInterface, _ -> dialogInterface.dismiss() }
 
         val dialog = builder.create()
         dialog.show()
+    }
+
+    private fun addHistory(list: List<String>) {
+
+        if (list.size === 3) {
+            val user = FirebaseAuth.getInstance().currentUser
+            user?.let {
+                val uid = user.uid
+
+                val db = Firebase.firestore
+
+                val start = list[0]
+                val end = list[1]
+                val line = list[2]
+
+                val c = Calendar.getInstance()
+
+                val year = c.get(Calendar.YEAR)
+                val month = c.get(Calendar.MONTH)
+                val day = c.get(Calendar.DAY_OF_MONTH)
+
+                val date = "$day-$month-$year"
+
+                val hour = c.get(Calendar.HOUR_OF_DAY)
+                val minute = c.get(Calendar.MINUTE)
+                val sec = c.get(Calendar.SECOND)
+
+                val time = "$hour:$minute:$sec"
+
+                val route = Route(date, time, start, end, line, uid)
+
+                Log.d("ROUTE_____________X", route.toString())
+
+                db.collection("routes")
+                    .add(route)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(
+                            ContentValues.TAG,
+                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                        )
+
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(ContentValues.TAG, "Error adding document", e)
+
+                    }
+            }
+        }
+
     }
 
 }
