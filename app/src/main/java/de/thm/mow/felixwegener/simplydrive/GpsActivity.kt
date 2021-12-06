@@ -1,6 +1,7 @@
 package de.thm.mow.felixwegener.simplydrive
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
@@ -9,9 +10,13 @@ import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_gps.*
 import java.lang.Exception
 
@@ -46,6 +51,10 @@ class GpsActivity : AppCompatActivity() {
 
         locationCallBack = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
+                Log.d("...................", locationResult.toString());
+                if (locationResult != null) {
+                    uploadLocation(locationResult)
+                }
                 locationResult ?: return
                 for (location in locationResult.locations){
                     updateUIValues(location)
@@ -96,6 +105,32 @@ class GpsActivity : AppCompatActivity() {
         updateGPS()
     }
 
+    private fun uploadLocation(locationResult: LocationResult) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = user.uid
+
+            val db = Firebase.firestore
+
+            val location = Location(locationResult, uid, "test")
+
+            db.collection("locations")
+                .add(location)
+                .addOnSuccessListener { documentReference ->
+                    Log.d(
+                        ContentValues.TAG,
+                        "DocumentSnapshot added with ID: ${documentReference.id}"
+                    )
+
+                }
+                .addOnFailureListener { e ->
+                    Log.w(ContentValues.TAG, "Error adding document", e)
+
+                }
+
+        }
+    }
+
 
     private fun startLocationUpdates() {
         tv_updates.text = "Location is being tracked"
@@ -140,6 +175,7 @@ class GpsActivity : AppCompatActivity() {
 
         when(requestCode) {
            permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+               Log.d(":_:_:_:_:_:_:", "updateGPS")
                updateGPS()
            } else {
                Toast.makeText(
@@ -160,6 +196,7 @@ class GpsActivity : AppCompatActivity() {
                 if (location != null) {
                     updateUIValues(location)
                     currentLocation = location
+                    Log.d("_________________>", currentLocation.toString());
                 }
             }
         } else {
