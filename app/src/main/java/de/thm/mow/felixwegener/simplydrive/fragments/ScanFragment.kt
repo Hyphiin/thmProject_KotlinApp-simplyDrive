@@ -37,6 +37,9 @@ class ScanFragment : Fragment() {
     //private lateinit var scanText: TextView
 
     private lateinit var contextF: FragmentActivity
+    private var startDrive: Boolean = true
+
+    private lateinit var driveId: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -128,9 +131,20 @@ class ScanFragment : Fragment() {
 
         Log.d(".......XXX", list.toString())
 
-        builder.setMessage(text)
-            .setPositiveButton("Fahrt starten!") { _, _ -> addHistory(list) }
-            .setNegativeButton("Abbrechen") { dialogInterface, _ -> dialogInterface.dismiss() }
+        startDrive = if (startDrive) {
+            builder.setMessage("${list[0]} mit ${list[1]}")
+                .setPositiveButton("Fahrt starten!") { _, _ -> addHistory(list) }
+                .setNegativeButton("Abbrechen") { dialogInterface, _ -> dialogInterface.dismiss() }
+
+            false
+        } else {
+            builder.setMessage("Aussteigen in ${list[0]}")
+                .setPositiveButton("Fahrt beenden!") { _, _ -> editHistory(list) }
+                .setNegativeButton("Abbrechen") { dialogInterface, _ -> dialogInterface.dismiss() }
+
+            true
+        }
+
 
         val dialog = builder.create()
         dialog.show()
@@ -138,7 +152,8 @@ class ScanFragment : Fragment() {
 
     private fun addHistory(list: List<String>) {
 
-        if (list.size === 3) {
+        // anzupassen, wenn nur noch 2 Parameter drinne stehen
+        if (list.size === 2) {
             val user = FirebaseAuth.getInstance().currentUser
             user?.let {
                 val uid = user.uid
@@ -146,8 +161,7 @@ class ScanFragment : Fragment() {
                 val db = Firebase.firestore
 
                 val start = list[0]
-                val end = list[1]
-                val line = list[2]
+                val line = list[1]
 
                 val c = Calendar.getInstance()
 
@@ -163,7 +177,7 @@ class ScanFragment : Fragment() {
 
                 val time = "$hour:$minute:$sec"
 
-                val route = Route(date, time, start, end, line, uid)
+                val route = Route(date, time, start, "", line, uid)
 
                 Log.d("ROUTE_____________X", route.toString())
 
@@ -174,6 +188,7 @@ class ScanFragment : Fragment() {
                             ContentValues.TAG,
                             "DocumentSnapshot added with ID: ${documentReference.id}"
                         )
+                        driveId = documentReference.id
 
                     }
                     .addOnFailureListener { e ->
@@ -183,6 +198,16 @@ class ScanFragment : Fragment() {
             }
         }
 
+    }
+
+    private fun editHistory(list: List<String>) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val db = Firebase.firestore
+
+            db.collection("routes")
+                .document(driveId).update("end", list[0])
+        }
     }
 
 }
