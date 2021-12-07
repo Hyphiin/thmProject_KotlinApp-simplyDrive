@@ -3,7 +3,9 @@ package de.thm.mow.felixwegener.simplydrive.fragments
 import android.Manifest
 import android.app.AlertDialog
 import android.content.ContentValues
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.GpsSatellite
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -24,8 +26,7 @@ import com.budiyev.android.codescanner.ErrorCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import de.thm.mow.felixwegener.simplydrive.R
-import de.thm.mow.felixwegener.simplydrive.Route
+import de.thm.mow.felixwegener.simplydrive.*
 import java.util.*
 
 
@@ -33,25 +34,37 @@ class ScanFragment : Fragment() {
 
     private lateinit var codeScanner: CodeScanner
 
-    //private lateinit var scanView: View
-    //private lateinit var scanText: TextView
-
     private lateinit var contextF: FragmentActivity
     private var startDrive: Boolean = true
 
     private lateinit var driveId: String
+
+    interface OnDataPass {
+        fun onDataPass(data: String)
+    }
+
+    lateinit var dataPasser: OnDataPass
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dataPasser = context as OnDataPass
+    }
+
+    fun passData(data: String){
+        dataPasser.onDataPass(data)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        //scanView = inflater.inflate(R.layout.fragment_scan, container, false)
-        //scanText = scanView.findViewById(R.id.tv__Scan)
-
         val activity = requireActivity()
         contextF = activity
         setupPermission()
+
+        driveId = (activity.application as MyApplication).getDriveId()!!
+        startDrive = (activity.application as MyApplication).getStartDrive()!!
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_scan, container, false)
@@ -63,7 +76,6 @@ class ScanFragment : Fragment() {
         codeScanner = CodeScanner(activity, scannerView)
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
-                //scanText.text = it.text
                 createDialog(it.text)
                 //Toast.makeText(activity, it.text, Toast.LENGTH_LONG).show()
             }
@@ -131,18 +143,19 @@ class ScanFragment : Fragment() {
 
         Log.d(".......XXX", list.toString())
 
-        startDrive = if (startDrive) {
+        if (startDrive) {
             builder.setMessage("${list[0]} mit ${list[1]}")
                 .setPositiveButton("Fahrt starten!") { _, _ -> addHistory(list) }
                 .setNegativeButton("Abbrechen") { dialogInterface, _ -> dialogInterface.dismiss() }
 
-            false
+            (requireActivity().application as MyApplication).setStartDrive(false)
         } else {
             builder.setMessage("Aussteigen in ${list[0]}")
                 .setPositiveButton("Fahrt beenden!") { _, _ -> editHistory(list) }
                 .setNegativeButton("Abbrechen") { dialogInterface, _ -> dialogInterface.dismiss() }
 
-            true
+            (requireActivity().application as MyApplication).setStartDrive(true)
+            (requireActivity().application as MyApplication).setDriveId("null")
         }
 
 
@@ -152,7 +165,7 @@ class ScanFragment : Fragment() {
 
     private fun addHistory(list: List<String>) {
 
-        // anzupassen, wenn nur noch 2 Parameter drinne stehen
+        // anzupassen... nur wenn beide Linien auch die gleiche sind
         if (list.size === 2) {
             val user = FirebaseAuth.getInstance().currentUser
             user?.let {
@@ -189,6 +202,7 @@ class ScanFragment : Fragment() {
                             "DocumentSnapshot added with ID: ${documentReference.id}"
                         )
                         driveId = documentReference.id
+                        passData(driveId)
 
                     }
                     .addOnFailureListener { e ->
