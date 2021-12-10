@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass {
     private val historyFragment = HistoryFragment()
     private val editFragment = EditFragment()
     private val scanFragment = ScanFragment()
+    private val mapsFragment = MapsFragment()
 
 
     //FAB Button(s)
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass {
                 R.id.nav_home -> replaceFragment(homeFragment)
                 R.id.nav_setting -> replaceGpsActivity()
                 R.id.nav_history -> replaceFragment(historyFragment)
-                R.id.nav_map -> replaceMapActivity()
+                R.id.nav_map -> replaceFragment(mapsFragment)
             }
             true
         }

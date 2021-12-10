@@ -13,6 +13,10 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import java.io.FileOutputStream
 import java.lang.Exception
+import androidx.core.content.ContextCompat.startActivity
+
+import android.content.Intent
+import androidx.core.content.ContextCompat
 
 
 class LatHisAdapter(private val routesList: MutableList<Route>) :
@@ -23,6 +27,7 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
     private lateinit var tvDeparturePopUp: TextView
     private lateinit var tvDestinationPopUp: TextView
     private lateinit var tvLinePopUp: TextView
+    private lateinit var showMapBtn: Button
     private lateinit var exportBtn: Button
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
@@ -40,25 +45,30 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
         tvDeparturePopUp = myDialog.findViewById(R.id.tvLHrouteStartPopUp)
         tvDestinationPopUp = myDialog.findViewById(R.id.tvLHrouteEndPopUp)
         tvLinePopUp = myDialog.findViewById(R.id.tvLHrouteLinePopUp)
+        showMapBtn = myDialog.findViewById(R.id.btn__showMap)
         exportBtn = myDialog.findViewById(R.id.btn__export)
+
+
 
         exportBtn.setOnClickListener {
             Toast.makeText(parent.context, "Export!", Toast.LENGTH_SHORT).show()
         }
+
 
         return LatHisViewHolder(itemView).listen { pos, _ ->
             val item = routesList[pos]
             //TODO do other stuff here
             Log.d("HEEEEEELLLLLLLOOOO", item.toString())
 
-            tvDatePopUp.text = routesList[pos].date.toString()
-            tvTimePopUp.text = routesList[pos].time
-            tvDeparturePopUp.text = routesList[pos].start
-            tvDestinationPopUp.text = routesList[pos].end
-            tvLinePopUp.text = routesList[pos].line
+            tvDatePopUp.text = item.date.toString()
+            tvTimePopUp.text = item.time
+            tvDeparturePopUp.text = item.start
+            tvDestinationPopUp.text = item.end
+            tvLinePopUp.text = item.line
 
             myDialog.show()
         }
+
     }
 
     override fun onBindViewHolder(holder: LatHisViewHolder, position: Int) {
