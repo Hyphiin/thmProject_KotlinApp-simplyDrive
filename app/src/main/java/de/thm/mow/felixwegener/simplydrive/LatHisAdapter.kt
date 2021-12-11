@@ -3,7 +3,6 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.app.Dialog
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import android.util.Log
@@ -17,10 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
-import java.io.ByteArrayOutputStream
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
-import java.lang.Exception
+import java.io.*
 
 
 class LatHisAdapter(private val routesList: MutableList<Route>) :
@@ -110,21 +106,12 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
                     Log.d("-------------------->", routePoints.toString())
                     if (routePoints.isNotEmpty()) {
 
-                        val array: Array<Location> = routePoints.stream().toArray { arrayOfNulls<Location>(it) }
-
-                        val array2 = arrayOf(routePoints.first())
-
-                        Log.d("array---------->", array2.toString())
-
                         try {
-                            outputStream = parent.context.openFileOutput("${currentRoute}.txt", MODE_PRIVATE)
-                            /*for (item in array) {
-                                outputStream.write(array.toByteArray())
-                            }*/
-                            outputStream.write(array2.toByteArray())
-                            Log.d("Saved to: ", parent.context.filesDir.toString())
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                            val outputStreamWriter = OutputStreamWriter(parent.context.openFileOutput("${currentRoute}.txt", MODE_PRIVATE))
+                            outputStreamWriter.write(routePoints.toString())
+                            outputStreamWriter.close()
+                        } catch (e: IOException) {
+                            Log.e("Exception", "File write failed: $e")
                         }
                     }
                 }
@@ -187,4 +174,8 @@ private fun <T> Array<T>.toByteArray(): ByteArray? {
     byteArrayOutputStream.close()
     objectOutputStream.close()
     return result
+}
+
+fun objectToBytArray(ob: Any): ByteArray? {
+    return ob.toString().toByteArray()
 }
