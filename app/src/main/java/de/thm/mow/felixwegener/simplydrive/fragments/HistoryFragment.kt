@@ -16,7 +16,7 @@ import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
 
 
-class HistoryFragment : Fragment(R.layout.fragment_history) {
+class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUserID: String
@@ -76,7 +76,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
                     }
                     Log.d("==========>", routesArrayList.toString())
 
-                    routesAdapter = LatHisAdapter(routesArrayList)
+                    routesAdapter = LatHisAdapter(routesArrayList, this@HistoryFragment)
                     rvLatestHistory.adapter = routesAdapter
 
                     routesAdapter.notifyDataSetChanged()
@@ -84,6 +84,15 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
                 }
             })
 
+    }
+
+    override fun onItemClick(route: Route) {
+        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString())
+        val transaction = activity?.supportFragmentManager!!.beginTransaction()
+        //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
+        transaction.add(R.id.fragmentContainer, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 }
 

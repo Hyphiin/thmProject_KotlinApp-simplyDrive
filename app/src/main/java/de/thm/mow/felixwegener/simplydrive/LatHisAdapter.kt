@@ -2,7 +2,6 @@ package de.thm.mow.felixwegener.simplydrive
 
 
 import android.app.Dialog
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,15 +10,14 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import java.io.FileOutputStream
-import java.lang.Exception
-import androidx.core.content.ContextCompat.startActivity
 
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.QuerySnapshot
 
 
-class LatHisAdapter(private val routesList: MutableList<Route>) :
+class LatHisAdapter(private val routesList: MutableList<Route>, private val clickListener: ClickListener) :
     RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
 
     private lateinit var tvDatePopUp: TextView
@@ -54,8 +52,9 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
             Toast.makeText(parent.context, "Export!", Toast.LENGTH_SHORT).show()
         }
 
+        return LatHisViewHolder(itemView)
 
-        return LatHisViewHolder(itemView).listen { pos, _ ->
+        /*return LatHisViewHolder(itemView).listen { pos, _ ->
             val item = routesList[pos]
             //TODO do other stuff here
             Log.d("HEEEEEELLLLLLLOOOO", item.toString())
@@ -67,7 +66,7 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
             tvLinePopUp.text = item.line
 
             myDialog.show()
-        }
+        }*/
 
     }
 
@@ -82,6 +81,10 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
         holder.tvLHrouteStart.text = currentItem.start
         holder.tvlHrouteEnd.text = currentItem.end
         holder.tvlHrouteLine.text = currentItem.line
+
+        holder.itemView.setOnClickListener{
+            clickListener.onItemClick(routesList[position])
+        }
     }
 
     override fun getItemCount(): Int {
@@ -103,5 +106,9 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
             event.invoke(getAdapterPosition(), itemViewType)
         }
         return this
+    }
+
+    interface ClickListener {
+        fun onItemClick(route: Route)
     }
 }

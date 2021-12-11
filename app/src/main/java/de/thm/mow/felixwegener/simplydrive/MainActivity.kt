@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass {
         }
         if (fragment != null) {
             val fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainer, fragment)
+            fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
             fragmentTransaction.commit()
         }
     }

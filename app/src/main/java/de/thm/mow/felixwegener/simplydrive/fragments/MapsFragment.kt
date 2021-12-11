@@ -13,19 +13,25 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMapsBinding
+import java.util.*
 
 
-
-
+private const val ARG_START = "start"
+private const val ARG_END = "end"
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityMapsBinding
+    private var start: DoubleArray? = null
+    private var end: DoubleArray? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.let {
+            start = it.getDoubleArray(ARG_START)
+            end = it.getDoubleArray(ARG_END)
+        }
     }
 
     override fun onCreateView(
@@ -56,6 +62,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         markerOptions.title("Lat:"+ sydney.latitude + " Lon:" + sydney.longitude)
         mMap.addMarker(markerOptions)
 
+    }
+
+    companion object {
+        fun newInstance(start: DoubleArray, end: DoubleArray) =
+            HistoryDetailView().apply {
+                arguments = Bundle().apply {
+                    putDoubleArray(ARG_START, start)
+                    putDoubleArray(ARG_END, end)
+                }
+            }
     }
 }
 

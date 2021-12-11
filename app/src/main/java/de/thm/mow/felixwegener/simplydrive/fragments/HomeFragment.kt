@@ -13,10 +13,9 @@ import com.google.firebase.firestore.*
 import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUserID: String
@@ -47,15 +46,15 @@ class HomeFragment : Fragment() {
         return homeView
     }
 
-    /*private fun onHomeCardClicked(){
-        val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof")
+   /* private fun onHomeCardClicked(){
+        val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof", )
         val transaction = activity?.supportFragmentManager!!.beginTransaction()
-        //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
+        transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
         transaction.replace(R.id.fragmentContainer, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
-    }
-     */
+    }*/
+
 
     private fun getUserData() {
         databaseRef = FirebaseFirestore.getInstance()
@@ -83,7 +82,7 @@ class HomeFragment : Fragment() {
                     }
                     Log.d("==========>", routesArrayList.toString())
 
-                    routesAdapter = LatHisAdapter(routesArrayList)
+                    routesAdapter = LatHisAdapter(routesArrayList, this@HomeFragment)
                     rvLatestHistory.adapter = routesAdapter
 
                     routesAdapter.notifyDataSetChanged()
@@ -91,6 +90,15 @@ class HomeFragment : Fragment() {
                 }
             })
 
+    }
+
+    override fun onItemClick (route: Route){
+        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString())
+        val transaction = activity?.supportFragmentManager!!.beginTransaction()
+        //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
+        transaction.add(R.id.fragmentContainer, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
 }

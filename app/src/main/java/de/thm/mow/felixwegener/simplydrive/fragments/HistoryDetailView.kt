@@ -6,6 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import de.thm.mow.felixwegener.simplydrive.R
 
 
@@ -31,6 +35,8 @@ class HistoryDetailView : Fragment() {
         text.text = param1
         return view
     }
+
+
 
     companion object {
         fun newInstance(param1: String) =
