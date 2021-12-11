@@ -2,7 +2,10 @@ package de.thm.mow.felixwegener.simplydrive
 
 
 import android.app.Dialog
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +13,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.*
+import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 import java.lang.Exception
 
 
@@ -25,12 +33,22 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
     private lateinit var tvLinePopUp: TextView
     private lateinit var exportBtn: Button
 
+    private lateinit var databaseRef: FirebaseFirestore
+    private lateinit var mAuth: FirebaseAuth
+    private lateinit var currentUserID: String
+    private lateinit var currentRoute: String
+
+    private lateinit var routePoints: MutableList<Location?>
+
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
 
         Log.d("::::::::::::::::::>", parent.context.toString())
 
         val itemView =
             LayoutInflater.from(parent.context).inflate(R.layout.item_latest_history, parent, false)
+
+        routePoints = mutableListOf()
 
         val myDialog = Dialog(parent.context)
         myDialog.setContentView(R.layout.dialog__drive)
@@ -50,6 +68,70 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
             val item = routesList[pos]
             //TODO do other stuff here
             Log.d("HEEEEEELLLLLLLOOOO", item.toString())
+
+            var outputStream: FileOutputStream
+
+            val time = routesList[pos].time
+            val date = routesList[pos].date
+
+            databaseRef = FirebaseFirestore.getInstance()
+
+            mAuth = FirebaseAuth.getInstance()
+            val firebaseUser = mAuth.currentUser
+
+            if (firebaseUser != null) {
+                currentUserID = firebaseUser.uid
+            }
+
+            databaseRef.collection("routes").whereEqualTo("uid", currentUserID).whereEqualTo("time", time).whereEqualTo("date", date.toString())
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        Log.d(TAG, "${document.id} => ${document.data}")
+                        currentRoute = document.id
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting documents: ", exception)
+                }
+
+            currentRoute = "ypW2olQp1kasQxnVbFOY"
+
+            databaseRef.collection("locations").whereEqualTo("uid", currentUserID)
+                .get()
+                .addOnSuccessListener { points ->
+                    val length = points.size()
+                    Log.d("....................", length.toString())
+                    for (point in points) {
+                        Log.d(TAG, "$point => $point")
+                        routePoints.add(point.toObject(Location::class.java))
+                    }
+
+                    Log.d("-------------------->", routePoints.toString())
+                    if (routePoints.isNotEmpty()) {
+
+                        val array: Array<Location> = routePoints.stream().toArray { arrayOfNulls<Location>(it) }
+
+                        val array2 = arrayOf(routePoints.first())
+
+                        Log.d("array---------->", array2.toString())
+
+                        try {
+                            outputStream = parent.context.openFileOutput("${currentRoute}.txt", MODE_PRIVATE)
+                            /*for (item in array) {
+                                outputStream.write(array.toByteArray())
+                            }*/
+                            outputStream.write(array2.toByteArray())
+                            Log.d("Saved to: ", parent.context.filesDir.toString())
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting documents: ", exception)
+                }
+
 
             tvDatePopUp.text = routesList[pos].date.toString()
             tvTimePopUp.text = routesList[pos].time
@@ -94,4 +176,15 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
         }
         return this
     }
+}
+
+private fun <T> Array<T>.toByteArray(): ByteArray? {
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    val objectOutputStream: ObjectOutputStream = ObjectOutputStream(byteArrayOutputStream)
+    objectOutputStream.writeObject(this)
+    objectOutputStream.flush()
+    val result = byteArrayOutputStream.toByteArray()
+    byteArrayOutputStream.close()
+    objectOutputStream.close()
+    return result
 }

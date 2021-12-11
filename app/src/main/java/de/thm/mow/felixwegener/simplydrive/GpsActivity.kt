@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
@@ -50,6 +51,7 @@ class GpsActivity : AppCompatActivity() {
         locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 
         locationCallBack = object : LocationCallback() {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onLocationResult(locationResult: LocationResult?) {
                 Log.d("...................", locationResult.toString());
                 if (locationResult != null) {
@@ -105,6 +107,7 @@ class GpsActivity : AppCompatActivity() {
         updateGPS()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadLocation(locationResult: LocationResult) {
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
@@ -115,8 +118,13 @@ class GpsActivity : AppCompatActivity() {
             // get
             val s = (this.application as MyApplication).getDriveId()
 
+            val lastLocation = LastLocation(locationResult.lastLocation?.accuracy, locationResult.lastLocation?.altitude, locationResult.lastLocation?.latitude, locationResult.lastLocation?.longitude, locationResult.lastLocation?.provider, locationResult.lastLocation?.speed, locationResult.lastLocation?.speedAccuracyMetersPerSecond, locationResult.lastLocation?.time, locationResult.lastLocation?.verticalAccuracyMeters)
+            val locationPoint = LocationPoint(locationResult.locations[0].accuracy, locationResult.locations[0].altitude, locationResult.locations[0].latitude, locationResult.locations[0].longitude, locationResult.locations[0].provider, locationResult.locations[0].speed, locationResult.locations[0].speedAccuracyMetersPerSecond, locationResult.locations[0].time, locationResult.locations[0].verticalAccuracyMeters)
+
+            val resultLocation = LocationResultSelf(lastLocation, locationPoint)
+
             if (s != "null") {
-                val location = Location(locationResult, uid, s!!)
+                val location = Location(resultLocation, uid, s!!)
 
                 db.collection("locations")
                     .add(location)
