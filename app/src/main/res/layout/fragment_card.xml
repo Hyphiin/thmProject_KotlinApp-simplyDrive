@@ -38,7 +38,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="20dp"
                     android:text="21.10.2021"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ivCardViewOne" />
 
@@ -49,7 +49,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="15dp"
                     android:text="Hanau HBF"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
 
@@ -60,7 +60,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="5dp"
                     android:text="Wetzlar Bahnhof"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvDep" />
 
@@ -69,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Start: 14:55"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     android:textSize="20dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

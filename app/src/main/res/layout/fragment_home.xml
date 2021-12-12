@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:text="Letzte Fahrten"
-        android:textColor="@color/textDark"
+        android:textColor="@color/textColor"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="18dp" />

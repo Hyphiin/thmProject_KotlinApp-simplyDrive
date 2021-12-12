@@ -13,7 +13,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
         android:text="Streckenauswahl"
-        android:textColor="@color/textDark"
+        android:textColor="@color/textColor"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

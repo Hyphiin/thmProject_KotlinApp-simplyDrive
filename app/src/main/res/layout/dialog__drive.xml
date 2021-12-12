@@ -48,7 +48,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="10dp"
                             android:text="21.10.2021"
-                            android:textColor="@color/textDark" />
+                            android:textColor="@color/textColor" />
 
                         <TextView
                             android:id="@+id/tvLHtimePopUp"
@@ -57,7 +57,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="5dp"
                             android:text="14:55 - 15:16"
-                            android:textColor="@color/textDark" />
+                            android:textColor="@color/textColor" />
 
                         <TextView
                             android:id="@+id/tvLHrouteStartPopUp"
@@ -65,7 +65,7 @@
                             android:layout_height="20dp"
                             android:layout_marginStart="10dp"
                             android:text="Start"
-                            android:textColor="@color/textDark" />
+                            android:textColor="@color/textColor" />
 
                         <TextView
                             android:id="@+id/tvLHrouteEndPopUp"
@@ -73,7 +73,7 @@
                             android:layout_height="20dp"
                             android:layout_marginStart="10dp"
                             android:text="End"
-                            android:textColor="@color/textDark" />
+                            android:textColor="@color/textColor" />
 
                         <TextView
                             android:id="@+id/tvLHrouteLinePopUp"
@@ -82,7 +82,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginBottom="20dp"
                             android:text="Line"
-                            android:textColor="@color/textDark" />
+                            android:textColor="@color/textColor" />
 
                         <Button
                             android:id="@+id/btn__showMap"
