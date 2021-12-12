@@ -6,16 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import de.thm.mow.felixwegener.simplydrive.R
 
 
 private const val ARG_PARAM1 = "param1"
 
-class HistoryDetailView : Fragment() {
+class HistoryDetailView : Fragment(){
     private var param1: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

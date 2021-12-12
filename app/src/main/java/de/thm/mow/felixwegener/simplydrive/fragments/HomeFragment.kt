@@ -177,7 +177,7 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                                         entry.location?.locations?.longitude!!
                                 }
                                 if (entry != null) {
-                                    lonArray[tempLat] =
+                                    latArray[tempLat] =
                                         entry.location?.locations?.latitude!!
                                 }
 

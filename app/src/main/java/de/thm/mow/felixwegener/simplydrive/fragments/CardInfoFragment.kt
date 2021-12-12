@@ -1,6 +1,7 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import de.thm.mow.felixwegener.simplydrive.R
@@ -66,26 +68,61 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         tvStartTime.text = startTime
         tvEndTime.text = endTime
 
+        val manager = fragmentManager
+        val transaction = manager!!.beginTransaction()
+        val fragment = SupportMapFragment()
+        transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.map, fragment)
+        transaction.commit()
+        fragment.getMapAsync(this)
+        return view
+
         return view
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        var idx = 0
+        var plus = 0.0
 
         // Add a marker and move the camera
-        val location = LatLng(startLon!!, startLat!!)
-        mMap.addMarker(MarkerOptions().position(location).title("StartMarker"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-        val markerOptions = MarkerOptions()
-        markerOptions.position(location)
-        markerOptions.title("Lat:"+ location.latitude + " Lon:" + location.longitude)
-        mMap.addMarker(markerOptions)
+        latArray?.forEach { entry ->
 
+            val tempLon = lonArray?.get(idx)
+            val location = LatLng(entry + plus, tempLon!! + plus)
+            mMap.addMarker(MarkerOptions().position(location).title("StartMarker"))
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
+            val markerOptions = MarkerOptions()
+            markerOptions.position(location)
+            markerOptions.title("Lat:" + location.latitude + " Lon:" + location.longitude)
+            mMap.addMarker(markerOptions)
+
+            idx++
+            plus += 0.1
+        }
+
+
+        /*
+        // Add a marker in Sydney and move the camera
+        val sydney = LatLng(-34.0, 151.0)
+        //mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val markerOptions = MarkerOptions()
+        markerOptions.position(sydney)
+        markerOptions.title("Lat:"+ sydney.latitude + " Lon:" + sydney.longitude)
+        mMap.addMarker(markerOptions)*/
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(departure: String, destination: String, startTime: String, startLon: Double, startLat: Double, lonArray: DoubleArray, latArray: DoubleArray) =
+        fun newInstance(
+            departure: String,
+            destination: String,
+            startTime: String,
+            startLon: Double,
+            startLat: Double,
+            lonArray: DoubleArray,
+            latArray: DoubleArray
+        ) =
             CardInfoFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_DEP, departure)

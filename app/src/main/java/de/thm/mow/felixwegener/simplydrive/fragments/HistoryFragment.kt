@@ -172,7 +172,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                                         entry.location?.locations?.longitude!!
                                 }
                                 if (entry != null) {
-                                    lonArray[tempLat] =
+                                    latArray[tempLat] =
                                         entry.location?.locations?.latitude!!
                                 }
 
