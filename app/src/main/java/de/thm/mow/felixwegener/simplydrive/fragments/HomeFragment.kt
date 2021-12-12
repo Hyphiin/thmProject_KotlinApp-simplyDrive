@@ -1,6 +1,7 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.content.ContentValues
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,6 +16,8 @@ import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
+import java.io.IOException
+import java.io.OutputStreamWriter
 
 
 class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
@@ -27,6 +30,8 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
     private lateinit var rvLatestHistory: RecyclerView
     private lateinit var routesArrayList: MutableList<Route>
     private lateinit var routesAdapter: LatHisAdapter
+
+    private lateinit var routePoints: MutableList<Location>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,45 +100,117 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
     }
 
     override fun onItemClick (route: Route){
-        val routePoints = mutableListOf<Location>()
+        //ToDo
+        val time = route.time
+        val date = route.date
+        var currentRoute: String
+        routePoints = mutableListOf()
 
-        //routeID einfügen
-        databaseRef.collection("locations").whereEqualTo("routeId", "1OqNMPWol0h6EfdXN5o4")
+        databaseRef = FirebaseFirestore.getInstance()
+
+        mAuth = FirebaseAuth.getInstance()
+        val firebaseUser = mAuth.currentUser
+
+        if (firebaseUser != null) {
+            currentUserID = firebaseUser.uid
+        }
+
+        Log.d("time", time.toString())
+        Log.d("date", date.toString())
+
+        val foundItems = mutableListOf<String>()
+
+        databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
+            .whereEqualTo("time", time.toString()).whereEqualTo("date", date.toString())
             .get()
-            .addOnSuccessListener { points ->
-                val length = points.size()
-                Log.d("....................", length.toString())
-                for (point in points) {
-                    Log.d(ContentValues.TAG, "$point => $point")
-                    routePoints.add(point.toObject(Location::class.java))
+            .addOnSuccessListener { documents ->
+                Log.d(".....................", documents.toString())
+                for (document in documents) {
+                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
+                    //currentRoute = document.id
+                    foundItems.add(document.id)
                 }
 
+                Log.d("----------->", foundItems.toString())
+
+                currentRoute = foundItems.first()
+
+                databaseRef.collection("locations")
+                    .whereEqualTo("uid", currentUserID)
+                    .whereEqualTo("routeId", currentRoute)
+                    .get()
+                    .addOnSuccessListener { points ->
+                        val length = points.size()
+                        Log.d("....................", length.toString())
+                        for (point in points) {
+                            Log.d(ContentValues.TAG, "$point => $point")
+                            routePoints.add(point.toObject(Location::class.java))
+                        }
+
+                        Log.d("-------------------->", routePoints.toString())
+                        if (routePoints.isNotEmpty()) {
+
+                            try {
+                                val outputStreamWriter = OutputStreamWriter(
+                                    context?.openFileOutput(
+                                        "${currentRoute}.txt",
+                                        Context.MODE_PRIVATE
+                                    )
+                                )
+                                outputStreamWriter.write(routePoints.toString())
+                                outputStreamWriter.close()
+                            } catch (e: IOException) {
+                                Log.e("Exception", "File write failed: $e")
+                            }
+
+                            val firstLoc = routePoints.first()?.location?.locations
+                            val lonArray = DoubleArray(routePoints.size)
+                            val latArray = DoubleArray(routePoints.size)
+
+                            var idx = 0
+                            routePoints.forEach { entry ->
+                                val tempLon = idx
+                                val tempLat = idx
+
+                                if (entry != null) {
+                                    lonArray[tempLon] =
+                                        entry.location?.locations?.longitude!!
+                                }
+                                if (entry != null) {
+                                    lonArray[tempLat] =
+                                        entry.location?.locations?.latitude!!
+                                }
+
+                                idx++
+                            }
+
+                            // die gefundene Route
+                            val fragment: Fragment = CardInfoFragment.newInstance(
+                                route.start.toString(),
+                                route.end.toString(),
+                                route.time.toString(),
+                                firstLoc?.longitude!!,
+                                firstLoc?.latitude!!,
+                                lonArray,
+                                latArray
+                            )
+                            val transaction =
+                                activity?.supportFragmentManager!!.beginTransaction()
+                            //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
+                            transaction.add(R.id.fragmentContainer, fragment)
+                            transaction.addToBackStack(null)
+                            transaction.commit()
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                    }
 
             }
             .addOnFailureListener { exception ->
                 Log.w(ContentValues.TAG, "Error getting documents: ", exception)
             }
 
-        val firstLoc = routePoints.first().location?.locations
-        val lonArray: DoubleArray = DoubleArray(0)
-        val latArray: DoubleArray = DoubleArray(0)
-
-        routePoints.forEach { entry ->
-            val tempLon = lonArray.size
-            val tempLat = latArray.size
-
-            lonArray[tempLon] = entry.location?.locations?.longitude!!
-            lonArray[tempLat] = entry.location?.locations?.latitude!!
-        }
-
-
-
-        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString(), firstLoc?.longitude!!, firstLoc?.latitude!!, lonArray, latArray )
-        val transaction = activity?.supportFragmentManager!!.beginTransaction()
-        //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
-        transaction.add(R.id.fragmentContainer, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
     }
 
 }
