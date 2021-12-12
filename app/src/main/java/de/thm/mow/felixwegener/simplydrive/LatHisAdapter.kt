@@ -3,7 +3,6 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.app.Dialog
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import android.util.Log
@@ -17,10 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
-import java.io.ByteArrayOutputStream
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
-import java.lang.Exception
+import java.io.*
 
 import android.content.Intent
 import androidx.core.content.ContextCompat
@@ -75,10 +71,8 @@ class LatHisAdapter(private val routesList: MutableList<Route>, private val clic
 
         return LatHisViewHolder(itemView).listen { pos, _ ->
             val item = routesList[pos]
-            //TODO do other stuff here
-            Log.d("HEEEEEELLLLLLLOOOO", item.toString())
 
-            var outputStream: FileOutputStream
+            Log.d("HEEEEEELLLLLLLOOOO", item.toString())
 
             val time = routesList[pos].time
             val date = routesList[pos].date
@@ -92,50 +86,57 @@ class LatHisAdapter(private val routesList: MutableList<Route>, private val clic
                 currentUserID = firebaseUser.uid
             }
 
-            databaseRef.collection("routes").whereEqualTo("uid", currentUserID).whereEqualTo("time", time).whereEqualTo("date", date.toString())
+            Log.d("time", time.toString())
+            Log.d("date", date.toString())
+
+            val foundItems = mutableListOf<String>()
+
+            databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
+                .whereEqualTo("time", time.toString()).whereEqualTo("date", date.toString())
                 .get()
                 .addOnSuccessListener { documents ->
+                    Log.d(".....................", documents.toString())
                     for (document in documents) {
                         Log.d(TAG, "${document.id} => ${document.data}")
-                        currentRoute = document.id
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.w(TAG, "Error getting documents: ", exception)
-                }
-
-            currentRoute = "ypW2olQp1kasQxnVbFOY"
-
-            databaseRef.collection("locations").whereEqualTo("uid", currentUserID)
-                .get()
-                .addOnSuccessListener { points ->
-                    val length = points.size()
-                    Log.d("....................", length.toString())
-                    for (point in points) {
-                        Log.d(TAG, "$point => $point")
-                        routePoints.add(point.toObject(Location::class.java))
+                        //currentRoute = document.id
+                        foundItems.add(document.id)
                     }
 
-                    Log.d("-------------------->", routePoints.toString())
-                    if (routePoints.isNotEmpty()) {
+                    Log.d("----------->", foundItems.toString())
 
-                        val array: Array<Location> = routePoints.stream().toArray { arrayOfNulls<Location>(it) }
+                    currentRoute = foundItems.first()
 
-                        val array2 = arrayOf(routePoints.first())
+                    databaseRef.collection("locations").whereEqualTo("uid", currentUserID)
+                        .whereEqualTo("routeId", currentRoute)
+                        .get()
+                        .addOnSuccessListener { points ->
+                            val length = points.size()
+                            Log.d("....................", length.toString())
+                            for (point in points) {
+                                Log.d(TAG, "$point => $point")
+                                routePoints.add(point.toObject(Location::class.java))
+                            }
 
-                        Log.d("array---------->", array2.toString())
+                            Log.d("-------------------->", routePoints.toString())
+                            if (routePoints.isNotEmpty()) {
 
-                        try {
-                            outputStream = parent.context.openFileOutput("${currentRoute}.txt", MODE_PRIVATE)
-                            /*for (item in array) {
-                                outputStream.write(array.toByteArray())
-                            }*/
-                            outputStream.write(array2.toByteArray())
-                            Log.d("Saved to: ", parent.context.filesDir.toString())
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                                try {
+                                    val outputStreamWriter = OutputStreamWriter(
+                                        parent.context.openFileOutput(
+                                            "${currentRoute}.txt",
+                                            MODE_PRIVATE
+                                        )
+                                    )
+                                    outputStreamWriter.write(routePoints.toString())
+                                    outputStreamWriter.close()
+                                } catch (e: IOException) {
+                                    Log.e("Exception", "File write failed: $e")
+                                }
+                            }
                         }
-                    }
+                        .addOnFailureListener { exception ->
+                            Log.w(TAG, "Error getting documents: ", exception)
+                        }
                 }
                 .addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting documents: ", exception)
@@ -206,4 +207,8 @@ private fun <T> Array<T>.toByteArray(): ByteArray? {
     byteArrayOutputStream.close()
     objectOutputStream.close()
     return result
+}
+
+fun objectToBytArray(ob: Any): ByteArray? {
+    return ob.toString().toByteArray()
 }
