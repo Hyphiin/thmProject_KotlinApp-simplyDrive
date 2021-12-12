@@ -73,8 +73,6 @@ class LatHisAdapter(private val routesList: MutableList<Route>, private val clic
             Toast.makeText(parent.context, "Export!", Toast.LENGTH_SHORT).show()
         }
 
-        return LatHisViewHolder(itemView)
-
         return LatHisViewHolder(itemView).listen { pos, _ ->
             val item = routesList[pos]
             //TODO do other stuff here
@@ -144,13 +142,14 @@ class LatHisAdapter(private val routesList: MutableList<Route>, private val clic
                 }
 
 
-            tvDatePopUp.text = routesList[pos].date.toString()
+            /*tvDatePopUp.text = routesList[pos].date.toString()
             tvTimePopUp.text = routesList[pos].time
             tvDeparturePopUp.text = routesList[pos].start
             tvDestinationPopUp.text = routesList[pos].end
             tvLinePopUp.text = routesList[pos].line
 
-            myDialog.show()
+            myDialog.show()*/
+
         }
 
     }

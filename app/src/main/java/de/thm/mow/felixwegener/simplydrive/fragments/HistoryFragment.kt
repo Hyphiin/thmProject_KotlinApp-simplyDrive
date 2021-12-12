@@ -1,5 +1,6 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.DocumentChange.*
 import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
+import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
 
@@ -87,7 +89,26 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
     }
 
     override fun onItemClick(route: Route) {
-        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString())
+        val routePoints = mutableListOf<Location>()
+
+        //routeID einfügen
+        databaseRef.collection("locations").whereEqualTo("routeId", "lgp83kwEbmZEfFdbePv9")
+            .get()
+            .addOnSuccessListener { points ->
+                val length = points.size()
+                Log.d("....................", length.toString())
+                for (point in points) {
+                    Log.d(TAG, "$point => $point")
+                    routePoints.add(point.toObject(Location::class.java))
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents: ", exception)
+            }
+
+        val firstLoc = routePoints.first().location?.locations
+
+        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString(), firstLoc?.longitude!!, firstLoc.latitude!! )
         val transaction = activity?.supportFragmentManager!!.beginTransaction()
         //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
         transaction.add(R.id.fragmentContainer, fragment)

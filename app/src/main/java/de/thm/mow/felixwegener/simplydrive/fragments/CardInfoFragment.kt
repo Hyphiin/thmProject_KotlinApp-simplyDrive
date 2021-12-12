@@ -17,8 +17,8 @@ private const val ARG_DEP = "departure"
 private const val ARG_DES = "destination"
 private const val ARG_STARTTIME = "departureTime"
 private const val ARG_ENDTIME = "destinationTime"
-private const val ARG_STARTLOC = "startLocation"
-private const val ARG_ENDLOC = "endLocation"
+private const val ARG_STARTLON = "startLon"
+private const val ARG_STARTLAT = "endLocation"
 
 class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var departure: String? = null
@@ -27,8 +27,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var endTime: String? = null
 
     private lateinit var mMap: GoogleMap
-    private var startLocation: Double? = null
-    private var endLocation: Double? = null
+    private var startLon: Double? = null
+    private var startLat: Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +37,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             destination = it.getString(ARG_DES)
             startTime = it.getString(ARG_STARTTIME)
             endTime = it.getString(ARG_ENDTIME)
-            startLocation = it.getDouble(ARG_STARTLOC)
-            endLocation = it.getDouble(ARG_ENDLOC)
+            startLon = it.getDouble(ARG_STARTLON)
+            startLat = it.getDouble(ARG_STARTLAT)
         }
     }
 
@@ -65,8 +65,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val location = LatLng(startLocation!!, endLocation!!)
-        mMap.addMarker(MarkerOptions().position(location).title("Marker in Sydney"))
+        val location = LatLng(startLon!!, startLat!!)
+        mMap.addMarker(MarkerOptions().position(location).title("StartMarker"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
         val markerOptions = MarkerOptions()
         markerOptions.position(location)
@@ -77,14 +77,15 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     companion object {
         @JvmStatic
-        fun newInstance(departure: String, destination: String, startTime: String) =
+        fun newInstance(departure: String, destination: String, startTime: String, startLon: Double, startLat: Double) =
             CardInfoFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_DEP, departure)
                     putString(ARG_DES, destination)
                     putString(ARG_STARTTIME, startTime)
-                    //putDouble(ARG_STARTLOC, startLocation)
-                    //putDouble(ARG_ENDLOC, endLocation)
+                    //putString(ARG_ENDTIME, endTime)
+                    putDouble(ARG_STARTLON, startLon)
+                    putDouble(ARG_STARTLAT, startLat)
                 }
             }
     }
