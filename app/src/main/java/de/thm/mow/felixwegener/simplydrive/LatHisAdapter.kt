@@ -62,10 +62,8 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
 
         return LatHisViewHolder(itemView).listen { pos, _ ->
             val item = routesList[pos]
-            //TODO do other stuff here
-            Log.d("HEEEEEELLLLLLLOOOO", item.toString())
 
-            var outputStream: FileOutputStream
+            Log.d("HEEEEEELLLLLLLOOOO", item.toString())
 
             val time = routesList[pos].time
             val date = routesList[pos].date
@@ -79,41 +77,57 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
                 currentUserID = firebaseUser.uid
             }
 
-            databaseRef.collection("routes").whereEqualTo("uid", currentUserID).whereEqualTo("time", time).whereEqualTo("date", date.toString())
+            Log.d("time", time.toString())
+            Log.d("date", date.toString())
+
+            val foundItems = mutableListOf<String>()
+
+            databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
+                .whereEqualTo("time", time.toString()).whereEqualTo("date", date.toString())
                 .get()
                 .addOnSuccessListener { documents ->
+                    Log.d(".....................", documents.toString())
                     for (document in documents) {
                         Log.d(TAG, "${document.id} => ${document.data}")
-                        currentRoute = document.id
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.w(TAG, "Error getting documents: ", exception)
-                }
-
-            currentRoute = "ypW2olQp1kasQxnVbFOY"
-
-            databaseRef.collection("locations").whereEqualTo("uid", currentUserID)
-                .get()
-                .addOnSuccessListener { points ->
-                    val length = points.size()
-                    Log.d("....................", length.toString())
-                    for (point in points) {
-                        Log.d(TAG, "$point => $point")
-                        routePoints.add(point.toObject(Location::class.java))
+                        //currentRoute = document.id
+                        foundItems.add(document.id)
                     }
 
-                    Log.d("-------------------->", routePoints.toString())
-                    if (routePoints.isNotEmpty()) {
+                    Log.d("----------->", foundItems.toString())
 
-                        try {
-                            val outputStreamWriter = OutputStreamWriter(parent.context.openFileOutput("${currentRoute}.txt", MODE_PRIVATE))
-                            outputStreamWriter.write(routePoints.toString())
-                            outputStreamWriter.close()
-                        } catch (e: IOException) {
-                            Log.e("Exception", "File write failed: $e")
+                    currentRoute = foundItems.first()
+
+                    databaseRef.collection("locations").whereEqualTo("uid", currentUserID)
+                        .whereEqualTo("routeId", currentRoute)
+                        .get()
+                        .addOnSuccessListener { points ->
+                            val length = points.size()
+                            Log.d("....................", length.toString())
+                            for (point in points) {
+                                Log.d(TAG, "$point => $point")
+                                routePoints.add(point.toObject(Location::class.java))
+                            }
+
+                            Log.d("-------------------->", routePoints.toString())
+                            if (routePoints.isNotEmpty()) {
+
+                                try {
+                                    val outputStreamWriter = OutputStreamWriter(
+                                        parent.context.openFileOutput(
+                                            "${currentRoute}.txt",
+                                            MODE_PRIVATE
+                                        )
+                                    )
+                                    outputStreamWriter.write(routePoints.toString())
+                                    outputStreamWriter.close()
+                                } catch (e: IOException) {
+                                    Log.e("Exception", "File write failed: $e")
+                                }
+                            }
                         }
-                    }
+                        .addOnFailureListener { exception ->
+                            Log.w(TAG, "Error getting documents: ", exception)
+                        }
                 }
                 .addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting documents: ", exception)
