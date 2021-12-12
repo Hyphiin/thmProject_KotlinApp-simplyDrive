@@ -115,8 +115,20 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
             }
 
         val firstLoc = routePoints.first().location?.locations
+        val lonArray: DoubleArray = DoubleArray(0)
+        val latArray: DoubleArray = DoubleArray(0)
 
-        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString(), firstLoc?.longitude!!, firstLoc?.latitude!! )
+        routePoints.forEach { entry ->
+            val tempLon = lonArray.size
+            val tempLat = latArray.size
+
+            lonArray[tempLon] = entry.location?.locations?.longitude!!
+            lonArray[tempLat] = entry.location?.locations?.latitude!!
+        }
+
+
+
+        val fragment: Fragment = CardInfoFragment.newInstance(route.start.toString(), route.end.toString(), route.time.toString(), firstLoc?.longitude!!, firstLoc?.latitude!!, lonArray, latArray )
         val transaction = activity?.supportFragmentManager!!.beginTransaction()
         //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
         transaction.add(R.id.fragmentContainer, fragment)

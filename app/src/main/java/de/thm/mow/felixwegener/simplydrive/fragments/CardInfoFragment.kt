@@ -19,6 +19,9 @@ private const val ARG_STARTTIME = "departureTime"
 private const val ARG_ENDTIME = "destinationTime"
 private const val ARG_STARTLON = "startLon"
 private const val ARG_STARTLAT = "endLocation"
+private const val ARG_LONARRAY = "LonArray"
+private const val ARG_LATARRAY = "LatArray"
+
 
 class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var departure: String? = null
@@ -30,6 +33,9 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var startLon: Double? = null
     private var startLat: Double? = null
 
+    private var lonArray: DoubleArray? = null
+    private var latArray: DoubleArray? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -39,6 +45,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             endTime = it.getString(ARG_ENDTIME)
             startLon = it.getDouble(ARG_STARTLON)
             startLat = it.getDouble(ARG_STARTLAT)
+            lonArray = it.getDoubleArray(ARG_LONARRAY)
+            latArray = it.getDoubleArray(ARG_LATARRAY)
         }
     }
 
@@ -64,7 +72,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
+        // Add a marker and move the camera
         val location = LatLng(startLon!!, startLat!!)
         mMap.addMarker(MarkerOptions().position(location).title("StartMarker"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
@@ -77,7 +85,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     companion object {
         @JvmStatic
-        fun newInstance(departure: String, destination: String, startTime: String, startLon: Double, startLat: Double) =
+        fun newInstance(departure: String, destination: String, startTime: String, startLon: Double, startLat: Double, lonArray: DoubleArray, latArray: DoubleArray) =
             CardInfoFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_DEP, departure)
@@ -86,6 +94,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                     //putString(ARG_ENDTIME, endTime)
                     putDouble(ARG_STARTLON, startLon)
                     putDouble(ARG_STARTLAT, startLat)
+                    putDoubleArray(ARG_LONARRAY, lonArray)
+                    putDoubleArray(ARG_LATARRAY, latArray)
                 }
             }
     }
