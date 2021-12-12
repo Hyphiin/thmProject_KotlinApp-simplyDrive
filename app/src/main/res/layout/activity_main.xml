@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:text="Simply Drive"
-            android:textColor="@color/textDark"
+            android:textColor="@color/textColor"
             android:textSize="28sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,8 +79,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="35dp"
                 android:background="@android:color/transparent"
-                app:itemIconTint="@color/textDark"
-                app:itemTextColor="@color/textDark"
+                app:itemIconTint="@color/textColor"
+                app:itemTextColor="@color/textColor"
                 app:menu="@menu/nav_menu" />
 
 

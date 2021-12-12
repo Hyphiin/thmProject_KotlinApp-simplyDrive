@@ -25,4 +25,25 @@ class MyApplication : Application() {
             get() = Companion.field
             private set
     }
+
+    private var startDrive: Boolean? = true
+
+    fun getStartDrive(): Boolean? {
+        return startDrive
+    }
+
+    fun setStartDrive(startDrive: Boolean?) {
+        this.startDrive = startDrive
+    }
+
+
+    private var driveId: String? = "null"
+
+    fun getDriveId(): String? {
+        return driveId
+    }
+
+    fun setDriveId(currentDriveId: String?) {
+        this.driveId = currentDriveId
+    }
 }

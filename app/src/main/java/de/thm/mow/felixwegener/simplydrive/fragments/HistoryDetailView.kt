@@ -11,7 +11,7 @@ import de.thm.mow.felixwegener.simplydrive.R
 
 private const val ARG_PARAM1 = "param1"
 
-class HistoryDetailView : Fragment() {
+class HistoryDetailView : Fragment(){
     private var param1: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +31,8 @@ class HistoryDetailView : Fragment() {
         text.text = param1
         return view
     }
+
+
 
     companion object {
         fun newInstance(param1: String) =

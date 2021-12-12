@@ -38,9 +38,9 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="20dp"
                     android:text="Datum:"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ivCardViewOne" />
+                    app:layout_constraintTop_toBottomOf="@+id/map" />
 
 
                 <TextView
@@ -50,9 +50,9 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="20dp"
                     android:text="21.10.2021"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView"
-                    app:layout_constraintTop_toBottomOf="@+id/ivCardViewOne" />
+                    app:layout_constraintTop_toBottomOf="@+id/map" />
 
                 <TextView
                     android:id="@+id/textView2"
@@ -61,7 +61,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="15dp"
                     android:text="Von:"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
 
@@ -72,7 +72,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="15dp"
                     android:text="Hanau HBF"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView2"
                     app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
 
@@ -83,7 +83,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="5dp"
                     android:text="Bis:"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvDepInfo" />
 
@@ -95,7 +95,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
                     android:text="Wetzlar Bahnhof"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView3"
                     app:layout_constraintTop_toBottomOf="@+id/tvDepInfo" />
 
@@ -106,7 +106,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="15dp"
                     android:text="Start:"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -118,7 +118,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="15dp"
                     android:text="17:20Uhr"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView5"
                     app:layout_constraintTop_toBottomOf="@+id/tvDesInfo" />
 
@@ -129,7 +129,7 @@
                     android:layout_marginStart="35dp"
                     android:layout_marginTop="5dp"
                     android:text="Ende:"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
@@ -140,19 +140,19 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"
                     android:text="18:25Uhr"
-                    android:textColor="@color/textDark"
+                    android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView6"
                     app:layout_constraintTop_toBottomOf="@+id/tvStartTime" />
 
-                <ImageView
-                    android:id="@+id/ivCardViewOne"
-                    android:layout_width="313dp"
-                    android:layout_height="182dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/hanau_hbf"
+                <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:context=".MapsActivity" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

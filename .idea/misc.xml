@@ -18,6 +18,7 @@
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/activity_register.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/activity_show_saved_locations_list.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/content_gps2.xml" value="0.36666666666666664" />
+        <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/dialog__drive.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment2.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_card.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_card_info.xml" value="0.36666666666666664" />
@@ -26,6 +27,7 @@
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_history.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_history_detail_view.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_home.xml" value="0.36666666666666664" />
+        <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_maps.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_scan.xml" value="0.36666666666666664" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/fragment_settings.xml" value="0.22056159420289856" />
         <entry key="..\:/Code/AndroidStudioProjects/simplydrive2/app/src/main/res/layout/item_latest_history.xml" value="0.36666666666666664" />
@@ -37,6 +39,8 @@
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/activity_profile.xml" value="0.2463768115942029" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/activity_register.xml" value="0.264" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/card__bg.xml" value="0.2346014492753623" />
+        <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_home.xml" value="0.23278985507246377" />
+        <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_scan.xml" value="0.23278985507246377" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/item_latest_history.xml" value="0.25833333333333336" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/nav_header.xml" value="0.25833333333333336" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/testlayout.xml" value="0.25833333333333336" />
@@ -45,5 +49,8 @@
     </option>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectPlainTextFileTypeManager">
+    <file url="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml(night).xml" />
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>

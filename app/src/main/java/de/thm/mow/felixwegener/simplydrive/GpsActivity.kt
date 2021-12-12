@@ -1,6 +1,7 @@
 package de.thm.mow.felixwegener.simplydrive
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
@@ -9,9 +10,14 @@ import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_gps.*
 import java.lang.Exception
 
@@ -21,7 +27,7 @@ class GpsActivity : AppCompatActivity() {
     private val fastUpdateInterval = 5
     private val permissionsFineLocation = 99
 
-    private lateinit var locationRequest : LocationRequest
+    private lateinit var locationRequest: LocationRequest
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationCallBack: LocationCallback
 
@@ -45,9 +51,14 @@ class GpsActivity : AppCompatActivity() {
         locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 
         locationCallBack = object : LocationCallback() {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onLocationResult(locationResult: LocationResult?) {
+                Log.d("...................", locationResult.toString());
+                if (locationResult != null) {
+                    uploadLocation(locationResult)
+                }
                 locationResult ?: return
-                for (location in locationResult.locations){
+                for (location in locationResult.locations) {
                     updateUIValues(location)
                 }
             }
@@ -96,6 +107,43 @@ class GpsActivity : AppCompatActivity() {
         updateGPS()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadLocation(locationResult: LocationResult) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = user.uid
+
+            val db = Firebase.firestore
+
+            // get
+            val s = (this.application as MyApplication).getDriveId()
+
+            val lastLocation = LastLocation(locationResult.lastLocation?.accuracy, locationResult.lastLocation?.altitude, locationResult.lastLocation?.latitude, locationResult.lastLocation?.longitude, locationResult.lastLocation?.provider, locationResult.lastLocation?.speed, locationResult.lastLocation?.speedAccuracyMetersPerSecond, locationResult.lastLocation?.time, locationResult.lastLocation?.verticalAccuracyMeters)
+            val locationPoint = LocationPoint(locationResult.locations[0].accuracy, locationResult.locations[0].altitude, locationResult.locations[0].latitude, locationResult.locations[0].longitude, locationResult.locations[0].provider, locationResult.locations[0].speed, locationResult.locations[0].speedAccuracyMetersPerSecond, locationResult.locations[0].time, locationResult.locations[0].verticalAccuracyMeters)
+
+            val resultLocation = LocationResultSelf(lastLocation, locationPoint)
+
+            if (s != "null") {
+                val location = Location(resultLocation, uid, s!!)
+
+                db.collection("locations")
+                    .add(location)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(
+                            ContentValues.TAG,
+                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                        )
+
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(ContentValues.TAG, "Error adding document", e)
+
+                    }
+            }
+
+        }
+    }
+
 
     private fun startLocationUpdates() {
         tv_updates.text = "Location is being tracked"
@@ -109,8 +157,14 @@ class GpsActivity : AppCompatActivity() {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), permissionsFineLocation)
-                requestPermissions(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION), permissionsFineLocation)
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    permissionsFineLocation
+                )
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    permissionsFineLocation
+                )
             }
             return
         }
@@ -138,16 +192,17 @@ class GpsActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        when(requestCode) {
-           permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-               updateGPS()
-           } else {
-               Toast.makeText(
-                   this@GpsActivity,
-                   "Diese Funktion benötigt eine Zustimmung um zu funktionieren",
-                   Toast.LENGTH_SHORT
-               ).show()
-           }
+        when (requestCode) {
+            permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(":_:_:_:_:_:_:", "updateGPS")
+                updateGPS()
+            } else {
+                Toast.makeText(
+                    this@GpsActivity,
+                    "Diese Funktion benötigt eine Zustimmung um zu funktionieren",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -155,17 +210,28 @@ class GpsActivity : AppCompatActivity() {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) === PackageManager.PERMISSION_GRANTED){
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location : Location? ->
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) === PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     updateUIValues(location)
                     currentLocation = location
+                    Log.d("_________________>", currentLocation.toString());
                 }
             }
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), permissionsFineLocation)
-                requestPermissions(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION), permissionsFineLocation)
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    permissionsFineLocation
+                )
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    permissionsFineLocation
+                )
             }
         }
     }
@@ -177,22 +243,22 @@ class GpsActivity : AppCompatActivity() {
 
         if (location.hasAltitude()) {
             tv_altitude.text = location.altitude.toString()
-        }else{
+        } else {
             tv_altitude.text = "Not availible"
         }
         if (location.hasSpeed()) {
             tv_speed.text = location.speed.toString()
-        }else{
+        } else {
             tv_speed.text = "Not availible"
         }
 
         val geocoder = Geocoder(this)
 
         try {
-            val adresses: List<Address> = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+            val adresses: List<Address> =
+                geocoder.getFromLocation(location.latitude, location.longitude, 1)
             tv_address.text = adresses.get(0).getAddressLine(0)
-        }
-        catch (e : Exception) {
+        } catch (e: Exception) {
             tv_address.text = "Unable to get street address"
         }
 

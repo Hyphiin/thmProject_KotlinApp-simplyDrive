@@ -1,18 +1,21 @@
 package de.thm.mow.felixwegener.simplydrive
 
-
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 
-
-class LatHisAdapter(private val routesList: MutableList<Route>) :
+class LatHisAdapter(
+    private val routesList: MutableList<Route>,
+    private val clickListener: ClickListener
+) :
     RecyclerView.Adapter<LatHisAdapter.LatHisViewHolder>() {
 
-
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
 
         Log.d("::::::::::::::::::>", parent.context.toString())
@@ -21,6 +24,7 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
             LayoutInflater.from(parent.context).inflate(R.layout.item_latest_history, parent, false)
 
         return LatHisViewHolder(itemView)
+
     }
 
     override fun onBindViewHolder(holder: LatHisViewHolder, position: Int) {
@@ -34,6 +38,10 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
         holder.tvLHrouteStart.text = currentItem.start
         holder.tvlHrouteEnd.text = currentItem.end
         holder.tvlHrouteLine.text = currentItem.line
+
+        holder.itemView.setOnClickListener {
+            clickListener.onItemClick(routesList[position])
+        }
     }
 
     override fun getItemCount(): Int {
@@ -48,5 +56,9 @@ class LatHisAdapter(private val routesList: MutableList<Route>) :
         val tvlHrouteEnd: TextView = itemView.findViewById(R.id.tvLHrouteEnd)
         val tvlHrouteLine: TextView = itemView.findViewById(R.id.tvLHrouteLine)
 
+    }
+
+    interface ClickListener {
+        fun onItemClick(route: Route)
     }
 }

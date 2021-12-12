@@ -13,7 +13,7 @@
         android:layout_marginTop="50dp"
         android:elevation="6dp"
         android:text="SimplyDrive"
-        android:textColor="@color/textDark"
+        android:textColor="@color/textColor"
         android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/login__layout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +53,7 @@
                     android:hint="Email"
                     android:inputType="textEmailAddress"
                     android:paddingLeft="25px"
-                    android:textColor="@color/black"
+                    android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
                 <EditText
