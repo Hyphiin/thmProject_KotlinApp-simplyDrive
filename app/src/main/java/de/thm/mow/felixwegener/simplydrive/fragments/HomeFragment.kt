@@ -5,9 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +15,18 @@ import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
 import java.io.IOException
 import java.io.OutputStreamWriter
+import androidmads.library.qrgenearator.QRGContents;
+import androidmads.library.qrgenearator.QRGEncoder;
+import android.graphics.Bitmap
+import android.widget.ImageView
+import com.google.zxing.WriterException
+import android.content.Context.WINDOW_SERVICE
+import android.graphics.Point
+import android.view.*
+
+import androidx.core.content.ContextCompat.getSystemService
+
+import androidx.core.content.ContextCompat
 
 
 class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
@@ -53,14 +62,14 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         return homeView
     }
 
-   /* private fun onHomeCardClicked(){
-        val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof", )
-        val transaction = activity?.supportFragmentManager!!.beginTransaction()
-        transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
-        transaction.replace(R.id.fragmentContainer, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-    }*/
+    /* private fun onHomeCardClicked(){
+         val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof", )
+         val transaction = activity?.supportFragmentManager!!.beginTransaction()
+         transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
+         transaction.replace(R.id.fragmentContainer, fragment)
+         transaction.addToBackStack(null)
+         transaction.commit()
+     }*/
 
 
     private fun getUserData() {
@@ -74,7 +83,8 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         }
 
         databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
-            .orderBy("date", Query.Direction.DESCENDING).orderBy("time", Query.Direction.DESCENDING).limit(3)
+            .orderBy("date", Query.Direction.DESCENDING).orderBy("time", Query.Direction.DESCENDING)
+            .limit(3)
             .addSnapshotListener(object : EventListener<QuerySnapshot> {
                 override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
                     if (error != null) {
@@ -82,7 +92,7 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                         return
                     }
 
-                    for (dc: DocumentChange in value?.documentChanges!!){
+                    for (dc: DocumentChange in value?.documentChanges!!) {
                         if (dc.type == DocumentChange.Type.ADDED) {
                             routesArrayList.add(dc.document.toObject(Route::class.java))
                         }
@@ -99,10 +109,12 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
 
     }
 
-    override fun onItemClick (route: Route){
+    override fun onItemClick(route: Route) {
         //ToDo
         val time = route.time
         val date = route.date
+        val start = route.start
+        val line = route.line
         var currentRoute: String
         routePoints = mutableListOf()
 

@@ -1,18 +1,23 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Point
 import android.os.Bundle
 import android.util.Log
+import android.view.*
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
+import androidmads.library.qrgenearator.QRGContents
+import androidmads.library.qrgenearator.QRGEncoder
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.zxing.WriterException
 import de.thm.mow.felixwegener.simplydrive.R
 
 private const val ARG_DEP = "departure"
@@ -37,6 +42,11 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     private var lonArray: DoubleArray? = null
     private var latArray: DoubleArray? = null
+
+    var bitmap: Bitmap? = null
+    var qrgEncoder: QRGEncoder? = null
+
+    private var qrCodeIV: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +73,63 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         val tvStartTime = view.findViewById<TextView>(R.id.tvStartTime)
         val tvEndTime = view.findViewById<TextView>(R.id.tvEndTime)
 
+        qrCodeIV = view.findViewById(R.id.idIVQrcode)
+
+
         tvDepInfo.text = departure
         tvDesInfo.text = destination
         tvStartTime.text = startTime
         tvEndTime.text = endTime
+
+        // for generating Ticket
+        // below line is for getting
+        // the windowmanager service.
+        // below line is for getting
+        // the windowmanager service.
+        val managerWindow = activity?.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
+
+        // initializing a variable for default display.
+
+        // initializing a variable for default display.
+        val display: Display = managerWindow!!.defaultDisplay
+
+        // creating a variable for point which
+        // is to be displayed in QR Code.
+
+        // creating a variable for point which
+        // is to be displayed in QR Code.
+        val point = Point()
+        display.getSize(point)
+
+        // getting width and
+        // height of a point
+
+        // getting width and
+        // height of a point
+        val width: Int = point.x
+        val height: Int = point.y
+
+        // generating dimension from width and height.
+
+        // generating dimension from width and height.
+        var dimen = if (width < height) width else height
+        dimen = dimen * 3 / 4
+
+
+        // ToDo overthink, where to integrate
+        qrgEncoder = QRGEncoder ("Fahrt um $startTime Uhr von $departure"
+            .toString(), null, QRGContents.Type.TEXT, dimen);
+        try {
+            // getting our qrcode in the form of bitmap.
+            bitmap = qrgEncoder!!.encodeAsBitmap();
+            // the bitmap is set inside our image
+            // view using .setimagebitmap method.
+            qrCodeIV?.setImageBitmap(bitmap);
+        } catch (e: WriterException) {
+            // this method is called for
+            // exception handling.
+            Log.e("Tag", e.toString());
+        }
 
         val manager = fragmentManager
         val transaction = manager!!.beginTransaction()
@@ -74,8 +137,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.map, fragment)
         transaction.commit()
         fragment.getMapAsync(this)
-        return view
-
         return view
     }
 
