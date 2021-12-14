@@ -32,24 +32,14 @@
         app:layout_constraintVertical_bias="0.65999997">
 
         <EditText
-            android:id="@+id/departureInput"
+            android:id="@+id/stationInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Von*"
+            android:hint="Station"
             android:inputType="textPersonName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/destinationInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Bis*"
-            android:inputType="textPersonName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/departureInput" />
 
         <EditText
             android:id="@+id/lineInput"
@@ -59,14 +49,14 @@
             android:hint="Linie"
             android:inputType="textPersonName"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/destinationInput" />
+            app:layout_constraintTop_toBottomOf="@+id/stationInput" />
 
         <Button
             android:id="@+id/btnInsert"
             android:layout_width="180dp"
             android:layout_height="60dp"
             android:backgroundTint="@color/primary"
-            android:text="Insert"
+            android:text="Fahrt starten!"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
