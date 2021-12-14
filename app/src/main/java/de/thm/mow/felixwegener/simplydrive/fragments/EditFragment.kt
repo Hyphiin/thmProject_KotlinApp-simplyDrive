@@ -41,7 +41,7 @@ class EditFragment : Fragment() {
         dataPasser = context as OnDataPass
     }
 
-    fun passData(data: String){
+    fun passData(data: String) {
         dataPasser.onDataPass(data)
     }
 
@@ -68,6 +68,8 @@ class EditFragment : Fragment() {
                 editHistory()
                 (requireActivity().application as MyApplication).setStartDrive(true)
                 (requireActivity().application as MyApplication).setDriveId("null")
+                stationInput.text.clear()
+                lineInput.text.clear()
             }
         }
 
@@ -95,6 +97,24 @@ class EditFragment : Fragment() {
     }
 
      */
+
+    override fun onResume() {
+        if (startDrive) {
+            insertBtn.text = "Fahrt starten!"
+        } else {
+            insertBtn.text = "Fahrt beenden!"
+        }
+        super.onResume()
+    }
+
+    override fun onPause() {
+        if (startDrive) {
+            insertBtn.text = "Fahrt starten!"
+        } else {
+            insertBtn.text = "Fahrt beenden!"
+        }
+        super.onPause()
+    }
 
     private fun addHistory() {
 
@@ -136,7 +156,9 @@ class EditFragment : Fragment() {
                     driveId = documentReference.id
                     insertBtn.text = "Fahrt beenden!"
                     passData(driveId)
-                    //(this.context as MyApplication).setDriveId(driveId)
+                    stationInput.text.clear()
+                    lineInput.text.clear()
+
                 }
                 .addOnFailureListener { e ->
                     Log.w(ContentValues.TAG, "Error adding document", e)
@@ -147,6 +169,7 @@ class EditFragment : Fragment() {
 
     private fun editHistory() {
         stationInput = view?.findViewById(R.id.stationInput) as EditText
+        lineInput = view?.findViewById(R.id.lineInput) as EditText
 
         val end = stationInput.text.toString()
 
@@ -156,6 +179,8 @@ class EditFragment : Fragment() {
 
             db.collection("routes")
                 .document(driveId).update("end", end)
+
+            insertBtn.text = "Fahrt starten!"
         }
     }
 
