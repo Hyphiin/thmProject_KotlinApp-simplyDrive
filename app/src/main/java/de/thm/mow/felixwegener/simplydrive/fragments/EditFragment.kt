@@ -52,6 +52,8 @@ class EditFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_edit, container, false)
 
         insertBtn = view.findViewById(R.id.btnInsert)
+        stationInput = view.findViewById(R.id.stationInput)
+        lineInput = view.findViewById(R.id.lineInput)
 
         val activity = requireActivity()
         contextF = activity
@@ -69,7 +71,7 @@ class EditFragment : Fragment() {
                 (requireActivity().application as MyApplication).setStartDrive(true)
                 (requireActivity().application as MyApplication).setDriveId("null")
                 stationInput.text.clear()
-                lineInput.text.clear()
+                lineInput.visibility = View.VISIBLE
             }
         }
 
@@ -100,8 +102,10 @@ class EditFragment : Fragment() {
 
     override fun onResume() {
         if (startDrive) {
+            lineInput.visibility = View.VISIBLE
             insertBtn.text = "Fahrt starten!"
         } else {
+            lineInput.visibility = View.GONE
             insertBtn.text = "Fahrt beenden!"
         }
         super.onResume()
@@ -109,17 +113,16 @@ class EditFragment : Fragment() {
 
     override fun onPause() {
         if (startDrive) {
+            lineInput.visibility = View.VISIBLE
             insertBtn.text = "Fahrt starten!"
         } else {
+            lineInput.visibility = View.GONE
             insertBtn.text = "Fahrt beenden!"
         }
         super.onPause()
     }
 
     private fun addHistory() {
-
-        stationInput = view?.findViewById(R.id.stationInput) as EditText
-        lineInput = view?.findViewById(R.id.lineInput) as EditText
 
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
@@ -158,6 +161,7 @@ class EditFragment : Fragment() {
                     passData(driveId)
                     stationInput.text.clear()
                     lineInput.text.clear()
+                    lineInput.visibility = View.GONE
 
                 }
                 .addOnFailureListener { e ->
@@ -168,8 +172,6 @@ class EditFragment : Fragment() {
     }
 
     private fun editHistory() {
-        stationInput = view?.findViewById(R.id.stationInput) as EditText
-        lineInput = view?.findViewById(R.id.lineInput) as EditText
 
         val end = stationInput.text.toString()
 
