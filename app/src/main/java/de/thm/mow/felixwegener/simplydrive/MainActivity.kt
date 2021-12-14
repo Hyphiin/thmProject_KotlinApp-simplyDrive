@@ -13,7 +13,7 @@ import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
 import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass {
+class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass {
 
     private lateinit var binding: ActivityMainBinding
 

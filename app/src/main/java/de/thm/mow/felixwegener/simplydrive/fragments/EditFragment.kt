@@ -1,17 +1,20 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.content.ContentValues
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
+import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import de.thm.mow.felixwegener.simplydrive.Location
+import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
 import kotlinx.android.synthetic.main.fragment_edit.view.*
@@ -19,9 +22,28 @@ import java.util.*
 
 class EditFragment : Fragment() {
 
-    lateinit var departureInput: EditText
-    lateinit var destinationInput: EditText
+    lateinit var stationInput: EditText
     lateinit var lineInput: EditText
+    lateinit var insertBtn: Button
+
+    private lateinit var contextF: FragmentActivity
+    private var startDrive: Boolean = true
+    private lateinit var driveId: String
+
+    lateinit var dataPasser: OnDataPass
+
+    interface OnDataPass {
+        fun onDataPass(data: String)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dataPasser = context as OnDataPass
+    }
+
+    fun passData(data: String){
+        dataPasser.onDataPass(data)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +51,24 @@ class EditFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit, container, false)
 
-        view.btnInsert.setOnClickListener { view ->
+        insertBtn = view.findViewById(R.id.btnInsert)
+
+        val activity = requireActivity()
+        contextF = activity
+        driveId = (activity.application as MyApplication).getDriveId()!!
+        startDrive = (activity.application as MyApplication).getStartDrive()!!
+
+        insertBtn.setOnClickListener { view ->
             //onSearchClick()
-            addHistory()
+            if (startDrive) {
+                addHistory()
+                (requireActivity().application as MyApplication).setStartDrive(false)
+            } else {
+                insertBtn.text = "Fahrt beenden!"
+                editHistory()
+                (requireActivity().application as MyApplication).setStartDrive(true)
+                (requireActivity().application as MyApplication).setDriveId("null")
+            }
         }
 
         view.clearHistory.setOnClickListener { view ->
@@ -43,10 +80,10 @@ class EditFragment : Fragment() {
 
 
     /*private fun onSearchClick() {
-        departureInput = view?.findViewById(R.id.departureInput) as EditText
+        stationInput = view?.findViewById(R.id.stationInput) as EditText
         destinationInput = view?.findViewById(R.id.destinationInput) as EditText
 
-        val departure = departureInput.text.toString()
+        val departure = stationInput.text.toString()
         val destination = destinationInput.text.toString()
 
         val fragment: Fragment = CardFragment.newInstance(departure, destination)
@@ -61,8 +98,7 @@ class EditFragment : Fragment() {
 
     private fun addHistory() {
 
-        departureInput = view?.findViewById(R.id.departureInput) as EditText
-        destinationInput = view?.findViewById(R.id.destinationInput) as EditText
+        stationInput = view?.findViewById(R.id.stationInput) as EditText
         lineInput = view?.findViewById(R.id.lineInput) as EditText
 
         val user = FirebaseAuth.getInstance().currentUser
@@ -71,8 +107,7 @@ class EditFragment : Fragment() {
 
             val db = Firebase.firestore
 
-            val start = departureInput.text.toString()
-            val end = destinationInput.text.toString()
+            val start = stationInput.text.toString()
             val line = lineInput.text.toString()
 
             val c = Calendar.getInstance()
@@ -89,7 +124,7 @@ class EditFragment : Fragment() {
 
             val time = "$hour:$minute:$sec"
 
-            val route = Route(date, time, start, end, line, uid)
+            val route = Route(date, time, start, "", line, uid)
 
             db.collection("routes")
                 .add(route)
@@ -98,12 +133,29 @@ class EditFragment : Fragment() {
                         ContentValues.TAG,
                         "DocumentSnapshot added with ID: ${documentReference.id}"
                     )
-
+                    driveId = documentReference.id
+                    insertBtn.text = "Fahrt beenden!"
+                    passData(driveId)
+                    //(this.context as MyApplication).setDriveId(driveId)
                 }
                 .addOnFailureListener { e ->
                     Log.w(ContentValues.TAG, "Error adding document", e)
 
                 }
+        }
+    }
+
+    private fun editHistory() {
+        stationInput = view?.findViewById(R.id.stationInput) as EditText
+
+        val end = stationInput.text.toString()
+
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val db = Firebase.firestore
+
+            db.collection("routes")
+                .document(driveId).update("end", end)
         }
     }
 
