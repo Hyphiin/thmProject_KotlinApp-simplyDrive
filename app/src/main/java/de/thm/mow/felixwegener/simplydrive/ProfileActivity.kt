@@ -3,15 +3,11 @@ package de.thm.mow.felixwegener.simplydrive
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import de.thm.mow.felixwegener.simplydrive.databinding.ActivityProfileBinding
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.nav_header.*
 
 class ProfileActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityProfileBinding
 
     private lateinit var firebaseAuth: FirebaseAuth
 
@@ -38,8 +34,7 @@ class ProfileActivity : AppCompatActivity() {
         if (firebaseUser == null) {
             startActivity(Intent(this@ProfileActivity, RegisterActivity::class.java))
             finish()
-        }
-        else {
+        } else {
             val email = firebaseUser.email
             val uid = firebaseUser.uid
 

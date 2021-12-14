@@ -61,7 +61,6 @@ class EditFragment : Fragment() {
         startDrive = (activity.application as MyApplication).getStartDrive()!!
 
         insertBtn.setOnClickListener { view ->
-            //onSearchClick()
             if (startDrive) {
                 addHistory()
                 (requireActivity().application as MyApplication).setStartDrive(false)
@@ -81,24 +80,6 @@ class EditFragment : Fragment() {
 
         return view
     }
-
-
-    /*private fun onSearchClick() {
-        stationInput = view?.findViewById(R.id.stationInput) as EditText
-        destinationInput = view?.findViewById(R.id.destinationInput) as EditText
-
-        val departure = stationInput.text.toString()
-        val destination = destinationInput.text.toString()
-
-        val fragment: Fragment = CardFragment.newInstance(departure, destination)
-        val transaction = activity?.supportFragmentManager!!.beginTransaction()
-//transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
-        transaction.replace(R.id.fragmentContainer, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-    }
-
-     */
 
     override fun onResume() {
         if (startDrive) {

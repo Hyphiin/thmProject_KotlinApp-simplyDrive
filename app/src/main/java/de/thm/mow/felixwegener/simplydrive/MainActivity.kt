@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val editFragment = EditFragment()
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
+    private val profileFragment = ProfileFragment()
 
 
     //FAB Button(s)
@@ -105,10 +106,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         //PROFILE
         profilePic.setOnClickListener {
-            val intent = Intent(this@MainActivity, ProfileActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            replaceFragment(profileFragment)
         }
 
     }
