@@ -143,14 +143,13 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         var idx = 0
-        var plus = 0.0
 
         // Add a marker and move the camera
         latArray?.forEach { entry ->
 
             val tempLon = lonArray?.get(idx)
-            val location = LatLng(entry + plus, tempLon!! + plus)
-            mMap.addMarker(MarkerOptions().position(location).title("StartMarker"))
+            val location = LatLng(entry, tempLon!!)
+            mMap.addMarker(MarkerOptions().position(location).title("Position: ${location.latitude} ; ${location.longitude}"))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
             val markerOptions = MarkerOptions()
             markerOptions.position(location)
@@ -158,7 +157,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             mMap.addMarker(markerOptions)
 
             idx++
-            plus += 0.1
         }
 
 

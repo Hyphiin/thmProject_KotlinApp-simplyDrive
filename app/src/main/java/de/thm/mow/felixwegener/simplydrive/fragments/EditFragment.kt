@@ -74,9 +74,9 @@ class EditFragment : Fragment() {
             }
         }
 
-        view.clearHistory.setOnClickListener { view ->
+        /*view.clearHistory.setOnClickListener { view ->
             clearDB()
-        }
+        }*/
 
         return view
     }
@@ -167,7 +167,7 @@ class EditFragment : Fragment() {
         }
     }
 
-    private fun clearDB() {
+    /*private fun clearDB() {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = user!!.uid
 
@@ -179,7 +179,14 @@ class EditFragment : Fragment() {
                 document.reference.delete()
             }
         }
-    }
+
+        db.collection("locations").whereEqualTo("uid", uid).get().addOnSuccessListener { result ->
+            for (document in result) {
+                document.reference.delete()
+            }
+        }
+
+    }*/
 
 
 }
