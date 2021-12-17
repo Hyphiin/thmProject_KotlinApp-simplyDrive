@@ -64,7 +64,6 @@ class GpsActivity : AppCompatActivity() {
             }
         }
 
-
         //Functions
 
         btnNewWaypoint.setOnClickListener {

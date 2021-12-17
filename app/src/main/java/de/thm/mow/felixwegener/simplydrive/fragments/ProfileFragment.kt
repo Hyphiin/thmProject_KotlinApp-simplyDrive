@@ -25,6 +25,7 @@ import android.app.ProgressDialog
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.firebase.storage.OnProgressListener
+import de.thm.mow.felixwegener.simplydrive.MyApplication
 import java.io.File
 
 
@@ -202,8 +203,8 @@ class ProfileFragment : Fragment() {
             val email = firebaseUser.email
             val uid = firebaseUser.uid
 
-            user_id__View.text = "User ID :: $uid"
-            user_email__View.text = "Email ID :: $email"
+            user_id__View.text = "ID: $uid"
+            user_email__View.text = "$email"
         }
 
     }

@@ -27,62 +27,107 @@
             app:cardElevation="6dp">
 
             <LinearLayout
-                android:id="@+id/linearLayout4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/img__ProfilePic"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    tools:layout_conversion_absoluteHeight="150dp"
-                    tools:layout_conversion_absoluteWidth="150dp"
-                    tools:layout_editor_absoluteX="72dp"
-                    tools:layout_editor_absoluteY="272dp"
-                    tools:srcCompat="@tools:sample/avatars" />
+                <LinearLayout
+                    android:id="@+id/linearLayout4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:orientation="horizontal">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        app:cardCornerRadius="20dp">
+
+                        <ImageView
+                            android:id="@+id/img__ProfilePic"
+                            android:layout_width="150dp"
+                            android:layout_height="150dp"
+                            tools:layout_conversion_absoluteHeight="150dp"
+                            tools:layout_conversion_absoluteWidth="150dp"
+                            tools:layout_editor_absoluteX="72dp"
+                            tools:layout_editor_absoluteY="272dp"
+                            tools:srcCompat="@tools:sample/avatars" />
+                    </androidx.cardview.widget.CardView>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+
+                        <Button
+                            android:id="@+id/btn__ImgSelect"
+                            android:layout_width="100dp"
+                            android:layout_height="40dp"
+                            android:backgroundTint="@color/underline"
+                            android:elevation="5dp"
+                            android:text="Select"
+                            app:cornerRadius="6dp"
+                            tools:layout_conversion_absoluteHeight="48dp"
+                            tools:layout_conversion_absoluteWidth="268dp"
+                            tools:layout_editor_absoluteX="72dp"
+                            tools:layout_editor_absoluteY="422dp" />
+
+                        <Button
+                            android:id="@+id/btn__ImgUpload"
+                            android:layout_width="100dp"
+                            android:layout_height="40dp"
+                            android:backgroundTint="@color/textColor"
+                            android:elevation="5dp"
+                            android:text="Upload"
+                            app:cornerRadius="6dp"
+                            tools:layout_conversion_absoluteHeight="48dp"
+                            tools:layout_conversion_absoluteWidth="268dp"
+                            tools:layout_editor_absoluteX="72dp"
+                            tools:layout_editor_absoluteY="470dp" />
+
+                        <Button
+                            android:id="@+id/logOut__btn"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="2dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/primary"
+                            android:elevation="5dp"
+                            android:text="Logout"
+                            app:cornerRadius="6dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_margin="16dp"
                     android:orientation="vertical">
 
-                    <Button
-                        android:id="@+id/btn__ImgSelect"
-                        android:layout_width="100dp"
-                        android:layout_height="40dp"
-                        android:backgroundTint="@color/underline"
-                        android:text="Select"
-                        app:cornerRadius="6dp"
-                        tools:layout_conversion_absoluteHeight="48dp"
-                        tools:layout_conversion_absoluteWidth="268dp"
-                        tools:layout_editor_absoluteX="72dp"
-                        tools:layout_editor_absoluteY="422dp" />
-
-                    <Button
-                        android:id="@+id/btn__ImgUpload"
-                        android:layout_width="100dp"
-                        android:layout_height="40dp"
-                        android:backgroundTint="@color/textColor"
-                        android:text="Upload"
-                        app:cornerRadius="6dp"
-                        tools:layout_conversion_absoluteHeight="48dp"
-                        tools:layout_conversion_absoluteWidth="268dp"
-                        tools:layout_editor_absoluteX="72dp"
-                        tools:layout_editor_absoluteY="470dp" />
-
-                    <Button
-                        android:id="@+id/logOut__btn"
-                        android:layout_width="100dp"
+                    <TextView
+                        android:id="@+id/user_email__View"
+                        android:layout_width="300dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/primary"
-                        android:text="Logout"
-                        app:cornerRadius="6dp" />
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/user_id__View"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:textSize="10sp" />
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -95,26 +140,6 @@
             android:layout_margin="16px"
             app:cardCornerRadius="12dp"
             app:cardElevation="6dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/user_id__View"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/user_email__View"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
