@@ -97,7 +97,6 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                             routesArrayList.add(dc.document.toObject(Route::class.java))
                         }
                     }
-                    Log.d("==========>", routesArrayList.toString())
 
                     routesAdapter = LatHisAdapter(routesArrayList, this@HomeFragment)
                     rvLatestHistory.adapter = routesAdapter
@@ -127,23 +126,16 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
             currentUserID = firebaseUser.uid
         }
 
-        Log.d("time", time.toString())
-        Log.d("date", date.toString())
-
         val foundItems = mutableListOf<String>()
 
         databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
             .whereEqualTo("time", time.toString()).whereEqualTo("date", date.toString())
             .get()
             .addOnSuccessListener { documents ->
-                Log.d(".....................", documents.toString())
                 for (document in documents) {
                     Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
-                    //currentRoute = document.id
                     foundItems.add(document.id)
                 }
-
-                Log.d("----------->", foundItems.toString())
 
                 currentRoute = foundItems.first()
 
@@ -152,14 +144,11 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                     .whereEqualTo("routeId", currentRoute)
                     .get()
                     .addOnSuccessListener { points ->
-                        val length = points.size()
-                        Log.d("....................", length.toString())
                         for (point in points) {
                             Log.d(ContentValues.TAG, "$point => $point")
                             routePoints.add(point.toObject(Location::class.java))
                         }
 
-                        Log.d("-------------------->", routePoints.toString())
                         if (routePoints.isNotEmpty()) {
 
                             try {

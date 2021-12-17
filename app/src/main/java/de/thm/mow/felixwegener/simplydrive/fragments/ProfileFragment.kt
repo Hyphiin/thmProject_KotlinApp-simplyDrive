@@ -126,22 +126,18 @@ class ProfileFragment : Fragment() {
                             )
                             .show()
                     }
-                    .addOnProgressListener(
-                        object : OnProgressListener<UploadTask.TaskSnapshot?> {
-                            // Progress Listener for loading
-                            // percentage on the dialog box
-                            override fun onProgress(
-                                taskSnapshot: UploadTask.TaskSnapshot
-                            ) {
-                                val progress = ((100.0
-                                        * taskSnapshot.bytesTransferred
-                                        / taskSnapshot.totalByteCount))
-                                progressDialog.setMessage(
-                                    ("Uploaded "
-                                            + progress.toInt() + "%")
-                                )
-                            }
-                        })
+                    .addOnProgressListener { taskSnapshot ->
+
+                        // Progress Listener for loading
+                        // percentage on the dialog box
+                        val progress = ((100.0
+                                * taskSnapshot.bytesTransferred
+                                / taskSnapshot.totalByteCount))
+                        progressDialog.setMessage(
+                            ("Uploaded "
+                                    + progress.toInt() + "%")
+                        )
+                    }
             }
         }
     }
@@ -221,11 +217,16 @@ class ProfileFragment : Fragment() {
 
             val localFile = File.createTempFile("tempImage", "jpg")
             imageRef.getFile(localFile).addOnSuccessListener {
-                Log.d("userPic:", imageRef.path.toString())
+                Log.d("Found User-Img:", imageRef.path)
                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                 img__ProfilePic.setImageBitmap(bitmap)
             }.addOnFailureListener {
-                // Handle any errors
+                Log.d("Failed finding User-Img", "Loading Fallback Image!")
+                val fallbackImage = storage.reference.child("images/maxe.png")
+                fallbackImage.getFile(localFile).addOnSuccessListener {
+                    val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                    img__ProfilePic.setImageBitmap(bitmap)
+                }
             }
         }
     }

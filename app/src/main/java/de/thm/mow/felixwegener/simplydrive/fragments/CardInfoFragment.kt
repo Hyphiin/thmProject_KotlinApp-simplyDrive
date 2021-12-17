@@ -6,6 +6,7 @@ import android.graphics.Point
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import android.widget.TextView
@@ -48,6 +49,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     private var qrCodeIV: ImageView? = null
 
+    private lateinit var closeBtn: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -71,7 +74,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         val tvDepInfo = view.findViewById<TextView>(R.id.tvDepInfo)
         val tvDesInfo = view.findViewById<TextView>(R.id.tvDesInfo)
         val tvStartTime = view.findViewById<TextView>(R.id.tvStartTime)
-        val tvEndTime = view.findViewById<TextView>(R.id.tvEndTime)
+        //val tvEndTime = view.findViewById<TextView>(R.id.tvEndTime)
+        closeBtn = view.findViewById(R.id.btn__closeCard)
 
         qrCodeIV = view.findViewById(R.id.idIVQrcode)
 
@@ -79,7 +83,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         tvDepInfo.text = departure
         tvDesInfo.text = destination
         tvStartTime.text = startTime
-        tvEndTime.text = endTime
+        //tvEndTime.text = endTime
 
         // for generating Ticket
         // below line is for getting
@@ -129,6 +133,10 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             // this method is called for
             // exception handling.
             Log.e("Tag", e.toString());
+        }
+
+        closeBtn.setOnClickListener {
+            activity?.onBackPressed()
         }
 
         val manager = fragmentManager

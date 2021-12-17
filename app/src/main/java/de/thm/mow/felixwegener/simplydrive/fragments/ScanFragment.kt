@@ -46,7 +46,7 @@ class ScanFragment : Fragment() {
         dataPasser = context as OnDataPass
     }
 
-    fun passData(data: String){
+    fun passData(data: String) {
         dataPasser.onDataPass(data)
     }
 
@@ -137,8 +137,6 @@ class ScanFragment : Fragment() {
 
         val list = text.split(delimiter)
 
-        Log.d(".......XXX", list.toString())
-
         if (startDrive) {
             builder.setMessage("${list[0]} mit ${list[1]}")
                 .setPositiveButton("Fahrt starten!") { _, _ -> addHistory(list) }
@@ -187,8 +185,6 @@ class ScanFragment : Fragment() {
                 val time = "$hour:$minute:$sec"
 
                 val route = Route(date, time, start, "", line, uid)
-
-                Log.d("ROUTE_____________X", route.toString())
 
                 db.collection("routes")
                     .add(route)

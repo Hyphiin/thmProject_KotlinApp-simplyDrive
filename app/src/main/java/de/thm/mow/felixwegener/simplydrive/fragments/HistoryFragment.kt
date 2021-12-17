@@ -82,7 +82,6 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                             routesArrayList.add(dc.document.toObject(Route::class.java))
                         }
                     }
-                    Log.d("==========>", routesArrayList.toString())
 
                     routesAdapter = LatHisAdapter(routesArrayList, this@HistoryFragment)
                     rvLatestHistory.adapter = routesAdapter
@@ -110,19 +109,14 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
             currentUserID = firebaseUser.uid
         }
 
-        Log.d("time", time.toString())
-        Log.d("date", date.toString())
-
         val foundItems = mutableListOf<String>()
 
         databaseRef.collection("routes").whereEqualTo("uid", currentUserID)
             .whereEqualTo("time", time.toString()).whereEqualTo("date", date.toString())
             .get()
             .addOnSuccessListener { documents ->
-                Log.d(".....................", documents.toString())
                 for (document in documents) {
                     Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
-                    //currentRoute = document.id
                     foundItems.add(document.id)
                 }
 
@@ -136,13 +130,10 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                     .get()
                     .addOnSuccessListener { points ->
                         val length = points.size()
-                        Log.d("....................", length.toString())
                         for (point in points) {
                             Log.d(ContentValues.TAG, "$point => $point")
                             routePoints.add(point.toObject(Location::class.java))
                         }
-
-                        Log.d("-------------------->", routePoints.toString())
                         if (routePoints.isNotEmpty()) {
 
                             try {

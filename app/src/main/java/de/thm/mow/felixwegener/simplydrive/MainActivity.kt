@@ -24,8 +24,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.StorageReference
 
 
-
-
 class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass {
 
     private lateinit var binding: ActivityMainBinding
@@ -70,7 +68,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private lateinit var currentDriveId: String
 
     override fun onDataPass(data: String) {
-        Log.d("LOG", "hello $data")
         currentDriveId = data
 
         // set

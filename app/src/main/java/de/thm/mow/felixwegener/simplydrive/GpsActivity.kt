@@ -53,7 +53,7 @@ class GpsActivity : AppCompatActivity() {
         locationCallBack = object : LocationCallback() {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onLocationResult(locationResult: LocationResult?) {
-                Log.d("...................", locationResult.toString());
+                Log.d("Tracked Location:", locationResult.toString());
                 if (locationResult != null) {
                     uploadLocation(locationResult)
                 }
@@ -118,8 +118,28 @@ class GpsActivity : AppCompatActivity() {
             // get
             val s = (this.application as MyApplication).getDriveId()
 
-            val lastLocation = LastLocation(locationResult.lastLocation?.accuracy, locationResult.lastLocation?.altitude, locationResult.lastLocation?.latitude, locationResult.lastLocation?.longitude, locationResult.lastLocation?.provider, locationResult.lastLocation?.speed, locationResult.lastLocation?.speedAccuracyMetersPerSecond, locationResult.lastLocation?.time, locationResult.lastLocation?.verticalAccuracyMeters)
-            val locationPoint = LocationPoint(locationResult.locations[0].accuracy, locationResult.locations[0].altitude, locationResult.locations[0].latitude, locationResult.locations[0].longitude, locationResult.locations[0].provider, locationResult.locations[0].speed, locationResult.locations[0].speedAccuracyMetersPerSecond, locationResult.locations[0].time, locationResult.locations[0].verticalAccuracyMeters)
+            val lastLocation = LastLocation(
+                locationResult.lastLocation?.accuracy,
+                locationResult.lastLocation?.altitude,
+                locationResult.lastLocation?.latitude,
+                locationResult.lastLocation?.longitude,
+                locationResult.lastLocation?.provider,
+                locationResult.lastLocation?.speed,
+                locationResult.lastLocation?.speedAccuracyMetersPerSecond,
+                locationResult.lastLocation?.time,
+                locationResult.lastLocation?.verticalAccuracyMeters
+            )
+            val locationPoint = LocationPoint(
+                locationResult.locations[0].accuracy,
+                locationResult.locations[0].altitude,
+                locationResult.locations[0].latitude,
+                locationResult.locations[0].longitude,
+                locationResult.locations[0].provider,
+                locationResult.locations[0].speed,
+                locationResult.locations[0].speedAccuracyMetersPerSecond,
+                locationResult.locations[0].time,
+                locationResult.locations[0].verticalAccuracyMeters
+            )
 
             val resultLocation = LocationResultSelf(lastLocation, locationPoint)
 
@@ -219,7 +239,7 @@ class GpsActivity : AppCompatActivity() {
                 if (location != null) {
                     updateUIValues(location)
                     currentLocation = location
-                    Log.d("_________________>", currentLocation.toString());
+                    Log.d("Current Location:", currentLocation.toString());
                 }
             }
         } else {
