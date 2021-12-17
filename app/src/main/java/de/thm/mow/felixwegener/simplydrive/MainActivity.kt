@@ -2,16 +2,29 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
 import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
+import com.google.android.gms.tasks.OnFailureListener
+
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.auth.FirebaseAuth
+
+import com.google.firebase.storage.StorageReference
+
+
+
 
 class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass {
 
@@ -25,6 +38,11 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
+
+    private lateinit var userPic: ImageView
+    var storage = Firebase.storage
+    private lateinit var firebaseAuth: FirebaseAuth
+
 
 
     //FAB Button(s)
@@ -75,6 +93,9 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        retrieveProfilePic()
 
         //Fragments
         replaceFragment(homeFragment)
@@ -109,6 +130,24 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             replaceFragment(profileFragment)
         }
 
+    }
+
+    private fun retrieveProfilePic() {
+        val firebaseUser = firebaseAuth.currentUser
+
+        if (firebaseUser != null) {
+            val imageRef = storage.reference.child("images/${firebaseUser.uid}")
+
+            val ONE_MEGABYTE = (1024 * 1024)*2000.toLong()
+            imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                // Data for "images/island.jpg" is returns, use this as needed
+                Log.d("userPic:", imageRef.path.toString())
+                val bitmap = BitmapFactory.decodeFile(imageRef.path)
+                userPic.setImageBitmap(bitmap)
+            }.addOnFailureListener {
+                // Handle any errors
+            }
+        }
     }
 
     private fun replaceGpsActivity() {

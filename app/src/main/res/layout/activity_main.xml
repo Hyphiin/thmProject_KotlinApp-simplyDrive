@@ -43,7 +43,7 @@
                 android:layout_height="match_parent">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/circleImageView"
+                    android:id="@+id/img__currentUser"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:src="@drawable/maxe"
