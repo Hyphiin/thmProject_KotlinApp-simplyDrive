@@ -22,7 +22,10 @@ import com.google.firebase.storage.UploadTask
 import android.widget.Toast
 import com.google.firebase.storage.StorageReference
 import android.app.ProgressDialog
+import android.graphics.BitmapFactory
+import android.util.Log
 import com.google.firebase.storage.OnProgressListener
+import java.io.File
 
 
 class ProfileFragment : Fragment() {
@@ -45,7 +48,6 @@ class ProfileFragment : Fragment() {
     var storage = Firebase.storage
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -64,6 +66,8 @@ class ProfileFragment : Fragment() {
 
         firebaseAuth = FirebaseAuth.getInstance()
         checkUser()
+
+        retrieveProfilePic()
 
         logOut__btn.setOnClickListener {
             firebaseAuth.signOut()
@@ -206,6 +210,24 @@ class ProfileFragment : Fragment() {
             user_email__View.text = "Email ID :: $email"
         }
 
+    }
+
+    private fun retrieveProfilePic() {
+        val firebaseUser = firebaseAuth.currentUser
+
+        if (firebaseUser != null) {
+            val imageRef = storage.reference.child("images/${firebaseUser.uid}")
+
+
+            val localFile = File.createTempFile("tempImage", "jpg")
+            imageRef.getFile(localFile).addOnSuccessListener {
+                Log.d("userPic:", imageRef.path.toString())
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                img__ProfilePic.setImageBitmap(bitmap)
+            }.addOnFailureListener {
+                // Handle any errors
+            }
+        }
     }
 
 

@@ -39,12 +39,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
 
-    private lateinit var userPic: ImageView
-    var storage = Firebase.storage
-    private lateinit var firebaseAuth: FirebaseAuth
-
-
-
     //FAB Button(s)
     private val rotateOpen: Animation by lazy {
         AnimationUtils.loadAnimation(
@@ -93,10 +87,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        retrieveProfilePic()
-
         //Fragments
         replaceFragment(homeFragment)
 
@@ -130,24 +120,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             replaceFragment(profileFragment)
         }
 
-    }
-
-    private fun retrieveProfilePic() {
-        val firebaseUser = firebaseAuth.currentUser
-
-        if (firebaseUser != null) {
-            val imageRef = storage.reference.child("images/${firebaseUser.uid}")
-
-            val ONE_MEGABYTE = (1024 * 1024)*2000.toLong()
-            imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
-                // Data for "images/island.jpg" is returns, use this as needed
-                Log.d("userPic:", imageRef.path.toString())
-                val bitmap = BitmapFactory.decodeFile(imageRef.path)
-                userPic.setImageBitmap(bitmap)
-            }.addOnFailureListener {
-                // Handle any errors
-            }
-        }
     }
 
     private fun replaceGpsActivity() {
