@@ -204,17 +204,17 @@ class RegisterActivity : AppCompatActivity() {
                 Log.d(TAG, "firebaseAuthWithGoogleAccount: Email: $email")
 
                 if (authResult.additionalUserInfo!!.isNewUser) {
-                    Log.d(TAG, "firebaseAuthWithGoogleAccount: Account created... n\$email")
+                    Log.d(TAG, "firebaseAuthWithGoogleAccount: Account created... \n\$email")
                     Toast.makeText(
                         this@RegisterActivity,
                         "Account created... n$email",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    Log.d(TAG, "firebaseAuthWithGoogleAccount: Existing user... n\$email")
+                    Log.d(TAG, "firebaseAuthWithGoogleAccount: Existing user... \n\$email")
                     Toast.makeText(
                         this@RegisterActivity,
-                        "Welcome back... n$email",
+                        "Welcome back:\n$email",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

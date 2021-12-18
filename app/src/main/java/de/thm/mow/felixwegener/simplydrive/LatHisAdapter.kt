@@ -18,8 +18,6 @@ class LatHisAdapter(
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LatHisViewHolder {
 
-        Log.d("::::::::::::::::::>", parent.context.toString())
-
         val itemView =
             LayoutInflater.from(parent.context).inflate(R.layout.item_latest_history, parent, false)
 
@@ -28,8 +26,6 @@ class LatHisAdapter(
     }
 
     override fun onBindViewHolder(holder: LatHisViewHolder, position: Int) {
-
-        Log.d("::::::::::::::::::>", "${routesList[position]} , $position")
 
         val currentItem = routesList[position]
 

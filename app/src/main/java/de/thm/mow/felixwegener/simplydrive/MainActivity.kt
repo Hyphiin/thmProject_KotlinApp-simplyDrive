@@ -2,6 +2,7 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -9,13 +10,21 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
 import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
+import com.google.firebase.auth.FirebaseAuth
+import java.io.File
+
 
 class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var firebaseAuth: FirebaseAuth
+
+    var storage = Firebase.storage
 
     //Fragments
     private val homeFragment = HomeFragment()
@@ -25,7 +34,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
-
 
     //FAB Button(s)
     private val rotateOpen: Animation by lazy {
@@ -58,7 +66,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private lateinit var currentDriveId: String
 
     override fun onDataPass(data: String) {
-        Log.d("LOG", "hello $data")
         currentDriveId = data
 
         // set
@@ -74,7 +81,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
-
 
         //Fragments
         replaceFragment(homeFragment)
@@ -109,6 +115,33 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             replaceFragment(profileFragment)
         }
 
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        retrieveUserImage()
+
+    }
+
+    private fun retrieveUserImage() {
+        val firebaseUser = firebaseAuth.currentUser
+
+        if (firebaseUser != null) {
+            val imageRef = storage.reference.child("images/${firebaseUser.uid}")
+
+
+            val localFile = File.createTempFile("tempImage", "jpg")
+            imageRef.getFile(localFile).addOnSuccessListener {
+                Log.d("Found User-Img:", imageRef.path)
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                img__currentUser.setImageBitmap(bitmap)
+            }.addOnFailureListener {
+                Log.d("Failed finding User-Img", "Loading Fallback Image!")
+                val fallbackImage = storage.reference.child("images/maxe.png")
+                fallbackImage.getFile(localFile).addOnSuccessListener {
+                    val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                    img__currentUser.setImageBitmap(bitmap)
+                }
+            }
+        }
     }
 
     private fun replaceGpsActivity() {
@@ -132,6 +165,9 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
             fragmentTransaction.commit()
         }
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        retrieveUserImage()
     }
 
     private fun onAddButtonClicked() {
