@@ -136,19 +136,6 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                         }
                         if (routePoints.isNotEmpty()) {
 
-                            try {
-                                val outputStreamWriter = OutputStreamWriter(
-                                    context?.openFileOutput(
-                                        "${currentRoute}.txt",
-                                        Context.MODE_PRIVATE
-                                    )
-                                )
-                                outputStreamWriter.write(routePoints.toString())
-                                outputStreamWriter.close()
-                            } catch (e: IOException) {
-                                Log.e("Exception", "File write failed: $e")
-                            }
-
                             val firstLoc = routePoints.first()?.location?.locations
                             val lonArray = DoubleArray(routePoints.size)
                             val latArray = DoubleArray(routePoints.size)
@@ -172,6 +159,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
 
                             // die gefundene Route
                             val fragment: Fragment = CardInfoFragment.newInstance(
+                                route.date.toString(),
                                 route.start.toString(),
                                 route.end.toString(),
                                 route.time.toString(),

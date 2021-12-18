@@ -14,6 +14,7 @@
         android:layout_marginEnd="50dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
+        app:contentPadding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,103 +33,111 @@
 
 
                 <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="35dp"
-                    android:layout_marginTop="20dp"
-                    android:text="Datum:"
-                    android:textColor="@color/textColor"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/map" />
-
-
-                <TextView
                     android:id="@+id/tvLHdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="12dp"
                     android:text="21.10.2021"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView"
                     app:layout_constraintTop_toBottomOf="@+id/map" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="35dp"
-                    android:layout_marginTop="15dp"
-                    android:text="Von:"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Uhrzeit:"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
                 <TextView
-                    android:id="@+id/tvDepInfo"
+                    android:id="@+id/tvStartTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="15dp"
-                    android:text="Hanau HBF"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="17:20:00"
                     android:textColor="@color/textColor"
-                    app:layout_constraintStart_toEndOf="@+id/textView2"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
+                    app:layout_constraintStart_toEndOf="@+id/textView5"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDesInfo" />
 
                 <TextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="35dp"
-                    android:layout_marginTop="5dp"
-                    android:text="Bis:"
+                    android:layout_marginLeft="2dp"
+                    android:text="Uhr"
                     android:textColor="@color/textColor"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDepInfo" />
-
+                    app:layout_constraintStart_toEndOf="@+id/tvStartTime"
+                    app:layout_constraintTop_toTopOf="@+id/tvStartTime" />
 
                 <TextView
                     android:id="@+id/tvDesInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
                     android:text="Wetzlar Bahnhof"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView3"
                     app:layout_constraintTop_toBottomOf="@+id/tvDepInfo" />
 
                 <TextView
-                    android:id="@+id/textView5"
+                    android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="35dp"
-                    android:layout_marginTop="15dp"
-                    android:text="Uhrzeit:"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="Bis:"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
+                    app:layout_constraintTop_toBottomOf="@+id/tvDepInfo" />
 
                 <TextView
-                    android:id="@+id/tvStartTime"
+                    android:id="@+id/tvDepInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="15dp"
-                    android:text="17:20Uhr"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Hanau HBF"
                     android:textColor="@color/textColor"
-                    app:layout_constraintStart_toEndOf="@+id/textView5"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDesInfo" />
+                    app:layout_constraintStart_toEndOf="@+id/textView2"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:text="Datum:"
+                    android:textColor="@color/textColor"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Von:"
+                    android:textColor="@color/textColor"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
+
 
                 <ImageView
                     android:id="@+id/idIVQrcode"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="80dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="100dp"
                     android:contentDescription="@string/qr_code"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
@@ -147,13 +156,28 @@
                     android:id="@+id/btn__closeCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
                     android:backgroundTint="@color/textColor"
                     android:text="Schließen"
                     app:cornerRadius="6dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvStartTime" />
+                    app:layout_constraintHorizontal_bias="0.09"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/btn__ExportTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:src="@android:drawable/stat_sys_download"
+                    app:backgroundTint="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.876"
+                    app:layout_constraintStart_toEndOf="@+id/btn__closeCard"
+                    app:layout_constraintTop_toBottomOf="@+id/idIVQrcode"
+                    app:layout_constraintVertical_bias="0.636" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

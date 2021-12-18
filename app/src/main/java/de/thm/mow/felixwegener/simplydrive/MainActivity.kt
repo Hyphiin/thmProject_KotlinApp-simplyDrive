@@ -3,6 +3,7 @@ package de.thm.mow.felixwegener.simplydrive
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -22,11 +23,21 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 
 import com.google.firebase.storage.StorageReference
+import java.io.File
 
 
 class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var firebaseAuth: FirebaseAuth
+
+    // Uri indicates, where the image will be picked from
+    private var filePath: Uri? = null
+
+    // request code
+    private val PICK_IMAGE_REQUEST = 22
+
+    var storage = Firebase.storage
 
     //Fragments
     private val homeFragment = HomeFragment()
@@ -117,6 +128,33 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             replaceFragment(profileFragment)
         }
 
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        retrieveUserImage()
+
+    }
+
+    private fun retrieveUserImage() {
+        val firebaseUser = firebaseAuth.currentUser
+
+        if (firebaseUser != null) {
+            val imageRef = storage.reference.child("images/${firebaseUser.uid}")
+
+
+            val localFile = File.createTempFile("tempImage", "jpg")
+            imageRef.getFile(localFile).addOnSuccessListener {
+                Log.d("Found User-Img:", imageRef.path)
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                img__currentUser.setImageBitmap(bitmap)
+            }.addOnFailureListener {
+                Log.d("Failed finding User-Img", "Loading Fallback Image!")
+                val fallbackImage = storage.reference.child("images/maxe.png")
+                fallbackImage.getFile(localFile).addOnSuccessListener {
+                    val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                    img__currentUser.setImageBitmap(bitmap)
+                }
+            }
+        }
     }
 
     private fun replaceGpsActivity() {
@@ -140,6 +178,9 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
             fragmentTransaction.commit()
         }
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        retrieveUserImage()
     }
 
     private fun onAddButtonClicked() {
