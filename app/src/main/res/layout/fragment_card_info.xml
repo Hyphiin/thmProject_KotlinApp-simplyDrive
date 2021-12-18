@@ -157,7 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:backgroundTint="@color/textColor"
+                    android:backgroundTint="@color/underline"
                     android:text="Schließen"
                     app:cornerRadius="6dp"
                     app:layout_constraintBottom_toBottomOf="parent"

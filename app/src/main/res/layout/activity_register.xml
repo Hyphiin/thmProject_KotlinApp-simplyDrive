@@ -44,61 +44,75 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/registerEmailInput"
-                    android:layout_width="300dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Email"
-                    android:inputType="textEmailAddress"
-                    android:paddingLeft="25px"
-                    android:textColor="@color/textColor"
-                    android:textSize="14sp" />
+                    android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/registerPasswordInput"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Passwort"
-                    android:inputType="textPassword"
-                    android:paddingLeft="25px"
-                    android:textSize="14sp" />
+                    <EditText
+                        android:id="@+id/registerEmailInput"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@android:color/transparent"
+                        android:ems="10"
+                        android:hint="Email"
+                        android:inputType="textEmailAddress"
+                        android:paddingLeft="25px"
+                        android:textColor="@color/textColor"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/registerPasswordInput"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@android:color/transparent"
+                        android:ems="10"
+                        android:hint="Passwort"
+                        android:inputType="textPassword"
+                        android:paddingLeft="25px"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/registerLoginBtn"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:backgroundTint="@color/underline"
+                        android:text="Login"
+                        android:textColor="@color/textColor"
+                        android:textSize="12sp"
+                        app:cornerRadius="6dp" />
+
+                    <Button
+                        android:id="@+id/registerRegisterBtn"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:backgroundTint="@color/underline"
+                        android:text="Registrieren"
+                        android:textColor="@color/textColor"
+                        android:textSize="12sp"
+                        app:cornerRadius="6dp" />
+                </LinearLayout>
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
-
-        <Button
-            android:id="@+id/registerLoginBtn"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="@color/primary"
-            android:text="Login"
-            android:textColor="@color/textColor"
-            android:textSize="12sp"
-            app:cornerRadius="6dp" />
-
-        <Button
-            android:id="@+id/registerRegisterBtn"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginBottom="2dp"
-            android:backgroundTint="@color/primary"
-            android:text="Registrieren"
-            android:textColor="@color/textColor"
-            android:textSize="12sp"
-            app:cornerRadius="6dp" />
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/register__google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="100dp"
-            android:layout_marginTop="10dp"
             android:layout_marginRight="100dp"
             android:layout_marginBottom="2dp"
             app:buttonSize="icon_only"
