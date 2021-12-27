@@ -12,8 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMapsBinding
-import java.util.*
+import de.thm.mow.felixwegener.simplydrive.MyApplication
 
 
 private const val ARG_START = "start"
@@ -24,6 +23,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var start: DoubleArray? = null
     private var end: DoubleArray? = null
+    private lateinit var currentLocation: Location
+    private var currLocTrue: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +33,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             start = it.getDoubleArray(ARG_START)
             end = it.getDoubleArray(ARG_END)
         }
+
     }
 
     override fun onCreateView(
@@ -46,6 +48,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.mapView, fragment)
         transaction.commit()
         fragment.getMapAsync(this)
+
+        currLocTrue = (activity?.application as MyApplication).getCurrLocTrue()
+
+        if (currLocTrue){
+            currentLocation = (activity?.application as MyApplication).getCurrentLocation()
+        }
+
         return view
     }
 
@@ -53,14 +62,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        //mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-        val markerOptions = MarkerOptions()
-        markerOptions.position(sydney)
-        markerOptions.title("Lat:"+ sydney.latitude + " Lon:" + sydney.longitude)
-        mMap.addMarker(markerOptions)
+        if (currLocTrue) {
+            val currLocation = LatLng(currentLocation.latitude, currentLocation.longitude)
+            val markerOptions = MarkerOptions()
+            markerOptions.position(currLocation)
+            markerOptions.title("Lat:" + currLocation.latitude + " Lon:" + currLocation.longitude)
+            mMap.addMarker(markerOptions)
+        }
 
     }
 

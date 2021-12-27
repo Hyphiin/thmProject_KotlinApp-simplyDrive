@@ -239,6 +239,8 @@ class GpsActivity : AppCompatActivity() {
                     updateUIValues(location)
                     currentLocation = location
                     Log.d("Current Location:", currentLocation.toString());
+                    (this.application as MyApplication).setCurrentLocation(location)
+                    (this.application as MyApplication).setCurrLocTrue()
                 }
             }
         } else {
