@@ -259,6 +259,12 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             }
             mMap.addMarker(markerOptions)
 
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15F));
+            // Zoom in, animating the camera.
+            googleMap.animateCamera(CameraUpdateFactory.zoomIn());
+            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15F), 2000, null);
+
             idx++
         }
 
