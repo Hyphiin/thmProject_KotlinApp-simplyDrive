@@ -64,25 +64,10 @@ class GpsActivity : AppCompatActivity() {
             }
         }
 
-        //Functions
-
-        btnNewWaypoint.setOnClickListener {
-            val myApplication = applicationContext as MyApplication
-            savedLocations = myApplication.getMyLocations() as MutableList<Location>
-            savedLocations.add(currentLocation)
-        }
-
-        btnWaypointList.setOnClickListener {
-            startActivity(Intent(this@GpsActivity, ShowSavedLocationsListActivity::class.java))
-            finish()
-        }
-
         btnShowMap.setOnClickListener {
             startActivity(Intent(this@GpsActivity, MapsActivity::class.java))
             finish()
         }
-
-
 
         sw_gps.setOnClickListener {
             if (sw_gps.isChecked) {
@@ -93,17 +78,8 @@ class GpsActivity : AppCompatActivity() {
                 tv_sensor.text = "Using Towers + WIFI"
             }
         }
-
-        sw_locationsupdates.setOnClickListener {
-            if (sw_locationsupdates.isChecked) {
-                startLocationUpdates()
-            } else {
-                stopLocationUpdates()
-            }
-        }
-
-
         updateGPS()
+        startLocationUpdates()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -165,7 +141,6 @@ class GpsActivity : AppCompatActivity() {
 
 
     private fun startLocationUpdates() {
-        tv_updates.text = "Location is being tracked"
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -191,18 +166,6 @@ class GpsActivity : AppCompatActivity() {
         updateGPS()
     }
 
-    private fun stopLocationUpdates() {
-        tv_updates.text = "Location is NOT being tracked"
-        tv_lat.text = "Not tracking location"
-        tv_lon.text = "Not tracking location"
-        tv_altitude.text = "Not tracking location"
-        tv_accuracy.text = "Not tracking location"
-        tv_speed.text = "Not tracking location"
-        tv_address.text = "Not tracking location"
-        tv_sensor.text = "Not tracking location"
-
-        fusedLocationProviderClient.removeLocationUpdates(locationCallBack)
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -226,7 +189,6 @@ class GpsActivity : AppCompatActivity() {
     }
 
     private fun updateGPS() {
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (ActivityCompat.checkSelfPermission(
@@ -239,8 +201,6 @@ class GpsActivity : AppCompatActivity() {
                     updateUIValues(location)
                     currentLocation = location
                     Log.d("Current Location:", currentLocation.toString());
-                    (this.application as MyApplication).setCurrentLocation(location)
-                    (this.application as MyApplication).setCurrLocTrue()
                 }
             }
         } else {
@@ -278,14 +238,12 @@ class GpsActivity : AppCompatActivity() {
         try {
             val adresses: List<Address> =
                 geocoder.getFromLocation(location.latitude, location.longitude, 1)
-            tv_address.text = adresses.get(0).getAddressLine(0)
+            tv_address.text = adresses[0].getAddressLine(0)
         } catch (e: Exception) {
             tv_address.text = "Unable to get street address"
         }
 
         val myApplication = applicationContext as MyApplication
         savedLocations = myApplication.getMyLocations() as MutableList<Location>
-        tv_wayPointsCounts.text = savedLocations.size.toString()
-
     }
 }
