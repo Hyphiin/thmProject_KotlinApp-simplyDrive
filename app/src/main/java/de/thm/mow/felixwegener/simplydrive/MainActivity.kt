@@ -1,15 +1,23 @@
 package de.thm.mow.felixwegener.simplydrive
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.location.Location
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.google.android.gms.location.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
@@ -65,6 +73,17 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private lateinit var currentDriveId: String
 
+    //GPS
+    private val defaultUpdateInterval = 30
+    private val fastUpdateInterval = 5
+    private val permissionsFineLocation = 99
+
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationCallBack: LocationCallback
+
+    private lateinit var currentLocation: Location
+
     override fun onDataPass(data: String) {
         currentDriveId = data
 
@@ -118,6 +137,23 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         firebaseAuth = FirebaseAuth.getInstance()
 
         retrieveUserImage()
+
+        //GPS
+        locationRequest = LocationRequest()
+
+        locationRequest.interval = (1000 * defaultUpdateInterval).toLong()
+        locationRequest.fastestInterval = (1000 * fastUpdateInterval).toLong()
+
+        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+
+        locationCallBack = object : LocationCallback() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onLocationResult(locationResult: LocationResult?) {
+                Log.d("Tracked Location:", locationResult.toString());
+            }
+        }
+        updateGPS()
+        startLocationUpdates()
 
     }
 
@@ -211,6 +247,84 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private fun setDrive(d: String) {
         currentDrive = d
+    }
+
+    // GPS STUFF
+
+    private fun startLocationUpdates() {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    permissionsFineLocation
+                )
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    permissionsFineLocation
+                )
+            }
+            return
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null)
+        updateGPS()
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(":_:_:_:_:_:_:", "updateGPS")
+                updateGPS()
+            } else {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Diese Funktion benötigt eine Zustimmung um zu funktionieren",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun updateGPS() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) === PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    currentLocation = location
+                    Log.d("Current Location:", currentLocation.toString());
+                }
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    permissionsFineLocation
+                )
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    permissionsFineLocation
+                )
+            }
+        }
     }
 
 }
