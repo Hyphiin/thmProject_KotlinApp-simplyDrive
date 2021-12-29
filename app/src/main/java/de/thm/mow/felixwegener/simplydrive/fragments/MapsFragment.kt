@@ -1,6 +1,7 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -23,6 +24,12 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import de.thm.mow.felixwegener.simplydrive.LastLocation
+import de.thm.mow.felixwegener.simplydrive.LocationPoint
+import de.thm.mow.felixwegener.simplydrive.LocationResultSelf
 import de.thm.mow.felixwegener.simplydrive.MyApplication
 import java.lang.Exception
 
@@ -82,14 +89,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onLocationResult(locationResult: LocationResult?) {
                 Log.d("Tracked Location:", locationResult.toString());
+                if (locationResult != null) {
+                    uploadLocation(locationResult)
+                }
                 locationResult ?: return
                 /*for (location in locationResult.locations) {
-                    updateGPS()
-                    startLocationUpdates()
-
+                    updateUIValues(location)
                 }*/
-                updateGPS()
-                startLocationUpdates()
             }
         }
         updateGPS()
@@ -98,9 +104,63 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
-    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }*/
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadLocation(locationResult: LocationResult) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = user.uid
+
+            val db = Firebase.firestore
+
+            // get
+            val s = (activity?.application as MyApplication).getDriveId()
+
+            val lastLocation = LastLocation(
+                locationResult.lastLocation?.accuracy,
+                locationResult.lastLocation?.altitude,
+                locationResult.lastLocation?.latitude,
+                locationResult.lastLocation?.longitude,
+                locationResult.lastLocation?.provider,
+                locationResult.lastLocation?.speed,
+                locationResult.lastLocation?.speedAccuracyMetersPerSecond,
+                locationResult.lastLocation?.time,
+                locationResult.lastLocation?.verticalAccuracyMeters
+            )
+            val locationPoint = LocationPoint(
+                locationResult.locations[0].accuracy,
+                locationResult.locations[0].altitude,
+                locationResult.locations[0].latitude,
+                locationResult.locations[0].longitude,
+                locationResult.locations[0].provider,
+                locationResult.locations[0].speed,
+                locationResult.locations[0].speedAccuracyMetersPerSecond,
+                locationResult.locations[0].time,
+                locationResult.locations[0].verticalAccuracyMeters
+            )
+
+            val resultLocation = LocationResultSelf(lastLocation, locationPoint)
+
+            if (s != "null") {
+                val location =
+                    de.thm.mow.felixwegener.simplydrive.Location(resultLocation, uid, s!!)
+
+                db.collection("locations")
+                    .add(location)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(
+                            ContentValues.TAG,
+                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                        )
+
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(ContentValues.TAG, "Error adding document", e)
+
+                    }
+            }
+
+        }
+    }
 
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
