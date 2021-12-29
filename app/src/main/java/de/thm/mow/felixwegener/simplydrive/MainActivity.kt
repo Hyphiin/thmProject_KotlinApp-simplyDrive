@@ -1,21 +1,31 @@
 package de.thm.mow.felixwegener.simplydrive
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.location.Location
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.google.android.gms.location.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
 import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
 import java.io.File
 
 
@@ -34,6 +44,17 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
+
+    //GPS
+    private val defaultUpdateInterval = 30
+    private val fastUpdateInterval = 5
+    private val permissionsFineLocation = 99
+
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationCallBack: LocationCallback
+
+    private lateinit var currentLocation: Location
 
     //FAB Button(s)
     private val rotateOpen: Animation by lazy {
@@ -109,6 +130,30 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             replaceFragment(editFragment)
             fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_search, this.theme));
         }
+
+        //GPS
+        locationRequest = LocationRequest()
+
+        locationRequest.interval = (1000 * defaultUpdateInterval).toLong()
+        locationRequest.fastestInterval = (1000 * fastUpdateInterval).toLong()
+
+        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+
+        locationCallBack = object : LocationCallback() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onLocationResult(locationResult: LocationResult?) {
+                Log.d("Tracked Location:", locationResult.toString());
+                if (locationResult != null) {
+                    uploadLocation(locationResult)
+                }
+                locationResult ?: return
+                /*for (location in locationResult.locations) {
+                    updateUIValues(location)
+                }*/
+            }
+        }
+        updateGPS()
+        startLocationUpdates()
 
         //PROFILE
         profilePic.setOnClickListener {
@@ -211,6 +256,141 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private fun setDrive(d: String) {
         currentDrive = d
+    }
+
+    //GPS
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadLocation(locationResult: LocationResult) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = user.uid
+
+            val db = Firebase.firestore
+
+            // get
+            val s = (this.application as MyApplication).getDriveId()
+
+            val lastLocation = LastLocation(
+                locationResult.lastLocation?.accuracy,
+                locationResult.lastLocation?.altitude,
+                locationResult.lastLocation?.latitude,
+                locationResult.lastLocation?.longitude,
+                locationResult.lastLocation?.provider,
+                locationResult.lastLocation?.speed,
+                locationResult.lastLocation?.speedAccuracyMetersPerSecond,
+                locationResult.lastLocation?.time,
+                locationResult.lastLocation?.verticalAccuracyMeters
+            )
+            val locationPoint = LocationPoint(
+                locationResult.locations[0].accuracy,
+                locationResult.locations[0].altitude,
+                locationResult.locations[0].latitude,
+                locationResult.locations[0].longitude,
+                locationResult.locations[0].provider,
+                locationResult.locations[0].speed,
+                locationResult.locations[0].speedAccuracyMetersPerSecond,
+                locationResult.locations[0].time,
+                locationResult.locations[0].verticalAccuracyMeters
+            )
+
+            val resultLocation = LocationResultSelf(lastLocation, locationPoint)
+
+            if (s != "null") {
+                val location = Location(resultLocation, uid, s!!)
+
+                db.collection("locations")
+                    .add(location)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(
+                            ContentValues.TAG,
+                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                        )
+
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(ContentValues.TAG, "Error adding document", e)
+
+                    }
+            }
+
+        }
+    }
+
+
+    private fun startLocationUpdates() {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    permissionsFineLocation
+                )
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    permissionsFineLocation
+                )
+            }
+            return
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null)
+        updateGPS()
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(":_:_:_:_:_:_:", "updateGPS")
+                updateGPS()
+            } else {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Diese Funktion benötigt eine Zustimmung um zu funktionieren",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun updateGPS() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) === PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    currentLocation = location
+                    Log.d("Current Location:", currentLocation.toString());
+                }
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    permissionsFineLocation
+                )
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    permissionsFineLocation
+                )
+            }
+        }
     }
 
 }
