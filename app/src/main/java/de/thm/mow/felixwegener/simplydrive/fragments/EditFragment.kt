@@ -1,7 +1,9 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,15 +12,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
+import de.thm.mow.felixwegener.simplydrive.Station
 import kotlinx.android.synthetic.main.fragment_edit.view.*
 import java.util.*
+import kotlin.math.abs
 
 class EditFragment : Fragment() {
 
@@ -29,6 +35,9 @@ class EditFragment : Fragment() {
     private lateinit var contextF: FragmentActivity
     private var startDrive: Boolean = true
     private lateinit var driveId: String
+
+    private var currentLocation: Location? = null
+    private var endDrive: Boolean? = false
 
     lateinit var dataPasser: OnDataPass
 
@@ -43,6 +52,12 @@ class EditFragment : Fragment() {
 
     fun passData(data: String) {
         dataPasser.onDataPass(data)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        currentLocation = (activity?.application as MyApplication).getCurrentLocation()
+
     }
 
     override fun onCreateView(
@@ -67,16 +82,14 @@ class EditFragment : Fragment() {
             } else {
                 insertBtn.text = "Fahrt beenden!"
                 editHistory()
-                (requireActivity().application as MyApplication).setStartDrive(true)
-                (requireActivity().application as MyApplication).setDriveId("null")
-                stationInput.text.clear()
-                lineInput.visibility = View.VISIBLE
+                if (endDrive == true) {
+                    (requireActivity().application as MyApplication).setStartDrive(true)
+                    (requireActivity().application as MyApplication).setDriveId("null")
+                    stationInput.text.clear()
+                    lineInput.visibility = View.VISIBLE
+                }
             }
         }
-
-        /*view.clearHistory.setOnClickListener { view ->
-            clearDB()
-        }*/
 
         return view
     }
@@ -112,42 +125,94 @@ class EditFragment : Fragment() {
             val db = Firebase.firestore
 
             val start = stationInput.text.toString()
-            val line = lineInput.text.toString()
+            var success = false
+            lateinit var station: Station
 
-            val c = Calendar.getInstance()
+            db.collection("stations").document(start)
+                .get()
+                .addOnSuccessListener { document ->
+                    Log.d("___________", document.toString())
 
-            val year = c.get(Calendar.YEAR)
-            val month = c.get(Calendar.MONTH)
-            val day = c.get(Calendar.DAY_OF_MONTH)
+                    if (document.exists()) {
+                        success = true
+                        station = document.toObject<Station>()!!
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Bitte wählen Sie eine gültige Station!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
-            val date = "$day-$month-$year"
+                    if (success) {
+                        val line = lineInput.text.toString()
 
-            val hour = c.get(Calendar.HOUR_OF_DAY)
-            val minute = c.get(Calendar.MINUTE)
-            val sec = c.get(Calendar.SECOND)
+                        val c = Calendar.getInstance()
 
-            val time = "$hour:$minute:$sec"
+                        val year = c.get(Calendar.YEAR)
+                        val month = c.get(Calendar.MONTH)
+                        val day = c.get(Calendar.DAY_OF_MONTH)
 
-            val route = Route(date, time, start, "", line, uid)
+                        val date = "$day-$month-$year"
 
-            db.collection("routes")
-                .add(route)
-                .addOnSuccessListener { documentReference ->
-                    Log.d(
-                        ContentValues.TAG,
-                        "DocumentSnapshot added with ID: ${documentReference.id}"
-                    )
-                    driveId = documentReference.id
-                    insertBtn.text = "Fahrt beenden!"
-                    passData(driveId)
-                    stationInput.text.clear()
-                    lineInput.text.clear()
-                    lineInput.visibility = View.GONE
+                        val hour = c.get(Calendar.HOUR_OF_DAY)
+                        val minute = c.get(Calendar.MINUTE)
+                        val sec = c.get(Calendar.SECOND)
 
+                        val time = "$hour:$minute:$sec"
+
+                        val route = Route(date, time, start, "", line, uid)
+
+                        val checkLatitude = station.latitude?.minus(currentLocation!!.latitude)
+                            ?.let { it1 -> abs(it1) }
+
+                        val checkLongitude = station.longitude?.minus(currentLocation!!.longitude)
+                            ?.let { it1 -> abs(it1) }
+
+                        Toast.makeText(
+                            context,
+                            " Lat: $checkLatitude, Long: $checkLongitude",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        if (checkLatitude != null && checkLongitude != null) {
+                            if (checkLatitude <= 0.005 && checkLongitude <= 0.005) {
+                                Toast.makeText(
+                                    context,
+                                    "Nah genug!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                db.collection("routes")
+                                    .add(route)
+                                    .addOnSuccessListener { documentReference ->
+                                        Log.d(
+                                            ContentValues.TAG,
+                                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                                        )
+                                        driveId = documentReference.id
+                                        insertBtn.text = "Fahrt beenden!"
+                                        passData(driveId)
+                                        stationInput.text.clear()
+                                        lineInput.text.clear()
+                                        lineInput.visibility = View.GONE
+
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.w(ContentValues.TAG, "Error adding document", e)
+
+                                    }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Zu weit entfernt von der ausgewählten Station!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
                 }
-                .addOnFailureListener { e ->
-                    Log.w(ContentValues.TAG, "Error adding document", e)
-
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
                 }
         }
     }
@@ -160,33 +225,68 @@ class EditFragment : Fragment() {
         user?.let {
             val db = Firebase.firestore
 
-            db.collection("routes")
-                .document(driveId).update("end", end)
+            var success = false
+            lateinit var station: Station
 
-            insertBtn.text = "Fahrt starten!"
+            db.collection("stations").document(end)
+                .get()
+                .addOnSuccessListener { document ->
+                    Log.d("___________", document.toString())
+
+                    if (document.exists()) {
+                        success = true
+                        station = document.toObject<Station>()!!
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Bitte wählen Sie eine gültige Station!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    if (success) {
+
+                        val checkLatitude = station.latitude?.minus(currentLocation!!.latitude)
+                            ?.let { it1 -> abs(it1) }
+
+                        val checkLongitude = station.longitude?.minus(currentLocation!!.longitude)
+                            ?.let { it1 -> abs(it1) }
+
+                        Toast.makeText(
+                            context,
+                            " Lat: $checkLatitude, Long: $checkLongitude",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        if (checkLatitude != null && checkLongitude != null) {
+                            if (checkLatitude <= 0.005 && checkLongitude <= 0.005) {
+                                Toast.makeText(
+                                    context,
+                                    "Nah genug!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                db.collection("routes")
+                                    .document(driveId).update("end", end)
+
+                                insertBtn.text = "Fahrt starten!"
+
+                                endDrive = true
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Zu weit entfernt von der ausgewählten Station!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
+                }
         }
     }
-
-    /*private fun clearDB() {
-        val user = FirebaseAuth.getInstance().currentUser
-        val uid = user!!.uid
-
-        Log.d("TAG", "clearDB")
-        val db = Firebase.firestore
-
-        db.collection("routes").whereEqualTo("uid", uid).get().addOnSuccessListener { result ->
-            for (document in result) {
-                document.reference.delete()
-            }
-        }
-
-        db.collection("locations").whereEqualTo("uid", uid).get().addOnSuccessListener { result ->
-            for (document in result) {
-                document.reference.delete()
-            }
-        }
-
-    }*/
 
 
 }

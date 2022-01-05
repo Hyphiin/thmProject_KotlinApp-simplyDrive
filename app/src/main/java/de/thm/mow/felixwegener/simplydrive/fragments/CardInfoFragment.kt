@@ -25,6 +25,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.zxing.WriterException
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
@@ -64,6 +66,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var closeBtn: Button
 
+    private lateinit var deleteBtn: FloatingActionButton
+
     private lateinit var exportBtnTxt: FloatingActionButton
     private lateinit var databaseRef: FirebaseFirestore
     private lateinit var routePoints: MutableList<Location>
@@ -97,6 +101,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         //val tvEndTime = view.findViewById<TextView>(R.id.tvEndTime)
         closeBtn = view.findViewById(R.id.btn__closeCard)
         exportBtnTxt = view.findViewById(R.id.btn__ExportTxt)
+        deleteBtn = view.findViewById(R.id.deleteBTN)
 
         qrCodeIV = view.findViewById(R.id.idIVQrcode)
 
@@ -163,6 +168,10 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             activity?.onBackPressed()
         }
 
+        deleteBtn.setOnClickListener {
+            deleteLocations()
+        }
+
         exportBtnTxt.setOnClickListener {
             date?.let { it1 -> startTime?.let { it2 -> saveTxt(it1, it2) } }
         }
@@ -216,7 +225,11 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                                     )
                                     outputStreamWriter.write(routePoints.toString())
                                     outputStreamWriter.close()
-                                    Toast.makeText(activity, "Datei mit dem Namen ${currentRoute}.txt \nerfolgreich heruntergeladen", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        activity,
+                                        "Datei mit dem Namen ${currentRoute}.txt \nerfolgreich heruntergeladen",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } catch (e: IOException) {
                                     Log.e("Exception", "File write failed: $e")
                                 }
@@ -255,7 +268,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                     geocoder.getFromLocation(location.latitude, location.longitude, 1)
                 markerOptions.title(adresses[0].getAddressLine(0))
             } catch (e: Exception) {
-                markerOptions.title("Lat: "+location.latitude + ", Lon: " + location.longitude)
+                markerOptions.title("Lat: " + location.latitude + ", Lon: " + location.longitude)
             }
             mMap.addMarker(markerOptions)
 
@@ -269,6 +282,32 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         }
 
 
+    }
+
+    private fun deleteLocations() {
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val uid = user!!.uid
+
+        Log.d("TAG", "clearDB")
+        val db = Firebase.firestore
+
+        var docId: String? = "leer"
+
+        db.collection("routes").whereEqualTo("date", date).whereEqualTo("time", startTime).get().addOnSuccessListener { result ->
+            for (document in result) {
+                docId = document.id
+                document.reference.delete()
+
+                if (docId != "leer") {
+                    db.collection("locations").whereEqualTo("routeId", docId).get().addOnSuccessListener { result ->
+                        for (document in result) {
+                            document.reference.delete()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     companion object {
