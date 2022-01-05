@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -39,13 +40,13 @@ private const val ARG_END = "end"
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
-    private val defaultUpdateInterval = 30
+   /* private val defaultUpdateInterval = 30
     private val fastUpdateInterval = 5
     private val permissionsFineLocation = 99
 
     private lateinit var locationRequest: LocationRequest
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var locationCallBack: LocationCallback
+    private lateinit var locationCallBack: LocationCallback*/
 
     private var currentLocation: Location? = null
 
@@ -61,7 +62,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             end = it.getDoubleArray(ARG_END)
         }
 
-
+        currentLocation = (activity?.application as MyApplication).getCurrentLocation()
 
     }
 
@@ -78,7 +79,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         transaction.commit()
         fragment.getMapAsync(this)
 
-        locationRequest = LocationRequest()
+        /*locationRequest = LocationRequest()
 
         locationRequest.interval = (1000 * defaultUpdateInterval).toLong()
         locationRequest.fastestInterval = (1000 * fastUpdateInterval).toLong()
@@ -93,18 +94,62 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     uploadLocation(locationResult)
                 }
                 locationResult ?: return
-                /*for (location in locationResult.locations) {
+                *//*for (location in locationResult.locations) {
                     updateUIValues(location)
-                }*/
+                }*//*
             }
         }
         updateGPS()
-        startLocationUpdates()
+        startLocationUpdates()*/
 
         return view
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+//        startLocationUpdates()
+//        updateGPS()
+        val markerOptions = MarkerOptions()
+
+        if (currentLocation != null) {
+            val latLng = LatLng(currentLocation?.latitude!!, currentLocation?.longitude!!)
+            markerOptions.position(latLng)
+
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        currentLocation?.latitude!!,
+                        currentLocation?.longitude!!,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+            }
+            mMap.addMarker(markerOptions)
+
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15F));
+            // Zoom in, animating the camera.
+            googleMap.animateCamera(CameraUpdateFactory.zoomIn());
+            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15F), 2000, null);
+        }
+
+    }
+
+    companion object {
+        fun newInstance(start: DoubleArray, end: DoubleArray) =
+            HistoryDetailView().apply {
+                arguments = Bundle().apply {
+                    putDoubleArray(ARG_START, start)
+                    putDoubleArray(ARG_END, end)
+                }
+            }
+    }
+
+    /*@RequiresApi(Build.VERSION_CODES.O)
     private fun uploadLocation(locationResult: LocationResult) {
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
@@ -160,9 +205,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             }
 
         }
-    }
+    }*/
 
-    private fun startLocationUpdates() {
+    /*private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -238,51 +283,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 )
             }
         }
-    }
+    }*/
 
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        startLocationUpdates()
-        updateGPS()
-        val markerOptions = MarkerOptions()
-
-        if (currentLocation != null) {
-            val latLng = LatLng(currentLocation?.latitude!!, currentLocation?.longitude!!)
-            markerOptions.position(latLng)
-
-            val geocoder = Geocoder(context)
-            try {
-                val adresses: List<Address> =
-                    geocoder.getFromLocation(
-                        currentLocation?.latitude!!,
-                        currentLocation?.longitude!!,
-                        1
-                    )
-                markerOptions.title(adresses[0].getAddressLine(0))
-            } catch (e: Exception) {
-                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
-            }
-            mMap.addMarker(markerOptions)
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15F));
-            // Zoom in, animating the camera.
-            googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15F), 2000, null);
-        }
-
-    }
-
-    companion object {
-        fun newInstance(start: DoubleArray, end: DoubleArray) =
-            HistoryDetailView().apply {
-                arguments = Bundle().apply {
-                    putDoubleArray(ARG_START, start)
-                    putDoubleArray(ARG_END, end)
-                }
-            }
-    }
 }
 

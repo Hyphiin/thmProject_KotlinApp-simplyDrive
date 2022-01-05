@@ -55,12 +55,4 @@ class MyApplication : Application() {
         this.currentLocation = location
     }
 
-    private var currLocTrue: Boolean = false
-    fun getCurrLocTrue(): Boolean {
-        return currLocTrue
-    }
-    fun setCurrLocTrue(){
-        currLocTrue = true
-    }
-
 }

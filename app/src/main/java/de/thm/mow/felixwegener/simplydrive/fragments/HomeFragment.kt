@@ -62,15 +62,6 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         return homeView
     }
 
-    /* private fun onHomeCardClicked(){
-         val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof", )
-         val transaction = activity?.supportFragmentManager!!.beginTransaction()
-         transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
-         transaction.replace(R.id.fragmentContainer, fragment)
-         transaction.addToBackStack(null)
-         transaction.commit()
-     }*/
-
 
     private fun getUserData() {
         databaseRef = FirebaseFirestore.getInstance()

@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     var storage = Firebase.storage
 
     //Fragments
+    private var startDrive: Boolean = false
+
     private val homeFragment = HomeFragment()
     private val settingsFragment = SettingsFragment()
     private val historyFragment = HistoryFragment()
@@ -44,10 +46,11 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
+    private val driveFragment = CardDriveFragment()
 
     //GPS
-    private val defaultUpdateInterval = 30
-    private val fastUpdateInterval = 5
+    private val defaultUpdateInterval = 5
+    private val fastUpdateInterval = 2
     private val permissionsFineLocation = 99
 
     private lateinit var locationRequest: LocationRequest
@@ -104,12 +107,16 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
         //Fragments
-        replaceFragment(homeFragment)
+        checkHomeScreen()
 
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> replaceFragment(homeFragment)
-                R.id.nav_setting -> replaceGpsActivity()
+                R.id.nav_setting -> Toast.makeText(
+                    this@MainActivity,
+                    "Moin",
+                    Toast.LENGTH_SHORT
+                ).show()
                 R.id.nav_history -> replaceFragment(historyFragment)
                 R.id.nav_map -> replaceFragment(mapsFragment)
             }
@@ -189,14 +196,13 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         }
     }
 
-    private fun replaceGpsActivity() {
-        startActivity(Intent(this@MainActivity, GpsActivity::class.java))
-        finish()
-    }
-
-    private fun replaceMapActivity() {
-        startActivity(Intent(this@MainActivity, MapsActivity::class.java))
-        finish()
+    private fun checkHomeScreen() {
+        startDrive = (application as MyApplication).getStartDrive()!!
+        if (startDrive === true) {
+            replaceFragment(homeFragment)
+        } else {
+            replaceFragment(driveFragment)
+        }
     }
 
 
@@ -210,7 +216,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
             fragmentTransaction.commit()
         }
-
         firebaseAuth = FirebaseAuth.getInstance()
         retrieveUserImage()
     }
@@ -312,13 +317,12 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
                     }
             }
-
         }
     }
 
 
     private fun startLocationUpdates() {
-
+        Log.d(">>>>>>>>>>>>>>>", "startLocationUpdates")
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -353,7 +357,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         when (requestCode) {
             permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(":_:_:_:_:_:_:", "updateGPS")
+
                 updateGPS()
             } else {
                 Toast.makeText(
@@ -366,6 +370,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     }
 
     private fun updateGPS() {
+        Log.d(">>>>>>>>>>>>>>>", "updateGPS")
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (ActivityCompat.checkSelfPermission(
@@ -376,6 +381,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     currentLocation = location
+                    (this.application as MyApplication).setCurrentLocation(currentLocation)
                     Log.d("Current Location:", currentLocation.toString());
                 }
             }
