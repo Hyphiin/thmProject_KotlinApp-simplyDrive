@@ -36,6 +36,16 @@ class MyApplication : Application() {
         this.startDrive = startDrive
     }
 
+    private var endDrive: Boolean? = false;
+
+    fun getEndDrive(): Boolean? {
+        return endDrive
+    }
+
+    fun setEndDrive(endDrive: Boolean?) {
+       this.endDrive = endDrive
+    }
+
 
     private var driveId: String? = "null"
 

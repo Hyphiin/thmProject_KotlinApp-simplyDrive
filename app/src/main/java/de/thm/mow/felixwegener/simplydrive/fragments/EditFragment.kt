@@ -74,15 +74,16 @@ class EditFragment : Fragment() {
         contextF = activity
         driveId = (activity.application as MyApplication).getDriveId()!!
         startDrive = (activity.application as MyApplication).getStartDrive()!!
+        endDrive = (activity.application as MyApplication).getEndDrive()!!
 
         insertBtn.setOnClickListener { view ->
             if (startDrive) {
                 addHistory()
                 (requireActivity().application as MyApplication).setStartDrive(false)
             } else {
-                insertBtn.text = "Fahrt beenden!"
                 editHistory()
                 if (endDrive == true) {
+                    insertBtn.text = "Fahrt beenden!"
                     (requireActivity().application as MyApplication).setStartDrive(true)
                     (requireActivity().application as MyApplication).setDriveId("null")
                     stationInput.text.clear()
@@ -169,19 +170,8 @@ class EditFragment : Fragment() {
                         val checkLongitude = station.longitude?.minus(currentLocation!!.longitude)
                             ?.let { it1 -> abs(it1) }
 
-                        Toast.makeText(
-                            context,
-                            " Lat: $checkLatitude, Long: $checkLongitude",
-                            Toast.LENGTH_LONG
-                        ).show()
-
                         if (checkLatitude != null && checkLongitude != null) {
                             if (checkLatitude <= 0.005 && checkLongitude <= 0.005) {
-                                Toast.makeText(
-                                    context,
-                                    "Nah genug!",
-                                    Toast.LENGTH_LONG
-                                ).show()
                                 db.collection("routes")
                                     .add(route)
                                     .addOnSuccessListener { documentReference ->
@@ -252,17 +242,12 @@ class EditFragment : Fragment() {
                         val checkLongitude = station.longitude?.minus(currentLocation!!.longitude)
                             ?.let { it1 -> abs(it1) }
 
-                        Toast.makeText(
-                            context,
-                            " Lat: $checkLatitude, Long: $checkLongitude",
-                            Toast.LENGTH_LONG
-                        ).show()
-
                         if (checkLatitude != null && checkLongitude != null) {
                             if (checkLatitude <= 0.005 && checkLongitude <= 0.005) {
+
                                 Toast.makeText(
                                     context,
-                                    "Nah genug!",
+                                    "Erfolgreich beendet!",
                                     Toast.LENGTH_LONG
                                 ).show()
 
@@ -270,8 +255,8 @@ class EditFragment : Fragment() {
                                     .document(driveId).update("end", end)
 
                                 insertBtn.text = "Fahrt starten!"
+                                (requireActivity().application as MyApplication).setEndDrive(true)
 
-                                endDrive = true
                             } else {
                                 Toast.makeText(
                                     context,
