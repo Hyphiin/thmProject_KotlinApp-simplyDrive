@@ -196,6 +196,16 @@ class ScanFragment : Fragment() {
                         driveId = documentReference.id
                         passData(driveId)
 
+                        val fragment: Fragment = HomeFragment()
+                        val transaction =
+                            activity?.supportFragmentManager!!.beginTransaction()
+                        transaction.replace(
+                            R.id.fragmentContainer,
+                            fragment,
+                            "fragmentTag"
+                        )
+                        transaction.commit()
+
                     }
                     .addOnFailureListener { e ->
                         Log.w(ContentValues.TAG, "Error adding document", e)
@@ -213,6 +223,16 @@ class ScanFragment : Fragment() {
 
             db.collection("routes")
                 .document(driveId).update("end", list[0])
+
+            val fragment: Fragment = HomeFragment()
+            val transaction =
+                activity?.supportFragmentManager!!.beginTransaction()
+            transaction.replace(
+                R.id.fragmentContainer,
+                fragment,
+                "fragmentTag"
+            )
+            transaction.commit()
         }
     }
 
