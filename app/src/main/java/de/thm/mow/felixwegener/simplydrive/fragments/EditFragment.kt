@@ -10,9 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
@@ -22,7 +20,6 @@ import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
 import de.thm.mow.felixwegener.simplydrive.Station
-import kotlinx.android.synthetic.main.fragment_edit.view.*
 import java.util.*
 import kotlin.math.abs
 
@@ -37,7 +34,6 @@ class EditFragment : Fragment() {
     private lateinit var driveId: String
 
     private var currentLocation: Location? = null
-    private var endDrive: Boolean? = false
 
     lateinit var dataPasser: OnDataPass
 
@@ -74,7 +70,6 @@ class EditFragment : Fragment() {
         contextF = activity
         driveId = (activity.application as MyApplication).getDriveId()!!
         startDrive = (activity.application as MyApplication).getStartDrive()!!
-        endDrive = (activity.application as MyApplication).getEndDrive()!!
 
         insertBtn.setOnClickListener { view ->
             if (startDrive) {
@@ -82,13 +77,6 @@ class EditFragment : Fragment() {
                 (requireActivity().application as MyApplication).setStartDrive(false)
             } else {
                 editHistory()
-                if (endDrive == true) {
-                    insertBtn.text = "Fahrt beenden!"
-                    (requireActivity().application as MyApplication).setStartDrive(true)
-                    (requireActivity().application as MyApplication).setDriveId("null")
-                    stationInput.text.clear()
-                    lineInput.visibility = View.VISIBLE
-                }
             }
         }
 
@@ -179,12 +167,27 @@ class EditFragment : Fragment() {
                                             ContentValues.TAG,
                                             "DocumentSnapshot added with ID: ${documentReference.id}"
                                         )
+                                        Toast.makeText(
+                                            context,
+                                            "Fahrt gestartet!",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         driveId = documentReference.id
                                         insertBtn.text = "Fahrt beenden!"
                                         passData(driveId)
                                         stationInput.text.clear()
                                         lineInput.text.clear()
                                         lineInput.visibility = View.GONE
+
+                                        val fragment: Fragment = HomeFragment()
+                                        val transaction =
+                                            activity?.supportFragmentManager!!.beginTransaction()
+                                        transaction.replace(
+                                            R.id.fragmentContainer,
+                                            fragment,
+                                            "fragmentTag"
+                                        )
+                                        transaction.commit()
 
                                     }
                                     .addOnFailureListener { e ->
@@ -255,7 +258,15 @@ class EditFragment : Fragment() {
                                     .document(driveId).update("end", end)
 
                                 insertBtn.text = "Fahrt starten!"
-                                (requireActivity().application as MyApplication).setEndDrive(true)
+                                (requireActivity().application as MyApplication).setStartDrive(true)
+                                (requireActivity().application as MyApplication).setDriveId("null")
+                                stationInput.text.clear()
+                                lineInput.visibility = View.VISIBLE
+                                val fragment: Fragment = HomeFragment()
+                                val transaction =
+                                    activity?.supportFragmentManager!!.beginTransaction()
+                                transaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
+                                transaction.commit()
 
                             } else {
                                 Toast.makeText(
