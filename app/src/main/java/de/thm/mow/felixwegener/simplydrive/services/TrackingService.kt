@@ -36,6 +36,7 @@ import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.MainActivity
 import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.TrackingUtility
+import pub.devrel.easypermissions.EasyPermissions
 import java.util.jar.Manifest
 
 typealias Polyline = MutableList<LatLng>
@@ -196,6 +197,7 @@ class TrackingService : LifecycleService() {
         },
         FLAG_MUTABLE
     )
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)

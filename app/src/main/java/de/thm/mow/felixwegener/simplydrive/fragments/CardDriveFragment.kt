@@ -1,25 +1,28 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
+import android.content.ContentValues
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import de.thm.mow.felixwegener.simplydrive.Constants
-import de.thm.mow.felixwegener.simplydrive.Location
-import de.thm.mow.felixwegener.simplydrive.MyApplication
-import de.thm.mow.felixwegener.simplydrive.R
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import de.thm.mow.felixwegener.simplydrive.*
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import kotlinx.android.synthetic.main.activity_gps.*
 import java.lang.Exception
 
@@ -43,6 +46,7 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var startLon: Double? = null
     private var startLat: Double? = null
+    var posMarker: Marker? = null
 
     private var isTracking = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
@@ -82,7 +86,167 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_card_drive, container, false)
 
+        subscribeToObservers()
+
        return view
+    }
+
+
+
+    private fun subscribeToObservers() {
+        TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
+            updateTracking(it)
+        })
+
+        TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
+            pathPoints = it
+            addLatestPolyline()
+            moveCameraToUser()
+        })
+    }
+
+    private fun updateTracking(isTracking: Boolean){
+        this.isTracking = isTracking
+    }
+
+    private fun moveCameraToUser() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
+            mMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    pathPoints.last().last(),
+                    Constants.MAP_ZOOM
+                )
+            )
+        }
+    }
+
+    private fun addAllPolylines() {
+        for (polyline in pathPoints) {
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .addAll(polyline)
+            mMap?.addPolyline(polylineOptions)
+        }
+        val markerOptions = MarkerOptions()
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            posMarker?.remove()
+            val lastLatLng = pathPoints.first().first()
+            markerOptions.position(lastLatLng)
+
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        currentLocation?.latitude!!,
+                        currentLocation?.longitude!!,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+            }
+            posMarker = mMap!!.addMarker(markerOptions)
+        }
+    }
+
+    private fun addLatestPolyline() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            posMarker?.remove()
+            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
+            val lastLatLng = pathPoints.last().last()
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .add(preLastLatLng)
+                .add(lastLatLng)
+            mMap?.addPolyline(polylineOptions)
+
+            val markerOptions = MarkerOptions()
+
+            markerOptions.position(lastLatLng)
+
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        lastLatLng.latitude,
+                        lastLatLng.longitude,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + lastLatLng.latitude + ", Lon: " + lastLatLng.longitude)
+            }
+
+            posMarker = mMap!!.addMarker(markerOptions)
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        val markerOptions = MarkerOptions()
+
+        addAllPolylines()
+
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            val latLng = pathPoints.first().first()
+            markerOptions.position(latLng)
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        latLng.latitude,
+                        latLng.longitude,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+            }
+            mMap!!.addMarker(markerOptions)
+        }
+
+
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val db = Firebase.firestore
+
+            lateinit var station: Station
+            var stationName: String = "Test"
+
+            db.collection("stations").get()
+                .addOnSuccessListener { document ->
+                    for (entry in document.documents) {
+                        if (entry.data?.isNotEmpty() == true){
+                            station = Station(
+                                entry.data!!.values.first() as Double?,
+                                entry.data!!.values.last() as Double?
+                            )
+
+                            stationName = entry.id
+                        }
+
+                        val latLng = LatLng(station.latitude!!, station.longitude!!)
+                        markerOptions.position(latLng)
+                        markerOptions.icon(getMarkerIcon("#65FADD"))
+
+                        markerOptions.title(stationName)
+
+                        mMap!!.addMarker(markerOptions)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                }
+        }
+    }
+
+    private fun getMarkerIcon(color: String?): BitmapDescriptor? {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(Color.parseColor(color), hsv)
+        return BitmapDescriptorFactory.defaultMarker(hsv[0])
     }
 
     companion object {
@@ -109,70 +273,5 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
                     putDoubleArray(ARG_LATARRAY, latArray)
                 }
             }
-    }
-
-    private fun moveCameraToUser() {
-        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
-            mMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    pathPoints.first().first(),
-                    Constants.MAP_ZOOM
-                )
-            )
-        }
-    }
-
-    private fun addAllPolylines() {
-        for (polyline in pathPoints) {
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .addAll(polyline)
-            mMap?.addPolyline(polylineOptions)
-        }
-    }
-
-    private fun addLatestPolyline() {
-        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
-            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
-            val lastLatLng = pathPoints.last().last()
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .add(preLastLatLng)
-                .add(lastLatLng)
-            mMap.addPolyline(polylineOptions)
-        }
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        val markerOptions = MarkerOptions()
-
-        if (currentLocation != null) {
-            val latLng = LatLng(currentLocation?.latitude!!, currentLocation?.longitude!!)
-            markerOptions.position(latLng)
-
-            val geocoder = Geocoder(context)
-            try {
-                val adresses: List<Address> =
-                    geocoder.getFromLocation(
-                        currentLocation?.latitude!!,
-                        currentLocation?.longitude!!,
-                        1
-                    )
-                markerOptions.title(adresses[0].getAddressLine(0))
-            } catch (e: Exception) {
-                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
-            }
-            mMap.addMarker(markerOptions)
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15F));
-            // Zoom in, animating the camera.
-            googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15F), 2000, null);
-        }
     }
 }

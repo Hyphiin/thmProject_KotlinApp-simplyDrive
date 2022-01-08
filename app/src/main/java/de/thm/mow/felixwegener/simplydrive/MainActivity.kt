@@ -2,11 +2,8 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -14,27 +11,24 @@ import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
-import com.google.android.gms.location.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
 import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_SHOW_CARD_FRAG
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_START_OR_RESUME_SERVICE
-import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_STOP_SERVICE
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import pub.devrel.easypermissions.AppSettingsDialog
 import java.io.File
+import pub.devrel.easypermissions.EasyPermissions
 
 
-class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass {
+
+class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.OnDataPass, EasyPermissions.PermissionCallbacks {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var firebaseAuth: FirebaseAuth
@@ -52,17 +46,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
     private val driveFragment = CardDriveFragment()
-
-    //GPS
-    private val defaultUpdateInterval = 5
-    private val fastUpdateInterval = 2
-    private val permissionsFineLocation = 99
-
-    private lateinit var locationRequest: LocationRequest
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var locationCallBack: LocationCallback
-
-    private lateinit var currentLocation: Location
 
     //FAB Button(s)
     private val rotateOpen: Animation by lazy {
@@ -101,6 +84,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         (this.application as MyApplication).setDriveId(currentDriveId)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -119,7 +103,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> replaceFragment(homeFragment)
-                R.id.nav_setting -> sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+                R.id.nav_setting -> Log.d("Moin","moin")
                 R.id.nav_history -> replaceFragment(historyFragment)
                 R.id.nav_map -> replaceFragment(mapsFragment)
             }
@@ -141,30 +125,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_search, this.theme));
         }
 
-        //GPS
-        locationRequest = LocationRequest()
-
-        locationRequest.interval = (1000 * defaultUpdateInterval).toLong()
-        locationRequest.fastestInterval = (1000 * fastUpdateInterval).toLong()
-
-        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-
-        locationCallBack = object : LocationCallback() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onLocationResult(locationResult: LocationResult?) {
-                Log.d("Tracked Location:", locationResult.toString());
-                if (locationResult != null) {
-                    uploadLocation(locationResult)
-                }
-                locationResult ?: return
-                /*for (location in locationResult.locations) {
-                    updateUIValues(location)
-                }*/
-            }
-        }
-        updateGPS()
-        startLocationUpdates()
-
         //PROFILE
         profilePic.setOnClickListener {
             replaceFragment(profileFragment)
@@ -174,6 +134,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         retrieveUserImage()
 
+        requestPermissions()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -223,6 +184,9 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             val fragmentTransaction = supportFragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
             fragmentTransaction.commit()
+        }
+        if (fragment === mapsFragment){
+            sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
         }
         firebaseAuth = FirebaseAuth.getInstance()
         retrieveUserImage()
@@ -285,8 +249,53 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {}
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if(EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
+        } else {
+            requestPermissions()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun requestPermissions() {
+        if (TrackingUtility.hasLocationPermissions(this)){
+            return
+        }
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            EasyPermissions.requestPermissions(
+                this,
+                "You need to accept location permissons to use this app.",
+                Constants.REQUEST_CODE_LOCATION_PERMISSION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        } else {
+            EasyPermissions.requestPermissions(
+                this,
+                "You need to accept location permissons to use this app.",
+                Constants.REQUEST_CODE_LOCATION_PERMISSION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
+        }
+    }
+
     //GPS
-    @RequiresApi(Build.VERSION_CODES.O)
+    /*@RequiresApi(Build.VERSION_CODES.O)
     private fun uploadLocation(locationResult: LocationResult) {
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
@@ -367,10 +376,10 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null)
         updateGPS()
-    }
+    }*/
 
 
-    override fun onRequestPermissionsResult(
+    /*override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
@@ -419,6 +428,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
                 )
             }
         }
-    }
+    }*/
 
 }

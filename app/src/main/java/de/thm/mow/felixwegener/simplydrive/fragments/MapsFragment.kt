@@ -1,55 +1,38 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
-import android.Manifest
 import android.content.ContentValues
-import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
-import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import androidx.lifecycle.Observer
-import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
-import de.thm.mow.felixwegener.simplydrive.Constants.POLYLINE_COLOR
-import de.thm.mow.felixwegener.simplydrive.Constants.POLYLINE_WIDTH
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
-import kotlinx.android.synthetic.main.fragment_maps.*
 import java.lang.Exception
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.firebase.firestore.ktx.toObject
-import de.thm.mow.felixwegener.simplydrive.R
-import kotlin.math.abs
+import com.google.android.gms.maps.model.BitmapDescriptor
 
 
 private const val ARG_START = "start"
 private const val ARG_END = "end"
 
-class MapsFragment : Fragment(), OnMapReadyCallback {
-
-    private var currentLocation: Location? = null
+class MapsFragment : Fragment(), OnMapReadyCallback{
 
     private var mMap: GoogleMap? = null
     private var start: DoubleArray? = null
@@ -66,8 +49,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             start = it.getDoubleArray(ARG_START)
             end = it.getDoubleArray(ARG_END)
         }
-
-        currentLocation = (activity?.application as MyApplication).getCurrentLocation()
     }
 
     override fun onCreateView(
@@ -121,7 +102,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 .color(Constants.POLYLINE_COLOR)
                 .width(Constants.POLYLINE_WIDTH)
                 .addAll(polyline)
-            mMap?.addPolyline(polylineOptions)
+            //mMap?.addPolyline(polylineOptions)
         }
         val markerOptions = MarkerOptions()
         if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
@@ -133,13 +114,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             try {
                 val adresses: List<Address> =
                     geocoder.getFromLocation(
-                        currentLocation?.latitude!!,
-                        currentLocation?.longitude!!,
+                        lastLatLng.latitude,
+                        lastLatLng.longitude,
                         1
                     )
                 markerOptions.title(adresses[0].getAddressLine(0))
             } catch (e: Exception) {
-                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+                markerOptions.title("Lat: " + lastLatLng.latitude + ", Lon: " + lastLatLng.longitude)
             }
             posMarker = mMap!!.addMarker(markerOptions)
         }
@@ -155,7 +136,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 .width(Constants.POLYLINE_WIDTH)
                 .add(preLastLatLng)
                 .add(lastLatLng)
-            mMap?.addPolyline(polylineOptions)
+            //mMap?.addPolyline(polylineOptions)
 
             val markerOptions = MarkerOptions()
 
@@ -165,20 +146,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             try {
                 val adresses: List<Address> =
                     geocoder.getFromLocation(
-                        currentLocation?.latitude!!,
-                        currentLocation?.longitude!!,
+                        lastLatLng.latitude,
+                        lastLatLng.longitude,
                         1
                     )
                 markerOptions.title(adresses[0].getAddressLine(0))
             } catch (e: Exception) {
-                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+                markerOptions.title("Lat: " + lastLatLng.latitude + ", Lon: " + lastLatLng.longitude)
             }
 
             posMarker = mMap!!.addMarker(markerOptions)
         }
     }
-
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -200,7 +179,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     )
                 markerOptions.title(adresses[0].getAddressLine(0))
             } catch (e: Exception) {
-                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+                markerOptions.title("Lat: " + latLng.latitude + ", Lon: " + latLng.longitude)
             }
             mMap!!.addMarker(markerOptions)
         }
@@ -227,10 +206,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
                         val latLng = LatLng(station.latitude!!, station.longitude!!)
                         markerOptions.position(latLng)
-                        markerOptions.icon(
-                            BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)
-                        )
+                        markerOptions.icon(getMarkerIcon("#65FADD"))
 
                         markerOptions.title(stationName)
 
@@ -241,12 +217,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     Log.d(ContentValues.TAG, "get failed with ", exception)
                 }
         }
-
-
-
-
-
-
     }
 
     companion object {
@@ -257,6 +227,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     putDoubleArray(ARG_END, end)
                 }
             }
+    }
+
+    private fun getMarkerIcon(color: String?): BitmapDescriptor? {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(Color.parseColor(color), hsv)
+        return BitmapDescriptorFactory.defaultMarker(hsv[0])
     }
 
     override fun onResume() {

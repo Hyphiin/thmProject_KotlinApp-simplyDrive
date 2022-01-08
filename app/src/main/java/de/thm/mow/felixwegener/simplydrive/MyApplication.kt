@@ -46,8 +46,8 @@ class MyApplication : Application() {
         this.driveId = currentDriveId
     }
 
-    private lateinit var currentLocation: Location
-    fun getCurrentLocation(): Location {
+    private var currentLocation: Location? = null
+    fun getCurrentLocation(): Location? {
         return currentLocation
     }
     fun setCurrentLocation(location: Location) {
