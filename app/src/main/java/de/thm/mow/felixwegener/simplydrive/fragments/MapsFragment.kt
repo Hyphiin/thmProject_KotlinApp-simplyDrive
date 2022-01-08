@@ -37,6 +37,11 @@ import de.thm.mow.felixwegener.simplydrive.Constants.POLYLINE_WIDTH
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import kotlinx.android.synthetic.main.fragment_maps.*
 import java.lang.Exception
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.firebase.firestore.ktx.toObject
+import de.thm.mow.felixwegener.simplydrive.R
+import kotlin.math.abs
 
 
 private const val ARG_START = "start"
@@ -49,7 +54,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private var mMap: GoogleMap? = null
     private var start: DoubleArray? = null
     private var end: DoubleArray? = null
-
+    var posMarker: Marker? = null
 
     private var isTracking = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
@@ -118,32 +123,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 .addAll(polyline)
             mMap?.addPolyline(polylineOptions)
         }
-    }
-
-    private fun addLatestPolyline() {
-        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
-            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
-            val lastLatLng = pathPoints.last().last()
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .add(preLastLatLng)
-                .add(lastLatLng)
-            mMap?.addPolyline(polylineOptions)
-        }
-    }
-
-
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
         val markerOptions = MarkerOptions()
-
-        addAllPolylines()
-        /*if (currentLocation != null) {
-            val latLng = LatLng(currentLocation?.latitude!!, currentLocation?.longitude!!)
-            markerOptions.position(latLng)
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            posMarker?.remove()
+            val lastLatLng = pathPoints.first().first()
+            markerOptions.position(lastLatLng)
 
             val geocoder = Geocoder(context)
             try {
@@ -157,14 +141,111 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             } catch (e: Exception) {
                 markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
             }
-            mMap!!.addMarker(markerOptions)
+            posMarker = mMap!!.addMarker(markerOptions)
+        }
+    }
 
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15F));
-            // Zoom in, animating the camera.
-            googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15F), 2000, null);
-        }*/
+    private fun addLatestPolyline() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            posMarker?.remove()
+            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
+            val lastLatLng = pathPoints.last().last()
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .add(preLastLatLng)
+                .add(lastLatLng)
+            mMap?.addPolyline(polylineOptions)
+
+            val markerOptions = MarkerOptions()
+
+            markerOptions.position(lastLatLng)
+
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        currentLocation?.latitude!!,
+                        currentLocation?.longitude!!,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+            }
+
+            posMarker = mMap!!.addMarker(markerOptions)
+        }
+    }
+
+
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        val markerOptions = MarkerOptions()
+
+        addAllPolylines()
+
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            val latLng = pathPoints.first().first()
+            markerOptions.position(latLng)
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        latLng.latitude,
+                        latLng.longitude,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + currentLocation?.latitude + ", Lon: " + currentLocation?.longitude)
+            }
+            mMap!!.addMarker(markerOptions)
+        }
+
+
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val db = Firebase.firestore
+
+            lateinit var station: Station
+            var stationName: String = "Test"
+
+            db.collection("stations").get()
+                .addOnSuccessListener { document ->
+                    for (entry in document.documents) {
+                        if (entry.data?.isNotEmpty() == true){
+                            station = Station(
+                                entry.data!!.values.first() as Double?,
+                                entry.data!!.values.last() as Double?
+                            )
+
+                            stationName = entry.id
+                        }
+
+                        val latLng = LatLng(station.latitude!!, station.longitude!!)
+                        markerOptions.position(latLng)
+                        markerOptions.icon(
+                            BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)
+                        )
+
+                        markerOptions.title(stationName)
+
+                        mMap!!.addMarker(markerOptions)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                }
+        }
+
+
+
+
+
 
     }
 

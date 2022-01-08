@@ -34,6 +34,7 @@ import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_NAME
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_ID
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.MainActivity
+import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.TrackingUtility
 import java.util.jar.Manifest
 
@@ -158,6 +159,7 @@ class TrackingService : LifecycleService() {
                 last().add(pos)
                 pathPoints.postValue(this)
             }
+            (application as MyApplication).setCurrentLocation(location)
         }
     }
 
