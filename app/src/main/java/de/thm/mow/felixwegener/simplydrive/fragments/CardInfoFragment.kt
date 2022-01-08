@@ -16,20 +16,26 @@ import android.widget.TextView
 import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.zxing.WriterException
+import de.thm.mow.felixwegener.simplydrive.Constants
+import de.thm.mow.felixwegener.simplydrive.Constants.MAP_ZOOM
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.lang.Exception
@@ -52,9 +58,12 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var startTime: String? = null
     private var endTime: String? = null
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     private var startLon: Double? = null
     private var startLat: Double? = null
+
+    private var isTracking = true
+    private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
     private var lonArray: DoubleArray? = null
     private var latArray: DoubleArray? = null
@@ -182,7 +191,62 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.map, fragment)
         transaction.commit()
         fragment.getMapAsync(this)
+
+        //subscribeToObservers()
         return view
+    }
+
+    /*private fun subscribeToObservers() {
+        TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
+            updateTracking(it)
+        })
+
+        TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
+            pathPointsRoute = it
+            addLatestPolyline()
+            moveCameraToUser()
+        })
+    }
+
+    private fun updateTracking(isTracking: Boolean){
+        this.isTracking = isTracking
+    }
+    */
+
+    private fun moveCameraToUser() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
+            mMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    pathPoints.first().first(),
+                    MAP_ZOOM
+                )
+            )
+        }
+    }
+
+    private fun addAllPolylines() {
+        Log.d("POLYLINE:", "ADDALL")
+        for (polyline in pathPoints) {
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .addAll(polyline)
+            mMap?.addPolyline(polylineOptions)
+        }
+    }
+
+    private fun addLatestPolyline() {
+        Log.d("POLYLINE:", "ADDLATEST")
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
+            val lastLatLng = pathPoints.last().last()
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .add(preLastLatLng)
+                .add(lastLatLng)
+            mMap?.addPolyline(polylineOptions)
+        }
     }
 
     private fun saveTxt(date: String, time: String) {
@@ -248,39 +312,34 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        var idx = 0
+        var idxLat = 1
+        var idxLon = 1
 
-        // Add a marker and move the camera
-        latArray?.forEach { entry ->
+        var lastLocation : LatLng = LatLng(latArray?.get(0)!!, lonArray?.get(0)!!)
+        var tempLocation : LatLng = LatLng(latArray?.get(1)!!, lonArray?.get(1)!!)
 
-            val tempLon = lonArray?.get(idx)
-            val location = LatLng(entry, tempLon!!)
-            mMap.addMarker(
-                MarkerOptions().position(location)
-                    .title("Position: ${location.latitude} ; ${location.longitude}")
-            )
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-            val markerOptions = MarkerOptions()
-            markerOptions.position(location)
-            val geocoder = Geocoder(context)
-            try {
-                val adresses: List<Address> =
-                    geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                markerOptions.title(adresses[0].getAddressLine(0))
-            } catch (e: Exception) {
-                markerOptions.title("Lat: " + location.latitude + ", Lon: " + location.longitude)
-            }
-            mMap.addMarker(markerOptions)
+        val polylineOptions = PolylineOptions().color(Constants.POLYLINE_COLOR).width(Constants.POLYLINE_WIDTH)
 
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15F));
-            // Zoom in, animating the camera.
-            googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15F), 2000, null);
+        Log.d("INDEX:", "${latArray?.size} | ${lonArray?.size}")
+        while (idxLat < latArray!!.size){
+            tempLocation = LatLng(latArray?.get(idxLat)!!, lonArray?.get(idxLon)!!)
 
-            idx++
+            polylineOptions.add(lastLocation).add(tempLocation)
+
+            lastLocation = LatLng(latArray?.get(idxLat)!!, lonArray?.get(idxLon)!!)
+
+            idxLat++
+            idxLon++
         }
 
+        mMap?.addPolyline(polylineOptions)
+
+        mMap?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                tempLocation,
+                MAP_ZOOM
+            )
+        )
 
     }
 

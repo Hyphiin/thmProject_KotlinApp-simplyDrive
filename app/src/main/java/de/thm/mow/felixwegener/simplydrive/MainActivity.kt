@@ -17,6 +17,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.*
 import com.google.firebase.ktx.Firebase
@@ -26,6 +27,10 @@ import de.thm.mow.felixwegener.simplydrive.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
+import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_SHOW_CARD_FRAG
+import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_START_OR_RESUME_SERVICE
+import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_STOP_SERVICE
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import java.io.File
 
 
@@ -103,6 +108,8 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        navigateToTrackingFragmentIfNeeded(intent)
+
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
@@ -112,11 +119,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> replaceFragment(homeFragment)
-                R.id.nav_setting -> Toast.makeText(
-                    this@MainActivity,
-                    "Moin",
-                    Toast.LENGTH_SHORT
-                ).show()
+                R.id.nav_setting -> sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
                 R.id.nav_history -> replaceFragment(historyFragment)
                 R.id.nav_map -> replaceFragment(mapsFragment)
             }
@@ -171,6 +174,11 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         retrieveUserImage()
 
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        navigateToTrackingFragmentIfNeeded(intent)
     }
 
     private fun retrieveUserImage() {
@@ -261,6 +269,20 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private fun setDrive(d: String) {
         currentDrive = d
+    }
+
+    private fun sendCommandToService(action: String) =
+        Intent(baseContext, TrackingService::class.java).also {
+            it.action = action
+            baseContext.startService(it)
+        }
+
+    private fun navigateToTrackingFragmentIfNeeded(intent: Intent?) {
+        if(intent?.action == ACTION_SHOW_CARD_FRAG) {
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainer, driveFragment, "fragmentTag")
+            fragmentTransaction.commit()
+        }
     }
 
     //GPS

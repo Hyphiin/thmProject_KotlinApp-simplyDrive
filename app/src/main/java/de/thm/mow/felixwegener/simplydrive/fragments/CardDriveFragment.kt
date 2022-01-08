@@ -13,8 +13,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
+import de.thm.mow.felixwegener.simplydrive.Constants
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.R
@@ -41,6 +43,9 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var startLon: Double? = null
     private var startLat: Double? = null
+
+    private var isTracking = true
+    private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
     private var lonArray: DoubleArray? = null
     private var latArray: DoubleArray? = null
@@ -104,6 +109,40 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
                     putDoubleArray(ARG_LATARRAY, latArray)
                 }
             }
+    }
+
+    private fun moveCameraToUser() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
+            mMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    pathPoints.first().first(),
+                    Constants.MAP_ZOOM
+                )
+            )
+        }
+    }
+
+    private fun addAllPolylines() {
+        for (polyline in pathPoints) {
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .addAll(polyline)
+            mMap?.addPolyline(polylineOptions)
+        }
+    }
+
+    private fun addLatestPolyline() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
+            val lastLatLng = pathPoints.last().last()
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .add(preLastLatLng)
+                .add(lastLatLng)
+            mMap.addPolyline(polylineOptions)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
