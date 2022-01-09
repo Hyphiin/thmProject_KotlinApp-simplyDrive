@@ -97,9 +97,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
-        //Fragments
-        checkHomeScreen()
-
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> replaceFragment(homeFragment)
@@ -109,6 +106,8 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             }
             true
         }
+
+        replaceFragment(homeFragment)
 
         //FAB Button(s)
         fab_main.setOnClickListener {
@@ -133,7 +132,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         firebaseAuth = FirebaseAuth.getInstance()
 
         retrieveUserImage()
-
         requestPermissions()
     }
 
@@ -165,26 +163,15 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         }
     }
 
-    private fun checkHomeScreen() {
-        startDrive = (application as MyApplication).getStartDrive()!!
-        if (startDrive === true) {
-            replaceFragment(homeFragment)
-        } else {
-            replaceFragment(driveFragment)
-        }
-    }
-
-
     private fun replaceFragment(fragment: Fragment) {
         fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_add, this.theme));
         if (clicked) {
             onAddButtonClicked()
         }
-        if (fragment != null) {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
-            fragmentTransaction.commit()
-        }
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
+        fragmentTransaction.commit()
+
         if (fragment === mapsFragment){
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
         }

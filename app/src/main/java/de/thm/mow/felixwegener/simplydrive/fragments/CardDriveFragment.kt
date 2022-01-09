@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -23,7 +24,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
-import kotlinx.android.synthetic.main.activity_gps.*
 import java.lang.Exception
 
 private const val ARG_DATE = "date"
@@ -43,9 +43,10 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     private var startTime: String? = null
     private var travelTime: String? = null
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     private var startLon: Double? = null
     private var startLat: Double? = null
+
     var posMarker: Marker? = null
 
     private var isTracking = true
@@ -76,8 +77,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             lonArray = it.getDoubleArray(ARG_LONARRAY)
             latArray = it.getDoubleArray(ARG_LATARRAY)
         }
-
-        currentLocation = (activity?.application as MyApplication).getCurrentLocation()
     }
 
     override fun onCreateView(
@@ -85,13 +84,17 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_card_drive, container, false)
+        val manager = fragmentManager
+        val transaction = manager!!.beginTransaction()
+        val fragment = SupportMapFragment()
+        transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.mapView, fragment)
+        transaction.commit()
+        fragment.getMapAsync(this)
 
         subscribeToObservers()
 
        return view
     }
-
-
 
     private fun subscribeToObservers() {
         TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
@@ -185,12 +188,10 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
         val markerOptions = MarkerOptions()
-
         addAllPolylines()
 
-        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+       if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
             val latLng = pathPoints.first().first()
             markerOptions.position(latLng)
             val geocoder = Geocoder(context)
@@ -208,7 +209,7 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             mMap!!.addMarker(markerOptions)
         }
 
-
+        /*
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
             val db = Firebase.firestore
@@ -240,7 +241,7 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
                 .addOnFailureListener { exception ->
                     Log.d(ContentValues.TAG, "get failed with ", exception)
                 }
-        }
+        }*/
     }
 
     private fun getMarkerIcon(color: String?): BitmapDescriptor? {

@@ -32,12 +32,9 @@ import de.thm.mow.felixwegener.simplydrive.Constants.LOCATION_UPDATE_INTERVAL
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_ID
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_NAME
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_ID
-import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.MainActivity
 import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.TrackingUtility
-import pub.devrel.easypermissions.EasyPermissions
-import java.util.jar.Manifest
 
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
@@ -58,6 +55,7 @@ class TrackingService : LifecycleService() {
         pathPoints.postValue(mutableListOf())
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate() {
         super.onCreate()
         postInitialValues()
@@ -119,6 +117,7 @@ class TrackingService : LifecycleService() {
         isTracking.postValue(false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     @SuppressLint("MissingPermission")
     private fun updateLocationTracking(isTracking: Boolean) {
         if(isTracking) {
@@ -197,8 +196,6 @@ class TrackingService : LifecycleService() {
         },
         FLAG_MUTABLE
     )
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel (notificationManager: NotificationManager) {

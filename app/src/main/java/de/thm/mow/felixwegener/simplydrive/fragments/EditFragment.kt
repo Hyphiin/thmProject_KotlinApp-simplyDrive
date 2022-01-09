@@ -3,6 +3,7 @@ package de.thm.mow.felixwegener.simplydrive.fragments
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -10,16 +11,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import android.widget.*
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import de.thm.mow.felixwegener.simplydrive.MyApplication
-import de.thm.mow.felixwegener.simplydrive.R
-import de.thm.mow.felixwegener.simplydrive.Route
-import de.thm.mow.felixwegener.simplydrive.Station
+import de.thm.mow.felixwegener.simplydrive.*
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import java.util.*
 import kotlin.math.abs
 
@@ -32,6 +32,8 @@ class EditFragment : Fragment() {
     private lateinit var contextF: FragmentActivity
     private var startDrive: Boolean = true
     private lateinit var driveId: String
+
+    private var isTracking = true
 
     private var currentLocation: Location? = null
 
@@ -53,7 +55,6 @@ class EditFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         currentLocation = (activity?.application as MyApplication).getCurrentLocation()
-
     }
 
     override fun onCreateView(
@@ -72,15 +73,30 @@ class EditFragment : Fragment() {
         startDrive = (activity.application as MyApplication).getStartDrive()!!
 
         insertBtn.setOnClickListener { view ->
-            if (startDrive) {
+            if (isTracking) {
+                sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+                currentLocation = (activity?.application as MyApplication).getCurrentLocation()
                 addHistory()
                 (requireActivity().application as MyApplication).setStartDrive(false)
             } else {
+                sendCommandToService(Constants.ACTION_STOP_SERVICE)
                 editHistory()
             }
         }
 
+        subscribeToObservers()
+
         return view
+    }
+
+    private fun subscribeToObservers() {
+        TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
+            updateTracking(it)
+        })
+    }
+
+    private fun updateTracking(isTracking: Boolean){
+        this.isTracking = isTracking
     }
 
     override fun onResume() {
@@ -90,6 +106,7 @@ class EditFragment : Fragment() {
         } else {
             lineInput.visibility = View.GONE
             insertBtn.text = "Fahrt beenden!"
+            sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
         }
         super.onResume()
     }
@@ -101,12 +118,18 @@ class EditFragment : Fragment() {
         } else {
             lineInput.visibility = View.GONE
             insertBtn.text = "Fahrt beenden!"
+            sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
         }
         super.onPause()
     }
 
-    private fun addHistory() {
+    private fun sendCommandToService(action: String) =
+        Intent(context, TrackingService::class.java).also {
+            it.action = action
+            context?.startService(it)
+        }
 
+    private fun addHistory() {
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
             val uid = user.uid
@@ -211,7 +234,6 @@ class EditFragment : Fragment() {
     }
 
     private fun editHistory() {
-
         val end = stationInput.text.toString()
 
         val user = FirebaseAuth.getInstance().currentUser

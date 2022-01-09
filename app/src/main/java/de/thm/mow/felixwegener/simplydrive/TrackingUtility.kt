@@ -29,5 +29,4 @@ object TrackingUtility {
             context,
             Manifest.permission.CAMERA,
         )
-
 }

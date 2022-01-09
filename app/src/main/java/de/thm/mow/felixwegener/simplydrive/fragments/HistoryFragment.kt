@@ -165,8 +165,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                                 route.time.toString(),
                                 firstLoc?.longitude!!,
                                 firstLoc?.latitude!!,
-                                lonArray,
-                                latArray
+                                currentUserID,
+                                time!!
                             )
                             val transaction =
                                 activity?.supportFragmentManager!!.beginTransaction()

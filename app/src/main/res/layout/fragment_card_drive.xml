@@ -42,7 +42,7 @@
                     android:text="21.10.2021"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView"
-                    app:layout_constraintTop_toBottomOf="@+id/map" />
+                    app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
                 <TextView
                     android:id="@+id/textView5"
@@ -111,7 +111,7 @@
                     android:text="Hanau HBF"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/textView2"
-                    app:layout_constraintTop_toBottomOf="@+id/map" />
+                    app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
                 <TextView
                     android:id="@+id/textView"
@@ -122,7 +122,7 @@
                     android:text="Datum:"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/map" />
+                    app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
 
                 <TextView
@@ -134,7 +134,7 @@
                     android:text="Von:"
                     android:textColor="@color/textColor"
                     app:layout_constraintStart_toEndOf="@+id/tvLHdate"
-                    app:layout_constraintTop_toBottomOf="@+id/map" />
+                    app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
                 <ImageView
                     android:id="@+id/idIVQrcode"
@@ -145,11 +145,11 @@
                     android:contentDescription="@string/qr_code"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/map"
+                    app:layout_constraintTop_toBottomOf="@+id/mapView"
                     app:layout_constraintVertical_bias="0.84000003" />
 
                 <fragment
-                    android:id="@+id/map"
+                    android:id="@+id/mapView"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="0dp"
                     android:layout_height="200dp"

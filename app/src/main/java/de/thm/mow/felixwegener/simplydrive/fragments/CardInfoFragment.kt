@@ -16,14 +16,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
-import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -35,10 +33,11 @@ import de.thm.mow.felixwegener.simplydrive.Constants
 import de.thm.mow.felixwegener.simplydrive.Constants.MAP_ZOOM
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
-import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import de.thm.mow.felixwegener.simplydrive.Route
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.lang.Exception
+import java.lang.StringBuilder
 
 private const val ARG_DATE = "date"
 private const val ARG_DEP = "departure"
@@ -47,8 +46,8 @@ private const val ARG_STARTTIME = "departureTime"
 private const val ARG_ENDTIME = "destinationTime"
 private const val ARG_STARTLON = "startLon"
 private const val ARG_STARTLAT = "endLocation"
-private const val ARG_LONARRAY = "LonArray"
-private const val ARG_LATARRAY = "LatArray"
+private const val ARG_USERID = "userId"
+private const val ARG_ROUTETIME = "routeTime"
 
 
 class CardInfoFragment : Fragment(), OnMapReadyCallback {
@@ -62,6 +61,10 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var startLon: Double? = null
     private var startLat: Double? = null
 
+    private lateinit var mAuth: FirebaseAuth
+    private var userId: String? = null
+    private var routeTime: String? = null
+
     private var isTracking = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
@@ -69,7 +72,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var latArray: DoubleArray? = null
 
     var bitmap: Bitmap? = null
-    var qrgEncoder: QRGEncoder? = null
+    private var qrgEncoder: QRGEncoder? = null
 
     private var qrCodeIV: ImageView? = null
 
@@ -92,9 +95,11 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             endTime = it.getString(ARG_ENDTIME)
             startLon = it.getDouble(ARG_STARTLON)
             startLat = it.getDouble(ARG_STARTLAT)
-            lonArray = it.getDoubleArray(ARG_LONARRAY)
-            latArray = it.getDoubleArray(ARG_LATARRAY)
+            userId = it.getString(ARG_USERID)
+            routeTime = it.getString(ARG_ROUTETIME)
         }
+        getRouteData()
+
     }
 
     override fun onCreateView(
@@ -249,6 +254,86 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun getRouteData() {
+        var currentRoute: String
+        routePoints = mutableListOf()
+
+        databaseRef = FirebaseFirestore.getInstance()
+
+        mAuth = FirebaseAuth.getInstance()
+        val firebaseUser = mAuth.currentUser
+
+        if (firebaseUser != null) {
+            userId = firebaseUser.uid
+        }
+
+        val foundItems = mutableListOf<String>()
+
+        databaseRef.collection("routes").whereEqualTo("uid", userId)
+            .whereEqualTo("time", routeTime.toString()).whereEqualTo("date", date.toString())
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
+                    foundItems.add(document.id)
+                }
+                    currentRoute = foundItems.first()
+
+                    databaseRef.collection("locations")
+                        .whereEqualTo("uid", userId)
+                        .whereEqualTo("routeId", currentRoute)
+                        .get()
+                        .addOnSuccessListener { points ->
+                            for (point in points) {
+                                Log.d("TEST", "$point => $point")
+                                routePoints.add(point.toObject(Location::class.java))
+                            }
+
+                            Log.d(ContentValues.TAG, "$routePoints")
+                            routePoints.sortBy { location: Location -> location.location?.lastLocation?.time }
+
+                            Log.d("TEST", "$routePoints")
+
+                            if (routePoints.isNotEmpty()) {
+                                val firstLoc = routePoints.first()?.location?.locations
+                                lonArray = DoubleArray(routePoints.size)
+                                latArray = DoubleArray(routePoints.size)
+
+                                var idx = 0
+                                routePoints.forEach { entry ->
+                                    val tempLon = idx
+                                    val tempLat = idx
+
+                                    if (entry != null) {
+                                        lonArray!![tempLon] =
+                                            entry.location?.locations?.longitude!!
+                                    }
+                                    if (entry != null) {
+                                        latArray!![tempLat] =
+                                            entry.location?.locations?.latitude!!
+                                    }
+                                    idx++
+                                }
+                                for (location in routePoints) {
+                                    pathPoints.add(mutableListOf(LatLng(location.location?.locations?.latitude!!,location.location?.locations?.longitude!!)))
+                                }
+                                Log.d("TEST???", "$pathPoints")
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                        }
+
+
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+            }
+
+
+
+    }
+
     private fun saveTxt(date: String, time: String) {
         databaseRef = FirebaseFirestore.getInstance()
         var currentRoute: String
@@ -312,34 +397,29 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        var idxLat = 1
-        var idxLon = 1
 
-        var lastLocation : LatLng = LatLng(latArray?.get(0)!!, lonArray?.get(0)!!)
-        var tempLocation : LatLng = LatLng(latArray?.get(1)!!, lonArray?.get(1)!!)
+        Log.d("TEST!!!", "$pathPoints")
 
-        val polylineOptions = PolylineOptions().color(Constants.POLYLINE_COLOR).width(Constants.POLYLINE_WIDTH)
-
-        Log.d("INDEX:", "${latArray?.size} | ${lonArray?.size}")
-        while (idxLat < latArray!!.size){
-            tempLocation = LatLng(latArray?.get(idxLat)!!, lonArray?.get(idxLon)!!)
-
-            polylineOptions.add(lastLocation).add(tempLocation)
-
-            lastLocation = LatLng(latArray?.get(idxLat)!!, lonArray?.get(idxLon)!!)
-
-            idxLat++
-            idxLon++
+        for (polyline in pathPoints) {
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .addAll(polyline)
+            mMap?.addPolyline(polylineOptions)
         }
 
-        mMap?.addPolyline(polylineOptions)
+        val markerOptions = MarkerOptions()
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            val firstLatLng = pathPoints.first().first()
+            markerOptions.position(firstLatLng)
+            markerOptions.title(departure)
+            mMap!!.addMarker(markerOptions)
 
-        mMap?.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                tempLocation,
-                MAP_ZOOM
-            )
-        )
+            val lastLatLng = pathPoints.last().last()
+            markerOptions.position(lastLatLng)
+            markerOptions.title(destination)
+            mMap!!.addMarker(markerOptions)
+        }
 
     }
 
@@ -378,8 +458,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             startTime: String,
             startLon: Double,
             startLat: Double,
-            lonArray: DoubleArray,
-            latArray: DoubleArray
+            userId: String,
+            routeTime: String
         ) =
             CardInfoFragment().apply {
                 arguments = Bundle().apply {
@@ -390,8 +470,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                     //putString(ARG_ENDTIME, endTime)
                     putDouble(ARG_STARTLON, startLon)
                     putDouble(ARG_STARTLAT, startLat)
-                    putDoubleArray(ARG_LONARRAY, lonArray)
-                    putDoubleArray(ARG_LATARRAY, latArray)
+                    putString(ARG_USERID, userId)
+                    putString(ARG_ROUTETIME, routeTime)
                 }
             }
     }
