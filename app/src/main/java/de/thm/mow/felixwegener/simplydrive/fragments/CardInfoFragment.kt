@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -34,6 +35,8 @@ import de.thm.mow.felixwegener.simplydrive.Constants.MAP_ZOOM
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.coroutines.awaitAll
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.lang.Exception
@@ -197,26 +200,9 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         transaction.commit()
         fragment.getMapAsync(this)
 
-        //subscribeToObservers()
         return view
     }
 
-    /*private fun subscribeToObservers() {
-        TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
-            updateTracking(it)
-        })
-
-        TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
-            pathPointsRoute = it
-            addLatestPolyline()
-            moveCameraToUser()
-        })
-    }
-
-    private fun updateTracking(isTracking: Boolean){
-        this.isTracking = isTracking
-    }
-    */
 
     private fun moveCameraToUser() {
         if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
@@ -230,29 +216,35 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun addAllPolylines() {
-        Log.d("POLYLINE:", "ADDALL")
+        var oldPoly = pathPoints.first().first()
+        var newPoly = pathPoints.first().first()
+
         for (polyline in pathPoints) {
+            newPoly = LatLng(polyline.first().latitude, polyline.last().longitude)
+
             val polylineOptions = PolylineOptions()
                 .color(Constants.POLYLINE_COLOR)
                 .width(Constants.POLYLINE_WIDTH)
-                .addAll(polyline)
+                .add(oldPoly)
+                .add(newPoly)
             mMap?.addPolyline(polylineOptions)
+            oldPoly = newPoly
         }
+        val markerOptions = MarkerOptions()
+
+        if(pathPoints.isNotEmpty()) {
+            val firstLatLng = pathPoints.first().first()
+            markerOptions.position(firstLatLng)
+            markerOptions.title(departure)
+            mMap!!.addMarker(markerOptions)
+            val lastLatLng = pathPoints.last().last()
+            markerOptions.position(lastLatLng)
+            markerOptions.title(destination)
+            mMap!!.addMarker(markerOptions)
+        }
+        moveCameraToUser()
     }
 
-    private fun addLatestPolyline() {
-        Log.d("POLYLINE:", "ADDLATEST")
-        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
-            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
-            val lastLatLng = pathPoints.last().last()
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .add(preLastLatLng)
-                .add(lastLatLng)
-            mMap?.addPolyline(polylineOptions)
-        }
-    }
 
     private fun getRouteData() {
         var currentRoute: String
@@ -318,20 +310,16 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                                     pathPoints.add(mutableListOf(LatLng(location.location?.locations?.latitude!!,location.location?.locations?.longitude!!)))
                                 }
                                 Log.d("TEST???", "$pathPoints")
+                                addAllPolylines()
                             }
                         }
                         .addOnFailureListener { exception ->
                             Log.w(ContentValues.TAG, "Error getting documents: ", exception)
                         }
-
-
             }
             .addOnFailureListener { exception ->
                 Log.w(ContentValues.TAG, "Error getting documents: ", exception)
             }
-
-
-
     }
 
     private fun saveTxt(date: String, time: String) {
@@ -397,31 +385,9 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        Log.d("TEST!!!", "$pathPoints")
-
-        for (polyline in pathPoints) {
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .addAll(polyline)
-            mMap?.addPolyline(polylineOptions)
-        }
-
-        val markerOptions = MarkerOptions()
-        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
-            val firstLatLng = pathPoints.first().first()
-            markerOptions.position(firstLatLng)
-            markerOptions.title(departure)
-            mMap!!.addMarker(markerOptions)
-
-            val lastLatLng = pathPoints.last().last()
-            markerOptions.position(lastLatLng)
-            markerOptions.title(destination)
-            mMap!!.addMarker(markerOptions)
-        }
-
     }
+
+
 
     private fun deleteLocations() {
 
