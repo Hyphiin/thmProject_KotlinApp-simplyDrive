@@ -20,6 +20,7 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.coroutines.withTimeout
 import java.util.*
 import kotlin.math.abs
 
@@ -73,13 +74,10 @@ class EditFragment : Fragment() {
         startDrive = (activity.application as MyApplication).getStartDrive()!!
 
         insertBtn.setOnClickListener { view ->
-            if (isTracking) {
-                sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
-                currentLocation = (activity?.application as MyApplication).getCurrentLocation()
+            if (startDrive) {
                 addHistory()
                 (requireActivity().application as MyApplication).setStartDrive(false)
             } else {
-                sendCommandToService(Constants.ACTION_STOP_SERVICE)
                 editHistory()
             }
         }
@@ -130,6 +128,9 @@ class EditFragment : Fragment() {
         }
 
     private fun addHistory() {
+        sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+        currentLocation = (activity?.application as MyApplication).getCurrentLocation()
+
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
             val uid = user.uid
@@ -278,6 +279,8 @@ class EditFragment : Fragment() {
 
                                 db.collection("routes")
                                     .document(driveId).update("end", end)
+
+                                sendCommandToService(Constants.ACTION_STOP_SERVICE)
 
                                 insertBtn.text = "Fahrt starten!"
                                 (requireActivity().application as MyApplication).setStartDrive(true)

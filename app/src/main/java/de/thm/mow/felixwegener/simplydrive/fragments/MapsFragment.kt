@@ -76,7 +76,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
 
         TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
             pathPoints = it
-            addLatestPolyline()
+            addLatestMarker()
             moveCameraToUser()
         })
     }
@@ -96,52 +96,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
         }
     }
 
-    private fun addAllPolylines() {
-        for (polyline in pathPoints) {
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .addAll(polyline)
-            //mMap?.addPolyline(polylineOptions)
-        }
-        val markerOptions = MarkerOptions()
+    private fun addLatestMarker() {
         if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
             posMarker?.remove()
-            val lastLatLng = pathPoints.first().first()
-            markerOptions.position(lastLatLng)
-
-            val geocoder = Geocoder(context)
-            try {
-                val adresses: List<Address> =
-                    geocoder.getFromLocation(
-                        lastLatLng.latitude,
-                        lastLatLng.longitude,
-                        1
-                    )
-                markerOptions.title(adresses[0].getAddressLine(0))
-            } catch (e: Exception) {
-                markerOptions.title("Lat: " + lastLatLng.latitude + ", Lon: " + lastLatLng.longitude)
-            }
-            posMarker = mMap!!.addMarker(markerOptions)
-        }
-    }
-
-    private fun addLatestPolyline() {
-        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
-            posMarker?.remove()
-            val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
             val lastLatLng = pathPoints.last().last()
-            val polylineOptions = PolylineOptions()
-                .color(Constants.POLYLINE_COLOR)
-                .width(Constants.POLYLINE_WIDTH)
-                .add(preLastLatLng)
-                .add(lastLatLng)
-            //mMap?.addPolyline(polylineOptions)
 
             val markerOptions = MarkerOptions()
-
             markerOptions.position(lastLatLng)
-
             val geocoder = Geocoder(context)
             try {
                 val adresses: List<Address> =
@@ -163,8 +124,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
         mMap = googleMap
 
         val markerOptions = MarkerOptions()
-
-        addAllPolylines()
 
         if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
             val latLng = pathPoints.first().first()
@@ -196,6 +155,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
                 .addOnSuccessListener { document ->
                     for (entry in document.documents) {
                         if (entry.data?.isNotEmpty() == true){
+                            Log.d("TEST!!!!!!","${entry.data!!.values.first()}")
                             station = Station(
                                 entry.data!!.values.first() as Double?,
                                 entry.data!!.values.last() as Double?

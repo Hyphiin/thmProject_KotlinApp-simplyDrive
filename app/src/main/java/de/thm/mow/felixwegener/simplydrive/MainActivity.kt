@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         fragmentTransaction.replace(R.id.fragmentContainer, fragment, "fragmentTag")
         fragmentTransaction.commit()
 
-        if (fragment === mapsFragment){
+        if (fragment === mapsFragment || fragment === editFragment){
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
         }
         firebaseAuth = FirebaseAuth.getInstance()
