@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import android.widget.*
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -26,19 +27,24 @@ import kotlin.math.abs
 
 class EditFragment : Fragment() {
 
-    lateinit var stationInput: EditText
+    //lateinit var stationInput: EditText
     lateinit var lineInput: EditText
     lateinit var insertBtn: Button
+    lateinit var stationSpinner: Spinner
 
     private lateinit var contextF: FragmentActivity
     private var startDrive: Boolean = true
     private lateinit var driveId: String
+    private lateinit var startStation: String
 
     private var isTracking = true
 
     private var currentLocation: Location? = null
 
     lateinit var dataPasser: OnDataPass
+
+    private lateinit var databaseRef: FirebaseFirestore
+    lateinit var items: Array<String?>
 
     interface OnDataPass {
         fun onDataPass(data: String)
@@ -65,8 +71,29 @@ class EditFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_edit, container, false)
 
         insertBtn = view.findViewById(R.id.btnInsert)
-        stationInput = view.findViewById(R.id.stationInput)
+        //stationInput = view.findViewById(R.id.stationInput)
         lineInput = view.findViewById(R.id.lineInput)
+        stationSpinner = view.findViewById(R.id.stationSpinner)
+
+        getAllStations()
+
+        stationSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                //stationInput.setText(items[position])
+                startStation = items[position].toString()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //stationInput.setText("Bitte eine Station auswählen")
+                startStation = "Bitte eine Station auswählen"
+            }
+
+        }
 
         val activity = requireActivity()
         contextF = activity
@@ -95,6 +122,38 @@ class EditFragment : Fragment() {
 
     private fun updateTracking(isTracking: Boolean){
         this.isTracking = isTracking
+    }
+
+    private fun getAllStations() {
+        databaseRef = FirebaseFirestore.getInstance()
+
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val foundItems = mutableListOf<String>()
+
+            databaseRef.collection("stations")
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        foundItems.add(document.id)
+                    }
+
+                    items = arrayOfNulls<String>(foundItems.size)
+
+                    var i = 0
+                    foundItems.forEach { value ->
+                        items[i] = value
+                        i++
+                    }
+
+                    val adapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item ,items)
+                    stationSpinner.adapter = adapter
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                }
+        }
     }
 
     override fun onResume() {
@@ -137,7 +196,7 @@ class EditFragment : Fragment() {
 
             val db = Firebase.firestore
 
-            val start = stationInput.text.toString()
+            val start = startStation
             var success = false
             lateinit var station: Station
 
@@ -199,7 +258,7 @@ class EditFragment : Fragment() {
                                         driveId = documentReference.id
                                         insertBtn.text = "Fahrt beenden!"
                                         passData(driveId)
-                                        stationInput.text.clear()
+                                        //stationInput.text.clear()
                                         lineInput.text.clear()
                                         lineInput.visibility = View.GONE
 
@@ -235,7 +294,8 @@ class EditFragment : Fragment() {
     }
 
     private fun editHistory() {
-        val end = stationInput.text.toString()
+
+        val end = startStation
 
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
@@ -285,7 +345,7 @@ class EditFragment : Fragment() {
                                 insertBtn.text = "Fahrt starten!"
                                 (requireActivity().application as MyApplication).setStartDrive(true)
                                 (requireActivity().application as MyApplication).setDriveId("null")
-                                stationInput.text.clear()
+                                //stationInput.text.clear()
                                 lineInput.visibility = View.VISIBLE
                                 val fragment: Fragment = HomeFragment()
                                 val transaction =

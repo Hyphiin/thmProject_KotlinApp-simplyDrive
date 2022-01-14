@@ -23,8 +23,8 @@ import java.lang.Exception
 
 class GpsActivity : AppCompatActivity() {
 
-    private val defaultUpdateInterval = 30
-    private val fastUpdateInterval = 5
+    private val defaultUpdateInterval = 5
+    private val fastUpdateInterval = 2
     private val permissionsFineLocation = 99
 
     private lateinit var locationRequest: LocationRequest
