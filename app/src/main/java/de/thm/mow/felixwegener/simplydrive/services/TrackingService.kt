@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
 import android.app.PendingIntent
 import android.app.PendingIntent.*
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -23,6 +24,10 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_PAUSE_SERVICE
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_SHOW_CARD_FRAG
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_START_OR_RESUME_SERVICE
@@ -32,9 +37,6 @@ import de.thm.mow.felixwegener.simplydrive.Constants.LOCATION_UPDATE_INTERVAL
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_ID
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_NAME
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_ID
-import de.thm.mow.felixwegener.simplydrive.MainActivity
-import de.thm.mow.felixwegener.simplydrive.MyApplication
-import de.thm.mow.felixwegener.simplydrive.TrackingUtility
 
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
@@ -44,6 +46,8 @@ class TrackingService : LifecycleService() {
     var isFirstRun = true
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+    //private var currentLocation : android.location.Location? = null
 
     companion object {
         val isTracking = MutableLiveData<Boolean>()
@@ -149,6 +153,7 @@ class TrackingService : LifecycleService() {
                     }
                 }
             }
+            uploadLocation(result)
         }
     }
 
@@ -196,6 +201,62 @@ class TrackingService : LifecycleService() {
         },
         FLAG_MUTABLE
     )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadLocation(locationResult: LocationResult) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = user.uid
+
+            val db = Firebase.firestore
+
+            // get
+            val s = (this.application as MyApplication).getDriveId()
+
+            val lastLocation = LastLocation(
+                locationResult.lastLocation?.accuracy,
+                locationResult.lastLocation?.altitude,
+                locationResult.lastLocation?.latitude,
+                locationResult.lastLocation?.longitude,
+                locationResult.lastLocation?.provider,
+                locationResult.lastLocation?.speed,
+                locationResult.lastLocation?.speedAccuracyMetersPerSecond,
+                locationResult.lastLocation?.time,
+                locationResult.lastLocation?.verticalAccuracyMeters
+            )
+            val locationPoint = LocationPoint(
+                locationResult.locations[0].accuracy,
+                locationResult.locations[0].altitude,
+                locationResult.locations[0].latitude,
+                locationResult.locations[0].longitude,
+                locationResult.locations[0].provider,
+                locationResult.locations[0].speed,
+                locationResult.locations[0].speedAccuracyMetersPerSecond,
+                locationResult.locations[0].time,
+                locationResult.locations[0].verticalAccuracyMeters
+            )
+
+            val resultLocation = LocationResultSelf(lastLocation, locationPoint)
+
+            if (s != "null") {
+                val location = Location(resultLocation, uid, s!!)
+
+                db.collection("locations")
+                    .add(location)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(
+                            ContentValues.TAG,
+                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                        )
+
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(ContentValues.TAG, "Error adding document", e)
+
+                    }
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel (notificationManager: NotificationManager) {
