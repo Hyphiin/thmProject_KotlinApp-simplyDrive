@@ -37,6 +37,11 @@ import de.thm.mow.felixwegener.simplydrive.Constants.LOCATION_UPDATE_INTERVAL
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_ID
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_CHANNEL_NAME
 import de.thm.mow.felixwegener.simplydrive.Constants.NOTIFICATION_ID
+import de.thm.mow.felixwegener.simplydrive.Constants.TIMER_UPDATE_INTERVAL
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
@@ -47,9 +52,10 @@ class TrackingService : LifecycleService() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    //private var currentLocation : android.location.Location? = null
+    private val timeInSeconds = MutableLiveData<Long>()
 
     companion object {
+        val timeInMillis = MutableLiveData<Long>()
         val isTracking = MutableLiveData<Boolean>()
         val pathPoints = MutableLiveData<Polylines>()
     }
@@ -57,6 +63,8 @@ class TrackingService : LifecycleService() {
     private fun postInitialValues() {
         isTracking.postValue(false)
         pathPoints.postValue(mutableListOf())
+        timeInSeconds.postValue(0L)
+        timeInMillis.postValue(0L)
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -85,11 +93,11 @@ class TrackingService : LifecycleService() {
                     } else {
                         Toast.makeText(
                             this@TrackingService,
-                            "Resuming Service",
+                            "Start Timer again",
                             Toast.LENGTH_SHORT
                         ).show()
                         //has to be changed
-                        startForegroundService()
+                        startTimer()
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
@@ -117,9 +125,37 @@ class TrackingService : LifecycleService() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    private var isTimerEnabled = false
+    private var lapTime = 0L
+    private var timeRoute = 0L
+    private var timeStarted = 0L
+    private var lastSecondTimestamp = 0L
+
+    private fun startTimer() {
+        addEmptyPolyline()
+        isTracking.postValue(true)
+        timeStarted = System.currentTimeMillis()
+        isTimerEnabled = true
+        CoroutineScope(Dispatchers.Main).launch {
+            while (isTracking.value!!) {
+                lapTime = System.currentTimeMillis() - timeStarted
+                timeInMillis.postValue(timeRoute + lapTime)
+                if(timeInMillis.value!! >= lastSecondTimestamp + 1000L) {
+                    timeInSeconds.postValue(timeInSeconds.value!! + 1)
+                    lastSecondTimestamp += 1000L
+                }
+                delay(TIMER_UPDATE_INTERVAL)
+            }
+            timeRoute += lapTime
+        }
+
+    }
+
     private fun pauseService() {
         isTracking.postValue(false)
+        isTimerEnabled = false
     }
+
 
     @RequiresApi(Build.VERSION_CODES.P)
     @SuppressLint("MissingPermission")
@@ -175,7 +211,7 @@ class TrackingService : LifecycleService() {
     } ?: pathPoints.postValue(mutableListOf(mutableListOf()))
 
     private fun startForegroundService() {
-        addEmptyPolyline()
+        startTimer()
         isTracking.postValue(true)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

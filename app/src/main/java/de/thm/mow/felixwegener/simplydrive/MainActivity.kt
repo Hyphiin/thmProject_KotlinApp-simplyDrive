@@ -11,8 +11,11 @@ import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.databinding.ActivityMainBinding
@@ -97,10 +100,15 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
+
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> replaceFragment(homeFragment)
-                R.id.nav_setting -> Log.d("Moin","moin")
+                R.id.nav_setting ->  Toast.makeText(
+                    this@MainActivity,
+                    "Nix",
+                    Toast.LENGTH_SHORT
+                ).show()
                 R.id.nav_history -> replaceFragment(historyFragment)
                 R.id.nav_map -> replaceFragment(mapsFragment)
             }
@@ -133,7 +141,20 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         retrieveUserImage()
         requestPermissions()
+        //enableBottomBar(true)
+        //subscribeToObservers()
     }
+
+    /*private fun subscribeToObservers() {
+        startDrive = (this.application as MyApplication).getStartDrive()!!
+        TrackingService.isTracking.observe(this, Observer {
+            if(startDrive === false){
+                enableBottomBar(false)
+            }
+        })
+
+    }*/
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -281,140 +302,10 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         }
     }
 
-    //GPS
-    /*@RequiresApi(Build.VERSION_CODES.O)
-    private fun uploadLocation(locationResult: LocationResult) {
-        val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            val uid = user.uid
-
-            val db = Firebase.firestore
-
-            // get
-            val s = (this.application as MyApplication).getDriveId()
-
-            val lastLocation = LastLocation(
-                locationResult.lastLocation?.accuracy,
-                locationResult.lastLocation?.altitude,
-                locationResult.lastLocation?.latitude,
-                locationResult.lastLocation?.longitude,
-                locationResult.lastLocation?.provider,
-                locationResult.lastLocation?.speed,
-                locationResult.lastLocation?.speedAccuracyMetersPerSecond,
-                locationResult.lastLocation?.time,
-                locationResult.lastLocation?.verticalAccuracyMeters
-            )
-            val locationPoint = LocationPoint(
-                locationResult.locations[0].accuracy,
-                locationResult.locations[0].altitude,
-                locationResult.locations[0].latitude,
-                locationResult.locations[0].longitude,
-                locationResult.locations[0].provider,
-                locationResult.locations[0].speed,
-                locationResult.locations[0].speedAccuracyMetersPerSecond,
-                locationResult.locations[0].time,
-                locationResult.locations[0].verticalAccuracyMeters
-            )
-
-            val resultLocation = LocationResultSelf(lastLocation, locationPoint)
-
-            if (s != "null") {
-                val location = Location(resultLocation, uid, s!!)
-
-                db.collection("locations")
-                    .add(location)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            ContentValues.TAG,
-                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                        )
-
-                    }
-                    .addOnFailureListener { e ->
-                        Log.w(ContentValues.TAG, "Error adding document", e)
-
-                    }
-            }
+    private fun enableBottomBar(enable: Boolean) {
+        for (i in 0 until bottomNavigationView.menu.size()) {
+            bottomNavigationView.menu.getItem(i).isEnabled = enable
         }
     }
-
-
-    private fun startLocationUpdates() {
-        Log.d(">>>>>>>>>>>>>>>", "startLocationUpdates")
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                    permissionsFineLocation
-                )
-                requestPermissions(
-                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
-                    permissionsFineLocation
-                )
-            }
-            return
-        }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null)
-        updateGPS()
-    }*/
-
-
-    /*override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-            permissionsFineLocation -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                updateGPS()
-            } else {
-                Toast.makeText(
-                    this@MainActivity,
-                    "Diese Funktion benötigt eine Zustimmung um zu funktionieren",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun updateGPS() {
-        Log.d(">>>>>>>>>>>>>>>", "updateGPS")
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) === PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    currentLocation = location
-                    (this.application as MyApplication).setCurrentLocation(currentLocation)
-                    Log.d("Current Location:", currentLocation.toString());
-                }
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                    permissionsFineLocation
-                )
-                requestPermissions(
-                    arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),
-                    permissionsFineLocation
-                )
-            }
-        }
-    }*/
 
 }

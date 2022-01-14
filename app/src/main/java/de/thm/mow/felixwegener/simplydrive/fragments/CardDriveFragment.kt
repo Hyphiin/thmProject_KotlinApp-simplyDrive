@@ -1,14 +1,18 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Point
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.TextView
+import androidmads.library.qrgenearator.QRGContents
 import androidx.fragment.app.Fragment
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.lifecycle.Observer
@@ -22,8 +26,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.zxing.WriterException
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.android.synthetic.main.fragment_card_drive.*
 import java.lang.Exception
 
 private const val ARG_DATE = "date"
@@ -41,28 +47,20 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     private var date: String? = null
     private var departure: String? = null
     private var startTime: String? = null
-    private var travelTime: String? = null
 
     private var mMap: GoogleMap? = null
-    private var startLon: Double? = null
-    private var startLat: Double? = null
 
     var posMarker: Marker? = null
 
     private var isTracking = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
-    private var lonArray: DoubleArray? = null
-    private var latArray: DoubleArray? = null
-
     var bitmap: Bitmap? = null
     var qrgEncoder: QRGEncoder? = null
 
     private var qrCodeIV: ImageView? = null
 
-    private lateinit var exportBtnTxt: FloatingActionButton
-    private lateinit var databaseRef: FirebaseFirestore
-    private lateinit var routePoints: MutableList<Location>
+    private var curTimeMillis = 0L
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,11 +69,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             date = it.getString(ARG_DATE)
             departure = it.getString(ARG_DEP)
             startTime = it.getString(ARG_STARTTIME)
-            travelTime = it.getString(ARG_TRAVELTIME)
-            startLon = it.getDouble(ARG_STARTLON)
-            startLat = it.getDouble(ARG_STARTLAT)
-            lonArray = it.getDoubleArray(ARG_LONARRAY)
-            latArray = it.getDoubleArray(ARG_LATARRAY)
         }
     }
 
@@ -84,6 +77,69 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_card_drive, container, false)
+
+        val tvDate = view.findViewById<TextView>(R.id.tvLHdate)
+        val tvDepInfo = view.findViewById<TextView>(R.id.tvDepInfo)
+        val tvStartTime = view.findViewById<TextView>(R.id.tvStartTime)
+
+        tvDepInfo.text = departure
+        tvStartTime.text = startTime
+        tvDate.text = date
+
+        qrCodeIV = view.findViewById(R.id.idIVQrcode)
+
+        // for generating Ticket
+        // below line is for getting
+        // the windowmanager service.
+        // below line is for getting
+        // the windowmanager service.
+        val managerWindow = activity?.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
+
+        // initializing a variable for default display.
+
+        // initializing a variable for default display.
+        val display: Display = managerWindow!!.defaultDisplay
+
+        // creating a variable for point which
+        // is to be displayed in QR Code.
+
+        // creating a variable for point which
+        // is to be displayed in QR Code.
+        val point = Point()
+        display.getSize(point)
+
+        // getting width and
+        // height of a point
+
+        // getting width and
+        // height of a point
+        val width: Int = point.x
+        val height: Int = point.y
+
+        // generating dimension from width and height.
+
+        // generating dimension from width and height.
+        var dimen = if (width < height) width else height
+        dimen = dimen * 3 / 4
+
+
+        // ToDo overthink, where to integrate
+        qrgEncoder = QRGEncoder(
+            "Fahrt um $startTime Uhr von $departure"
+                .toString(), null, QRGContents.Type.TEXT, dimen
+        );
+        try {
+            // getting our qrcode in the form of bitmap.
+            bitmap = qrgEncoder!!.encodeAsBitmap();
+            // the bitmap is set inside our image
+            // view using .setimagebitmap method.
+            qrCodeIV?.setImageBitmap(bitmap);
+        } catch (e: WriterException) {
+            // this method is called for
+            // exception handling.
+            Log.e("Tag", e.toString());
+        }
+
         val manager = fragmentManager
         val transaction = manager!!.beginTransaction()
         val fragment = SupportMapFragment()
@@ -92,6 +148,8 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
         fragment.getMapAsync(this)
 
         subscribeToObservers()
+
+
 
        return view
     }
@@ -105,6 +163,12 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             pathPoints = it
             addLatestPolyline()
             moveCameraToUser()
+        })
+
+        TrackingService.timeInMillis.observe(viewLifecycleOwner, Observer {
+            curTimeMillis = it
+            val formattedTime = TrackingUtility.getFormattedStopWatchTime(curTimeMillis,true)
+            timer.text = formattedTime
         })
     }
 
@@ -256,22 +320,12 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             date: String,
             departure: String,
             startTime: String,
-            travelTime: String,
-            startLon: Double,
-            startLat: Double,
-            lonArray: DoubleArray,
-            latArray: DoubleArray
         ) =
             CardDriveFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_DATE, date)
                     putString(ARG_DEP, departure)
                     putString(ARG_STARTTIME, startTime)
-                    putString(ARG_TRAVELTIME, travelTime)
-                    putDouble(ARG_STARTLON, startLon)
-                    putDouble(ARG_STARTLAT, startLat)
-                    putDoubleArray(ARG_LONARRAY, lonArray)
-                    putDoubleArray(ARG_LATARRAY, latArray)
                 }
             }
     }

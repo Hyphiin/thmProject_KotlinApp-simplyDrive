@@ -19,7 +19,6 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
     private lateinit var currentUserID: String
 
     private var startDrive: Boolean = false
-    private val driveFragment = CardDriveFragment()
 
     private lateinit var homeView: View
     private lateinit var databaseRef: FirebaseFirestore
@@ -34,11 +33,7 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         getUserData()
 
         startDrive = (requireActivity().application as MyApplication).getStartDrive()!!
-        val fragmentTransaction = parentFragmentManager.beginTransaction()
-        if (startDrive === false) {
-            fragmentTransaction.replace(R.id.fragmentContainer, driveFragment, "fragmentTag")
-            fragmentTransaction.commit()
-        }
+
     }
 
     override fun onCreateView(

@@ -106,6 +106,7 @@ class EditFragment : Fragment() {
                 (requireActivity().application as MyApplication).setStartDrive(false)
             } else {
                 editHistory()
+                (requireActivity().application as MyApplication).setStartDrive(true)
             }
         }
 
@@ -262,7 +263,11 @@ class EditFragment : Fragment() {
                                         lineInput.text.clear()
                                         lineInput.visibility = View.GONE
 
-                                        val fragment: Fragment = HomeFragment()
+                                        val fragment: Fragment = CardDriveFragment.newInstance(
+                                            route.date.toString(),
+                                            route.start.toString(),
+                                            route.time.toString(),
+                                        )
                                         val transaction =
                                             activity?.supportFragmentManager!!.beginTransaction()
                                         transaction.replace(
