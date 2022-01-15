@@ -14,12 +14,14 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import android.widget.*
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
+import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_STOP_SERVICE
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import kotlinx.coroutines.withTimeout
 import java.util.*
@@ -38,6 +40,7 @@ class EditFragment : Fragment() {
     private lateinit var startStation: String
 
     private var isTracking = true
+    private var activeRoute = true
 
     private var currentLocation: Location? = null
 
@@ -103,9 +106,12 @@ class EditFragment : Fragment() {
         insertBtn.setOnClickListener { view ->
             if (startDrive) {
                 addHistory()
+                TrackingService.activeRoute = MutableLiveData(true)
                 (requireActivity().application as MyApplication).setStartDrive(false)
             } else {
                 editHistory()
+                sendCommandToService(ACTION_STOP_SERVICE)
+                TrackingService.activeRoute = MutableLiveData(false)
                 (requireActivity().application as MyApplication).setStartDrive(true)
             }
         }
@@ -119,10 +125,18 @@ class EditFragment : Fragment() {
         TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
             updateTracking(it)
         })
+
+        TrackingService.activeRoute.observe(viewLifecycleOwner, Observer {
+            updateTrackingRoute(it)
+        })
     }
 
     private fun updateTracking(isTracking: Boolean){
         this.isTracking = isTracking
+    }
+
+    private fun updateTrackingRoute(activeRoute: Boolean){
+        this.activeRoute = activeRoute
     }
 
     private fun getAllStations() {

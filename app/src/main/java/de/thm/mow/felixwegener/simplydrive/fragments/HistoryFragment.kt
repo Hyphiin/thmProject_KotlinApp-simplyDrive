@@ -3,6 +3,7 @@ package de.thm.mow.felixwegener.simplydrive.fragments
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,10 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.DocumentChange.*
-import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
-import de.thm.mow.felixwegener.simplydrive.Location
+import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.R
-import de.thm.mow.felixwegener.simplydrive.Route
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import java.io.IOException
 import java.io.OutputStreamWriter
 
@@ -38,6 +38,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getUserData()
+        sendCommandToService(Constants.ACTION_STOP_SERVICE)
     }
 
     override fun onCreateView(
@@ -57,6 +58,12 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
 
         return historyView
     }
+
+    private fun sendCommandToService(action: String) =
+        Intent(context, TrackingService::class.java).also {
+            it.action = action
+            context?.startService(it)
+        }
 
     private fun getUserData() {
         databaseRef = FirebaseFirestore.getInstance()

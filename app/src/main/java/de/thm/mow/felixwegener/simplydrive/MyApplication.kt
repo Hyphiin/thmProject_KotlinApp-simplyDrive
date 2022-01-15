@@ -2,7 +2,10 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.app.Application
 import android.location.Location
+import dagger.hilt.android.HiltAndroidApp
 
+
+@HiltAndroidApp
 class MyApplication : Application() {
     private var myLocations: List<Location>? = null
     fun getMyLocations(): List<Location>? {

@@ -195,29 +195,5 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
         return BitmapDescriptorFactory.defaultMarker(hsv[0])
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-    }
-
 }
 

@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import androidx.room.Room
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.Module
 import dagger.Provides
@@ -12,7 +11,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
-import java.nio.channels.AcceptPendingException
 
 
 @Module
@@ -49,5 +47,6 @@ object ServiceModule {
         .setContentTitle("SimplyDrive")
         .setContentText("00:00:00")
         .setContentIntent(pendingIntent)
+        .setSmallIcon(R.drawable.ic_location)
 
 }
