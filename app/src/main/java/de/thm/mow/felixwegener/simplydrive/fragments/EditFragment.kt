@@ -117,7 +117,6 @@ class EditFragment : Fragment() {
         }
 
         subscribeToObservers()
-
         return view
     }
 
@@ -137,6 +136,7 @@ class EditFragment : Fragment() {
 
     private fun updateTrackingRoute(activeRoute: Boolean){
         this.activeRoute = activeRoute
+        Log.d("TESTII","$activeRoute")
     }
 
     private fun getAllStations() {

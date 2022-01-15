@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidmads.library.qrgenearator.QRGContents
 import androidx.fragment.app.Fragment
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -29,6 +30,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.zxing.WriterException
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_card_drive.*
 import java.lang.Exception
 
@@ -53,6 +55,7 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     var posMarker: Marker? = null
 
     private var isTracking = true
+    private var activeRoute = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
     var bitmap: Bitmap? = null
@@ -148,8 +151,7 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
         fragment.getMapAsync(this)
 
         subscribeToObservers()
-
-
+        TrackingService.activeRoute = MutableLiveData(true)
 
        return view
     }
@@ -157,6 +159,10 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
     private fun subscribeToObservers() {
         TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
             updateTracking(it)
+        })
+
+        TrackingService.activeRoute.observe(viewLifecycleOwner, Observer {
+            updateTrackingRoute(it)
         })
 
         TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
@@ -174,6 +180,11 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateTracking(isTracking: Boolean){
         this.isTracking = isTracking
+    }
+
+    private fun updateTrackingRoute(activeRoute: Boolean){
+        this.activeRoute = activeRoute
+        Log.d("TESTII","$activeRoute")
     }
 
     private fun moveCameraToUser() {
@@ -272,40 +283,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             }
             mMap!!.addMarker(markerOptions)
         }
-
-        /*
-        val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            val db = Firebase.firestore
-
-            lateinit var station: Station
-            var stationName: String = "Test"
-
-            db.collection("stations").get()
-                .addOnSuccessListener { document ->
-                    for (entry in document.documents) {
-                        if (entry.data?.isNotEmpty() == true){
-                            station = Station(
-                                entry.data!!.values.first() as Double?,
-                                entry.data!!.values.last() as Double?
-                            )
-
-                            stationName = entry.id
-                        }
-
-                        val latLng = LatLng(station.latitude!!, station.longitude!!)
-                        markerOptions.position(latLng)
-                        markerOptions.icon(getMarkerIcon("#65FADD"))
-
-                        markerOptions.title(stationName)
-
-                        mMap!!.addMarker(markerOptions)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(ContentValues.TAG, "get failed with ", exception)
-                }
-        }*/
     }
 
     private fun getMarkerIcon(color: String?): BitmapDescriptor? {

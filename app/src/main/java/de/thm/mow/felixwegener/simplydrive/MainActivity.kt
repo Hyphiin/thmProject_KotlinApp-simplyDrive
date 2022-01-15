@@ -39,8 +39,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     var storage = Firebase.storage
 
     //Fragments
-    private var startDrive: Boolean = false
-
     private val homeFragment = HomeFragment()
     private val settingsFragment = SettingsFragment()
     private val historyFragment = HistoryFragment()
@@ -77,6 +75,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     }
 
     private var clicked = false
+    private var activeRoute = true
 
     private lateinit var currentDriveId: String
 
@@ -141,19 +140,24 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         retrieveUserImage()
         requestPermissions()
-        //enableBottomBar(true)
-        //subscribeToObservers()
+        subscribeToObservers()
     }
 
-    /*private fun subscribeToObservers() {
-        startDrive = (this.application as MyApplication).getStartDrive()!!
-        TrackingService.isTracking.observe(this, Observer {
-            if(startDrive === false){
-                enableBottomBar(false)
-            }
+    private fun subscribeToObservers() {
+        TrackingService.activeRoute.observe(this, Observer {
+            updateTrackingRoute(it)
         })
+    }
 
-    }*/
+    private fun updateTrackingRoute(activeRoute: Boolean){
+        this.activeRoute = activeRoute
+        Log.d("TESTOOO","$activeRoute")
+        if (activeRoute){
+            enableBottomBar(false)
+        } else {
+            enableBottomBar(true)
+        }
+    }
 
 
     override fun onNewIntent(intent: Intent?) {
@@ -303,7 +307,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     }
 
     private fun enableBottomBar(enable: Boolean) {
-        for (i in 0 until bottomNavigationView.menu.size()) {
+        for (i in 0 until bottomNavigationView.menu.size()-1) {
             bottomNavigationView.menu.getItem(i).isEnabled = enable
         }
     }
