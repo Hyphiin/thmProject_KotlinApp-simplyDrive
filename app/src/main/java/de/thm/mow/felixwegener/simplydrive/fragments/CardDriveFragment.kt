@@ -283,6 +283,59 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
             }
             mMap!!.addMarker(markerOptions)
         }
+
+        if(pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+            val latLng = pathPoints.first().first()
+            markerOptions.position(latLng)
+            val geocoder = Geocoder(context)
+            try {
+                val adresses: List<Address> =
+                    geocoder.getFromLocation(
+                        latLng.latitude,
+                        latLng.longitude,
+                        1
+                    )
+                markerOptions.title(adresses[0].getAddressLine(0))
+            } catch (e: Exception) {
+                markerOptions.title("Lat: " + latLng.latitude + ", Lon: " + latLng.longitude)
+            }
+            mMap!!.addMarker(markerOptions)
+        }
+
+
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val db = Firebase.firestore
+
+            lateinit var station: Station
+            var stationName: String = "Test"
+
+            db.collection("stations").get()
+                .addOnSuccessListener { document ->
+                    for (entry in document.documents) {
+                        if (entry.data?.isNotEmpty() == true){
+                            Log.d("TEST!!!!!!","${entry.data!!.values.first()}")
+                            station = Station(
+                                entry.data!!.values.first() as Double?,
+                                entry.data!!.values.last() as Double?
+                            )
+
+                            stationName = entry.id
+                        }
+
+                        val latLng = LatLng(station.latitude!!, station.longitude!!)
+                        markerOptions.position(latLng)
+                        markerOptions.icon(getMarkerIcon("#65FADD"))
+
+                        markerOptions.title(stationName)
+
+                        mMap!!.addMarker(markerOptions)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                }
+        }
     }
 
     private fun getMarkerIcon(color: String?): BitmapDescriptor? {
