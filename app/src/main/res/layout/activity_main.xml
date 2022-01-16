@@ -10,7 +10,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="86dp">
+        android:layout_height="86dp"
+        android:elevation="10dp">
 
 
         <androidx.cardview.widget.CardView
@@ -20,10 +21,10 @@
             android:layout_marginTop="7dp"
             android:layout_marginEnd="15dp"
             android:backgroundTint="@color/primaryLight"
+            android:elevation="6dp"
             app:cardCornerRadius="50dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:elevation="6dp">
+            app:layout_constraintTop_toTopOf="parent">
 
 
             <androidx.constraintlayout.widget.ConstraintLayout

@@ -44,10 +44,12 @@
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/activity_register.xml" value="0.264" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/card__bg.xml" value="0.2346014492753623" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_card.xml" value="0.19293478260869565" />
+        <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_card_drive.xml" value="0.264" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_card_info.xml" value="0.4" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_edit.xml" value="0.18115942028985507" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_history_detail_view.xml" value="0.19293478260869565" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_home.xml" value="0.23278985507246377" />
+        <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_maps.xml" value="0.17300724637681159" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/fragment_scan.xml" value="0.23278985507246377" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/item_latest_history.xml" value="0.25833333333333336" />
         <entry key="..\:/Users/felix/AndroidStudioProjects/simplydrive/app/src/main/res/layout/nav_header.xml" value="0.25833333333333336" />

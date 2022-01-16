@@ -37,12 +37,13 @@
                     android:id="@+id/tvLHdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="5dp"
                     android:layout_marginTop="12dp"
                     android:text="21.10.2021"
                     android:textColor="@color/textColor"
+                    android:textSize="16sp"
                     app:layout_constraintStart_toEndOf="@+id/textView"
-                    app:layout_constraintTop_toBottomOf="@+id/mapView" />
+                    app:layout_constraintTop_toBottomOf="@+id/tvDepInfo" />
 
                 <TextView
                     android:id="@+id/textView5"
@@ -52,6 +53,7 @@
                     android:layout_marginTop="5dp"
                     android:text="Startzeit: "
                     android:textColor="@color/textColor"
+                    android:textSize="16sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -59,12 +61,14 @@
                     android:id="@+id/timer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="16dp"
                     android:text="01:35"
                     android:textColor="@color/textColor"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/idIVQrcode"
+                    app:layout_constraintHorizontal_bias="0.153"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
@@ -72,10 +76,11 @@
                     android:id="@+id/tvStartTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:text="17:20:00"
                     android:textColor="@color/textColor"
+                    android:textSize="16sp"
                     app:layout_constraintStart_toEndOf="@+id/textView5"
                     app:layout_constraintTop_toBottomOf="@+id/tvLHdate" />
 
@@ -86,30 +91,20 @@
                     android:layout_marginLeft="2dp"
                     android:text="Uhr"
                     android:textColor="@color/textColor"
+                    android:textSize="16sp"
                     app:layout_constraintStart_toEndOf="@+id/tvStartTime"
                     app:layout_constraintTop_toTopOf="@+id/tvStartTime" />
 
-                <TextView
-                    android:id="@+id/textView9"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="16dp"
-                    android:text="h"
-                    android:textColor="@color/textColor"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/timer"
-                    app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
                 <TextView
                     android:id="@+id/tvDepInfo"
                     android:layout_width="wrap_content"
-                    android:layout_height="19dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:text="Hanau HBF"
                     android:textColor="@color/textColor"
+                    android:textSize="16sp"
                     app:layout_constraintStart_toEndOf="@+id/textView2"
                     app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
@@ -121,19 +116,20 @@
                     android:layout_marginTop="12dp"
                     android:text="Datum:"
                     android:textColor="@color/textColor"
+                    android:textSize="16sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/mapView" />
-
+                    app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
                 <TextView
                     android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="68dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
                     android:text="Von:"
                     android:textColor="@color/textColor"
-                    app:layout_constraintStart_toEndOf="@+id/tvLHdate"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
                 <ImageView
@@ -141,12 +137,12 @@
                     android:layout_width="147dp"
                     android:layout_height="135dp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginEnd="100dp"
+                    android:layout_marginEnd="16dp"
                     android:contentDescription="@string/qr_code"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/mapView"
-                    app:layout_constraintVertical_bias="0.84000003" />
+                    app:layout_constraintVertical_bias="0.876" />
 
                 <fragment
                     android:id="@+id/mapView"
@@ -158,9 +154,19 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:context=".MapsActivity" />
 
-
-
-
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dauer"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/idIVQrcode"
+                    app:layout_constraintHorizontal_bias="0.173"
+                    app:layout_constraintStart_toEndOf="@+id/timer"
+                    app:layout_constraintTop_toBottomOf="@+id/textView6"
+                    app:layout_constraintVertical_bias="0.503" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
