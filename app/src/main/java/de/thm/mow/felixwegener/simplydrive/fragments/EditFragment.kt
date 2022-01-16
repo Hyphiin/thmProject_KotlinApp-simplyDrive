@@ -23,6 +23,7 @@ import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_STOP_SERVICE
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.withTimeout
 import java.util.*
 import kotlin.math.abs
@@ -280,7 +281,7 @@ class EditFragment : Fragment() {
                                         val fragment: Fragment = CardDriveFragment.newInstance(
                                             route.date.toString(),
                                             route.start.toString(),
-                                            route.time.toString(),
+                                            route.time.toString()
                                         )
                                         val transaction =
                                             activity?.supportFragmentManager!!.beginTransaction()

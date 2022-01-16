@@ -2,11 +2,14 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -75,7 +78,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     }
 
     private var clicked = false
-    private var activeRoute = true
+    private var activeRoute = false
 
     private lateinit var currentDriveId: String
 
@@ -118,8 +121,14 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
         //FAB Button(s)
         fab_main.setOnClickListener {
-            onAddButtonClicked()
-            fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_add, this.theme));
+            if(!activeRoute){
+                onAddButtonClicked()
+                fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_add, this.theme));
+            } else {
+                onAddButtonClicked()
+                fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_stopp, this.theme));
+            }
+
         }
         fab_scan.setOnClickListener {
             replaceFragment(scanFragment)
@@ -143,10 +152,18 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         subscribeToObservers()
     }
 
+
+    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
+        subscribeToObservers()
+        return super.onCreateView(name, context, attrs)
+
+    }
+
     private fun subscribeToObservers() {
         TrackingService.activeRoute.observe(this, Observer {
             updateTrackingRoute(it)
         })
+        Log.d("TESTOOOBSERVER","$activeRoute")
     }
 
     private fun updateTrackingRoute(activeRoute: Boolean){
@@ -154,8 +171,10 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         Log.d("TESTOOO","$activeRoute")
         if (activeRoute){
             enableBottomBar(false)
+            fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_stopp, this.theme));
         } else {
             enableBottomBar(true)
+            fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_add, this.theme));
         }
     }
 
@@ -309,7 +328,13 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private fun enableBottomBar(enable: Boolean) {
         for (i in 0 until bottomNavigationView.menu.size()-1) {
             bottomNavigationView.menu.getItem(i).isEnabled = enable
+            if (!enable){
+                bottomNavigationView.alpha = .5f
+            } else {
+                bottomNavigationView.alpha = 1f
+            }
         }
+
     }
 
 }
