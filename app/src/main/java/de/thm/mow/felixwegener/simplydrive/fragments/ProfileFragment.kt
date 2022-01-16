@@ -18,14 +18,11 @@ import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.RegisterActivity
 import android.provider.MediaStore
 import java.io.IOException
-import com.google.firebase.storage.UploadTask
 import android.widget.Toast
 import com.google.firebase.storage.StorageReference
 import android.app.ProgressDialog
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.google.firebase.storage.OnProgressListener
-import de.thm.mow.felixwegener.simplydrive.MyApplication
 import java.io.File
 
 

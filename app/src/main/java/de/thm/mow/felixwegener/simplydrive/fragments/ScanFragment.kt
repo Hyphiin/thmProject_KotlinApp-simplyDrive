@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -23,10 +25,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
 import java.util.*
 
 
-class ScanFragment : Fragment() {
+class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private lateinit var codeScanner: CodeScanner
 
@@ -66,7 +70,9 @@ class ScanFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_scan, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        requestPermissions()
         val scannerView = view.findViewById<CodeScannerView>(R.id.scanner_view)
         val activity = requireActivity()
         codeScanner = CodeScanner(activity, scannerView)
@@ -87,6 +93,7 @@ class ScanFragment : Fragment() {
         scannerView.setOnClickListener {
             codeScanner.startPreview()
         }
+
     }
 
     override fun onResume() {
@@ -117,17 +124,22 @@ class ScanFragment : Fragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        when (requestCode) {
-            101 -> {
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(
-                        contextF,
-                        "You need the camera permission to be granted!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun requestPermissions() {
+        if (TrackingUtility.hasLocationPermissions(requireContext())){
+            return
         }
+        EasyPermissions.requestPermissions(
+            this,
+            "You need to accept Camera permissons to use this feature.",
+            Constants.REQUEST_CODE_CAMERA_PERMISSION,
+            Manifest.permission.CAMERA
+        )
+
     }
 
     private fun createDialog(text: String) {
@@ -196,6 +208,16 @@ class ScanFragment : Fragment() {
                         driveId = documentReference.id
                         passData(driveId)
 
+                        val fragment: Fragment = HomeFragment()
+                        val transaction =
+                            activity?.supportFragmentManager!!.beginTransaction()
+                        transaction.replace(
+                            R.id.fragmentContainer,
+                            fragment,
+                            "fragmentTag"
+                        )
+                        transaction.commit()
+
                     }
                     .addOnFailureListener { e ->
                         Log.w(ContentValues.TAG, "Error adding document", e)
@@ -213,6 +235,27 @@ class ScanFragment : Fragment() {
 
             db.collection("routes")
                 .document(driveId).update("end", list[0])
+
+            val fragment: Fragment = HomeFragment()
+            val transaction =
+                activity?.supportFragmentManager!!.beginTransaction()
+            transaction.replace(
+                R.id.fragmentContainer,
+                fragment,
+                "fragmentTag"
+            )
+            transaction.commit()
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {}
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if(EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
+        } else {
+            requestPermissions()
         }
     }
 

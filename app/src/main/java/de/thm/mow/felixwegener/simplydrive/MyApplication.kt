@@ -2,7 +2,10 @@ package de.thm.mow.felixwegener.simplydrive
 
 import android.app.Application
 import android.location.Location
+import dagger.hilt.android.HiltAndroidApp
 
+
+@HiltAndroidApp
 class MyApplication : Application() {
     private var myLocations: List<Location>? = null
     fun getMyLocations(): List<Location>? {
@@ -36,7 +39,6 @@ class MyApplication : Application() {
         this.startDrive = startDrive
     }
 
-
     private var driveId: String? = "null"
 
     fun getDriveId(): String? {
@@ -46,4 +48,13 @@ class MyApplication : Application() {
     fun setDriveId(currentDriveId: String?) {
         this.driveId = currentDriveId
     }
+
+    private var currentLocation: Location? = null
+    fun getCurrentLocation(): Location? {
+        return currentLocation
+    }
+    fun setCurrentLocation(location: Location) {
+        this.currentLocation = location
+    }
+
 }

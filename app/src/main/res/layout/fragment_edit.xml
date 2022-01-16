@@ -31,13 +31,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.65999997">
 
-        <EditText
-            android:id="@+id/stationInput"
-            android:layout_width="match_parent"
+        <Spinner
+            android:id="@+id/stationSpinner"
+            android:layout_width="310dp"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Station"
-            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,8 +47,9 @@
             android:ems="10"
             android:hint="Linie"
             android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stationInput" />
+            app:layout_constraintTop_toBottomOf="@+id/stationSpinner" />
 
         <Button
             android:id="@+id/btnInsert"

@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -14,20 +16,31 @@ import android.widget.TextView
 import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.zxing.WriterException
+import de.thm.mow.felixwegener.simplydrive.Constants
+import de.thm.mow.felixwegener.simplydrive.Constants.MAP_ZOOM
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
+import de.thm.mow.felixwegener.simplydrive.Route
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.coroutines.awaitAll
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.lang.Exception
+import java.lang.StringBuilder
 
 private const val ARG_DATE = "date"
 private const val ARG_DEP = "departure"
@@ -36,8 +49,8 @@ private const val ARG_STARTTIME = "departureTime"
 private const val ARG_ENDTIME = "destinationTime"
 private const val ARG_STARTLON = "startLon"
 private const val ARG_STARTLAT = "endLocation"
-private const val ARG_LONARRAY = "LonArray"
-private const val ARG_LATARRAY = "LatArray"
+private const val ARG_USERID = "userId"
+private const val ARG_ROUTETIME = "routeTime"
 
 
 class CardInfoFragment : Fragment(), OnMapReadyCallback {
@@ -47,19 +60,28 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var startTime: String? = null
     private var endTime: String? = null
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     private var startLon: Double? = null
     private var startLat: Double? = null
+
+    private lateinit var mAuth: FirebaseAuth
+    private var userId: String? = null
+    private var routeTime: String? = null
+
+    private var isTracking = true
+    private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
     private var lonArray: DoubleArray? = null
     private var latArray: DoubleArray? = null
 
     var bitmap: Bitmap? = null
-    var qrgEncoder: QRGEncoder? = null
+    private var qrgEncoder: QRGEncoder? = null
 
     private var qrCodeIV: ImageView? = null
 
     private lateinit var closeBtn: Button
+
+    private lateinit var deleteBtn: FloatingActionButton
 
     private lateinit var exportBtnTxt: FloatingActionButton
     private lateinit var databaseRef: FirebaseFirestore
@@ -76,9 +98,11 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             endTime = it.getString(ARG_ENDTIME)
             startLon = it.getDouble(ARG_STARTLON)
             startLat = it.getDouble(ARG_STARTLAT)
-            lonArray = it.getDoubleArray(ARG_LONARRAY)
-            latArray = it.getDoubleArray(ARG_LATARRAY)
+            userId = it.getString(ARG_USERID)
+            routeTime = it.getString(ARG_ROUTETIME)
         }
+        getRouteData()
+
     }
 
     override fun onCreateView(
@@ -94,6 +118,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         //val tvEndTime = view.findViewById<TextView>(R.id.tvEndTime)
         closeBtn = view.findViewById(R.id.btn__closeCard)
         exportBtnTxt = view.findViewById(R.id.btn__ExportTxt)
+        deleteBtn = view.findViewById(R.id.deleteBTN)
 
         qrCodeIV = view.findViewById(R.id.idIVQrcode)
 
@@ -160,6 +185,10 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             activity?.onBackPressed()
         }
 
+        deleteBtn.setOnClickListener {
+            deleteLocations()
+        }
+
         exportBtnTxt.setOnClickListener {
             date?.let { it1 -> startTime?.let { it2 -> saveTxt(it1, it2) } }
         }
@@ -170,7 +199,127 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.map, fragment)
         transaction.commit()
         fragment.getMapAsync(this)
+
         return view
+    }
+
+
+    private fun moveCameraToUser() {
+        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
+            mMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    pathPoints.first().first(),
+                    MAP_ZOOM
+                )
+            )
+        }
+    }
+
+    private fun addAllPolylines() {
+        var oldPoly = pathPoints.first().first()
+        var newPoly = pathPoints.first().first()
+
+        for (polyline in pathPoints) {
+            newPoly = LatLng(polyline.first().latitude, polyline.last().longitude)
+
+            val polylineOptions = PolylineOptions()
+                .color(Constants.POLYLINE_COLOR)
+                .width(Constants.POLYLINE_WIDTH)
+                .add(oldPoly)
+                .add(newPoly)
+            mMap?.addPolyline(polylineOptions)
+            oldPoly = newPoly
+        }
+        val markerOptions = MarkerOptions()
+
+        if(pathPoints.isNotEmpty()) {
+            val firstLatLng = pathPoints.first().first()
+            markerOptions.position(firstLatLng)
+            markerOptions.title(departure)
+            mMap!!.addMarker(markerOptions)
+            val lastLatLng = pathPoints.last().last()
+            markerOptions.position(lastLatLng)
+            markerOptions.title(destination)
+            mMap!!.addMarker(markerOptions)
+        }
+        moveCameraToUser()
+    }
+
+
+    private fun getRouteData() {
+        var currentRoute: String
+        routePoints = mutableListOf()
+
+        databaseRef = FirebaseFirestore.getInstance()
+
+        mAuth = FirebaseAuth.getInstance()
+        val firebaseUser = mAuth.currentUser
+
+        if (firebaseUser != null) {
+            userId = firebaseUser.uid
+        }
+
+        val foundItems = mutableListOf<String>()
+
+        databaseRef.collection("routes").whereEqualTo("uid", userId)
+            .whereEqualTo("time", routeTime.toString()).whereEqualTo("date", date.toString())
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
+                    foundItems.add(document.id)
+                }
+                    currentRoute = foundItems.first()
+
+                    databaseRef.collection("locations")
+                        .whereEqualTo("uid", userId)
+                        .whereEqualTo("routeId", currentRoute)
+                        .get()
+                        .addOnSuccessListener { points ->
+                            for (point in points) {
+                                Log.d("TEST", "$point => $point")
+                                routePoints.add(point.toObject(Location::class.java))
+                            }
+
+                            Log.d(ContentValues.TAG, "$routePoints")
+                            routePoints.sortBy { location: Location -> location.location?.lastLocation?.time }
+
+                            Log.d("TEST", "$routePoints")
+
+                            if (routePoints.isNotEmpty()) {
+                                val firstLoc = routePoints.first()?.location?.locations
+                                lonArray = DoubleArray(routePoints.size)
+                                latArray = DoubleArray(routePoints.size)
+
+                                var idx = 0
+                                routePoints.forEach { entry ->
+                                    val tempLon = idx
+                                    val tempLat = idx
+
+                                    if (entry != null) {
+                                        lonArray!![tempLon] =
+                                            entry.location?.locations?.longitude!!
+                                    }
+                                    if (entry != null) {
+                                        latArray!![tempLat] =
+                                            entry.location?.locations?.latitude!!
+                                    }
+                                    idx++
+                                }
+                                for (location in routePoints) {
+                                    pathPoints.add(mutableListOf(LatLng(location.location?.locations?.latitude!!,location.location?.locations?.longitude!!)))
+                                }
+                                Log.d("TEST???", "$pathPoints")
+                                addAllPolylines()
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                        }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+            }
     }
 
     private fun saveTxt(date: String, time: String) {
@@ -213,7 +362,11 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                                     )
                                     outputStreamWriter.write(routePoints.toString())
                                     outputStreamWriter.close()
-                                    Toast.makeText(activity, "Datei mit dem Namen ${currentRoute}.txt \nerfolgreich heruntergeladen", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        activity,
+                                        "Datei mit dem Namen ${currentRoute}.txt \nerfolgreich heruntergeladen",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } catch (e: IOException) {
                                     Log.e("Exception", "File write failed: $e")
                                 }
@@ -232,36 +385,34 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        var idx = 0
+    }
 
-        // Add a marker and move the camera
-        latArray?.forEach { entry ->
 
-            val tempLon = lonArray?.get(idx)
-            val location = LatLng(entry, tempLon!!)
-            mMap.addMarker(
-                MarkerOptions().position(location)
-                    .title("Position: ${location.latitude} ; ${location.longitude}")
-            )
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-            val markerOptions = MarkerOptions()
-            markerOptions.position(location)
-            markerOptions.title("Lat:" + location.latitude + " Lon:" + location.longitude)
-            mMap.addMarker(markerOptions)
 
-            idx++
+    private fun deleteLocations() {
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val uid = user!!.uid
+
+        Log.d("TAG", "clearDB")
+        val db = Firebase.firestore
+
+        var docId: String? = "leer"
+
+        db.collection("routes").whereEqualTo("date", date).whereEqualTo("time", startTime).get().addOnSuccessListener { result ->
+            for (document in result) {
+                docId = document.id
+                document.reference.delete()
+
+                if (docId != "leer") {
+                    db.collection("locations").whereEqualTo("routeId", docId).get().addOnSuccessListener { result ->
+                        for (document in result) {
+                            document.reference.delete()
+                        }
+                    }
+                }
+            }
         }
-
-
-        /*
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        //mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-        val markerOptions = MarkerOptions()
-        markerOptions.position(sydney)
-        markerOptions.title("Lat:"+ sydney.latitude + " Lon:" + sydney.longitude)
-        mMap.addMarker(markerOptions)*/
     }
 
     companion object {
@@ -273,8 +424,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             startTime: String,
             startLon: Double,
             startLat: Double,
-            lonArray: DoubleArray,
-            latArray: DoubleArray
+            userId: String,
+            routeTime: String
         ) =
             CardInfoFragment().apply {
                 arguments = Bundle().apply {
@@ -285,8 +436,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                     //putString(ARG_ENDTIME, endTime)
                     putDouble(ARG_STARTLON, startLon)
                     putDouble(ARG_STARTLAT, startLat)
-                    putDoubleArray(ARG_LONARRAY, lonArray)
-                    putDoubleArray(ARG_LATARRAY, latArray)
+                    putString(ARG_USERID, userId)
+                    putString(ARG_ROUTETIME, routeTime)
                 }
             }
     }

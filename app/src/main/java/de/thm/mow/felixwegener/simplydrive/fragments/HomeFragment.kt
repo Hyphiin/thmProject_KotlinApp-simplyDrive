@@ -1,7 +1,7 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.content.ContentValues
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,30 +9,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
-import de.thm.mow.felixwegener.simplydrive.LatHisAdapter
-import de.thm.mow.felixwegener.simplydrive.Location
-import de.thm.mow.felixwegener.simplydrive.R
-import de.thm.mow.felixwegener.simplydrive.Route
-import java.io.IOException
-import java.io.OutputStreamWriter
-import androidmads.library.qrgenearator.QRGContents;
-import androidmads.library.qrgenearator.QRGEncoder;
-import android.graphics.Bitmap
-import android.widget.ImageView
-import com.google.zxing.WriterException
-import android.content.Context.WINDOW_SERVICE
-import android.graphics.Point
 import android.view.*
-
-import androidx.core.content.ContextCompat.getSystemService
-
-import androidx.core.content.ContextCompat
+import de.thm.mow.felixwegener.simplydrive.*
+import de.thm.mow.felixwegener.simplydrive.R
+import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 
 
 class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUserID: String
+
+    private var startDrive: Boolean = false
 
     private lateinit var homeView: View
     private lateinit var databaseRef: FirebaseFirestore
@@ -45,6 +33,9 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getUserData()
+        sendCommandToService(Constants.ACTION_STOP_SERVICE)
+        startDrive = (requireActivity().application as MyApplication).getStartDrive()!!
+
     }
 
     override fun onCreateView(
@@ -62,15 +53,11 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         return homeView
     }
 
-    /* private fun onHomeCardClicked(){
-         val fragment: Fragment = CardInfoFragment.newInstance("Hanau HBF - ", "Wetzlar Bahnhof", )
-         val transaction = activity?.supportFragmentManager!!.beginTransaction()
-         transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("home_fragment")!!)
-         transaction.replace(R.id.fragmentContainer, fragment)
-         transaction.addToBackStack(null)
-         transaction.commit()
-     }*/
-
+    private fun sendCommandToService(action: String) =
+        Intent(context, TrackingService::class.java).also {
+            it.action = action
+            context?.startService(it)
+        }
 
     private fun getUserData() {
         databaseRef = FirebaseFirestore.getInstance()
@@ -149,6 +136,9 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                             routePoints.add(point.toObject(Location::class.java))
                         }
 
+                        Log.d(ContentValues.TAG, "$routePoints")
+                        routePoints.sortBy { location: Location -> location.location?.lastLocation?.time }
+
                         if (routePoints.isNotEmpty()) {
 
                             val firstLoc = routePoints.first()?.location?.locations
@@ -180,8 +170,8 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                                 route.time.toString(),
                                 firstLoc?.longitude!!,
                                 firstLoc?.latitude!!,
-                                lonArray,
-                                latArray
+                                currentUserID,
+                                time!!
                             )
                             val transaction =
                                 activity?.supportFragmentManager!!.beginTransaction()

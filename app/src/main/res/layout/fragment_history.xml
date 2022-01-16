@@ -5,17 +5,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/tvFragHistoryMain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginBottom="35dp"
-        android:text="Letzte Fahrten"
-        android:textColor="@color/textColor"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/cvHomeOne"
-        app:layout_constraintStart_toStartOf="parent" />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -25,20 +15,22 @@
             android:id="@+id/linearLayout"
             android:layout_width="409dp"
             android:layout_height="500dp"
+            android:layout_marginTop="20dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/text_home"
-                android:layout_width="389dp"
+                android:id="@+id/tvFragHomeMain"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:textAlignment="viewStart"
-                android:textSize="24sp" />
+                android:layout_marginStart="40dp"
+                android:text="Letzte Fahrten"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteY="18dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvLatestHistory"
