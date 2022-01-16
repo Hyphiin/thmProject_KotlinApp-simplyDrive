@@ -226,7 +226,7 @@ class EditFragment : Fragment() {
                         val month = c.get(Calendar.MONTH)
                         val day = c.get(Calendar.DAY_OF_MONTH)
 
-                        val date = "$day-$month-$year"
+                        val date = "$day-${month+1}-$year"
 
                         val hour = c.get(Calendar.HOUR_OF_DAY)
                         val minute = c.get(Calendar.MINUTE)
