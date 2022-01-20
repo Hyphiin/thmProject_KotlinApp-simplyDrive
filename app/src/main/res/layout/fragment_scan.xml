@@ -35,7 +35,9 @@
         android:layout_below="@id/scanner_view"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:text="Haltestelle Scannen!" />
+        android:text="Haltestelle Scannen!"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>

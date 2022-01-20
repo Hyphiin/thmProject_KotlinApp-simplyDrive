@@ -44,7 +44,8 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="10dp"
                         android:text="21.10.2021"
-                        android:textColor="@color/textColor" />
+                        android:textColor="@color/textColor"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvLHtime"
@@ -57,19 +58,21 @@
 
                     <TextView
                         android:id="@+id/tvLHrouteStart"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="20dp"
                         android:layout_marginStart="10dp"
                         android:text="Start"
-                        android:textColor="@color/textColor" />
+                        android:textColor="@color/textColor"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvLHrouteEnd"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="20dp"
                         android:layout_marginStart="10dp"
                         android:text="End"
-                        android:textColor="@color/textColor" />
+                        android:textColor="@color/textColor"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvLHrouteLine"

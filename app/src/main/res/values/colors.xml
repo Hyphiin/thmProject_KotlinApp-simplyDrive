@@ -15,4 +15,5 @@
     <color name="primaryLight">#AFFAEB</color>
     <color name="primaryDark">#5AE0C5</color>
     <color name="textColor">#465258</color>
+    <color name="textColor2">#FFFFFFFF</color>
 </resources>

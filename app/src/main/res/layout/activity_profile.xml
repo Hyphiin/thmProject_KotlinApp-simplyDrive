@@ -65,7 +65,7 @@
                             android:id="@+id/btn__ImgSelect"
                             android:layout_width="100dp"
                             android:layout_height="40dp"
-                            android:backgroundTint="@color/underline"
+                            android:backgroundTint="@color/textColor2"
                             android:elevation="5dp"
                             android:text="Select"
                             android:textColor="@color/textColor"
@@ -79,7 +79,7 @@
                             android:id="@+id/btn__ImgUpload"
                             android:layout_width="100dp"
                             android:layout_height="40dp"
-                            android:backgroundTint="@color/underline"
+                            android:backgroundTint="@color/textColor2"
                             android:elevation="5dp"
                             android:text="Upload"
                             android:textColor="@color/textColor"
@@ -96,9 +96,10 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginBottom="2dp"
                             android:layout_weight="1"
-                            android:backgroundTint="@color/primary"
+                            android:backgroundTint="@color/textColor2"
                             android:elevation="5dp"
                             android:text="Logout"
+                            android:textColor="@color/textColor"
                             app:cornerRadius="6dp" />
                     </LinearLayout>
 

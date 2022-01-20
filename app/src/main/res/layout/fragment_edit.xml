@@ -14,16 +14,31 @@
         android:layout_marginTop="10dp"
         android:text="Streckenauswahl"
         android:textColor="@color/textColor"
-        android:textSize="20sp"
+        android:textSize="28sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="339dp"
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="10dp"
+        android:text="Wähle deine Station."
+        android:textColor="@color/textColor"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvFragHistoryMain" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"
+        android:layout_marginBottom="200dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,38 +48,47 @@
 
         <Spinner
             android:id="@+id/stationSpinner"
-            android:layout_width="310dp"
-            android:layout_height="wrap_content"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_border_color"
+            android:dropDownSelector="@color/textColor"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/lineInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/edittext_border_color"
             android:ems="10"
             android:hint="Linie"
             android:inputType="textPersonName"
+            android:paddingLeft="10dp"
+            android:textColor="@color/textColor"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/stationSpinner" />
 
-        <Button
-            android:id="@+id/btnInsert"
-            android:layout_width="180dp"
-            android:layout_height="60dp"
-            android:backgroundTint="@color/primary"
-            android:text="Fahrt starten!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lineInput"
-            app:layout_constraintVertical_bias="0.26" />
 
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/btnInsert"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:backgroundTint="@color/textColor2"
+        android:text="Fahrt starten!"
+        android:textColor="@color/textColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout7"
+        app:layout_constraintVertical_bias="0.108" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

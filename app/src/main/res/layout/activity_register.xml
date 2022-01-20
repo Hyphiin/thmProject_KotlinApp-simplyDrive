@@ -6,118 +6,130 @@
     android:layout_height="match_parent"
     tools:context=".RegisterActivity">
 
-    <TextView
-        android:id="@+id/register__TextLogo"
+    <LinearLayout
+        android:id="@+id/linearLayout5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:elevation="6dp"
-        android:text="SimplyDrive"
-        android:textColor="@color/primaryDark"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@+id/login__layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:id="@+id/login__layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="250dp"
-        android:layout_marginEnd="50dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="16px"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/registerEmailInput"
-                        android:layout_width="300dp"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@android:color/transparent"
-                        android:ems="10"
-                        android:hint="Email"
-                        android:inputType="textEmailAddress"
-                        android:paddingLeft="25px"
-                        android:textColor="@color/textColor"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/registerPasswordInput"
-                        android:layout_width="300dp"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@android:color/transparent"
-                        android:ems="10"
-                        android:hint="Passwort"
-                        android:inputType="textPassword"
-                        android:paddingLeft="25px"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/registerLoginBtn"
-                        android:layout_width="130dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:backgroundTint="@color/underline"
-                        android:text="Login"
-                        android:textColor="@color/textColor"
-                        android:textSize="12sp"
-                        app:cornerRadius="6dp" />
-
-                    <Button
-                        android:id="@+id/registerRegisterBtn"
-                        android:layout_width="130dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="5dp"
-                        android:backgroundTint="@color/underline"
-                        android:text="Registrieren"
-                        android:textColor="@color/textColor"
-                        android:textSize="12sp"
-                        app:cornerRadius="6dp" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/register__google"
+        <TextView
+            android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
-            android:layout_marginRight="100dp"
-            android:layout_marginBottom="2dp"
-            app:buttonSize="icon_only"
-            app:colorScheme="auto" />
+            android:layout_marginBottom="10dp"
+            android:text="Loggen wir dich mal ein."
+            android:textColor="@color/textColor"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Willkommen zurück."
+            android:textColor="@color/textColor"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wir haben dich vermisst!"
+            android:textColor="@color/textColor"
+            android:textSize="22sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/login__layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout5"
+        app:layout_constraintVertical_bias="0.19">
+
+        <EditText
+            android:id="@+id/registerEmailInput"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/edittext_border_color"
+            android:ems="10"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="25px"
+            android:textColor="@color/textColor"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/registerPasswordInput"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/edittext_border_color"
+            android:ems="10"
+            android:hint="Passwort"
+            android:inputType="textPassword"
+            android:paddingLeft="25px"
+            android:textSize="16sp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/registerLoginBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="@color/textColor2"
+                android:text="Login"
+                android:textColor="@color/textColor"
+                android:textSize="12sp"
+                app:cornerRadius="6dp" />
+
+            <Button
+                android:id="@+id/registerRegisterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="@color/textColor2"
+                android:text="Registrieren"
+                android:textColor="@color/textColor"
+                android:textSize="12sp"
+                app:cornerRadius="6dp" />
+
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/register__google"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:buttonSize="icon_only"
+                app:colorScheme="auto" />
+        </LinearLayout>
 
     </LinearLayout>
 
