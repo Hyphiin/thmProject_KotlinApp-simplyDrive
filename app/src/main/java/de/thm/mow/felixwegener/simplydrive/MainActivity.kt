@@ -102,15 +102,10 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(4).isEnabled = false
 
-
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> replaceFragment(homeFragment)
-                R.id.nav_setting ->  Toast.makeText(
-                    this@MainActivity,
-                    "Nix",
-                    Toast.LENGTH_SHORT
-                ).show()
+                R.id.nav_setting ->  replaceFragment(profileFragment)
                 R.id.nav_history -> replaceFragment(historyFragment)
                 R.id.nav_map -> replaceFragment(mapsFragment)
             }

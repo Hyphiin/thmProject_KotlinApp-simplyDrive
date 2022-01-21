@@ -32,72 +32,102 @@
                 android:layout_height="match_parent">
 
 
-                <TextView
-                    android:id="@+id/tvLHdate"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="21.10.2021"
-                    android:textColor="@color/textColor"
-                    android:textStyle="bold"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/btn__closeCard"
+                    app:layout_constraintEnd_toStartOf="@+id/idIVQrcode"
+                    app:layout_constraintHorizontal_bias="0.048"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/map"
-                    tools:layout_editor_absoluteX="95dp" />
+                    app:layout_constraintVertical_bias="0.265">
 
-                <TextView
-                    android:id="@+id/tvStartTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="17:20:00"
-                    android:textColor="@color/textColor"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDesInfo"
-                    tools:layout_editor_absoluteX="96dp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="2dp"
-                    android:text="Uhr"
-                    android:textColor="@color/textColor"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/tvStartTime"
-                    app:layout_constraintTop_toTopOf="@+id/tvStartTime" />
+                        <TextView
+                            android:id="@+id/tvLHdate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="21.10.2021"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvDesInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Wetzlar Bahnhof"
-                    android:textColor="@color/textColor"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDepInfo"
-                    tools:layout_editor_absoluteX="95dp" />
+                        <TextView
+                            android:id="@+id/tvDepInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Hanau HBF"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvDepInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Hanau HBF"
-                    android:textColor="@color/textColor"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLHdate"
-                    tools:layout_editor_absoluteX="96dp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvDesInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Wetzlar Bahnhof"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvStartTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="17:20:00"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textView6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="2dp"
+                            android:layout_marginTop="10dp"
+                            android:text="Uhr"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/idIVQrcode"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="25dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="150dp"
+                    android:layout_marginTop="36dp"
+                    android:layout_marginEnd="16dp"
                     android:contentDescription="@string/qr_code"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/map" />
 
@@ -115,14 +145,13 @@
                     android:id="@+id/btn__closeCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:layout_marginBottom="16dp"
                     android:backgroundTint="@color/textColor2"
                     android:text="Schließen"
                     android:textColor="@color/textColor"
                     app:cornerRadius="6dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.09"
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -134,10 +163,10 @@
                     app:backgroundTint="@color/textColor2"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.892"
+                    app:layout_constraintHorizontal_bias="0.885"
                     app:layout_constraintStart_toEndOf="@+id/btn__closeCard"
                     app:layout_constraintTop_toBottomOf="@+id/idIVQrcode"
-                    app:layout_constraintVertical_bias="0.808"
+                    app:layout_constraintVertical_bias="0.836"
                     app:rippleColor="@color/textColor" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
