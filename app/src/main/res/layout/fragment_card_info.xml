@@ -158,15 +158,16 @@
                     android:id="@+id/btn__ExportTxt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
                     android:clickable="true"
                     android:src="@android:drawable/stat_sys_download"
                     app:backgroundTint="@color/textColor2"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.885"
+                    app:layout_constraintHorizontal_bias="0.88"
                     app:layout_constraintStart_toEndOf="@+id/btn__closeCard"
                     app:layout_constraintTop_toBottomOf="@+id/idIVQrcode"
-                    app:layout_constraintVertical_bias="0.836"
+                    app:layout_constraintVertical_bias="0.982"
                     app:rippleColor="@color/textColor" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
