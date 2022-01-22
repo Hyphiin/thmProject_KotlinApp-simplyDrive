@@ -104,7 +104,7 @@
                             android:layout_marginTop="10dp"
                             android:text="17:20:00"
                             android:textColor="@color/textColor"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -115,7 +115,7 @@
                             android:layout_marginTop="10dp"
                             android:text="Uhr"
                             android:textColor="@color/textColor"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>

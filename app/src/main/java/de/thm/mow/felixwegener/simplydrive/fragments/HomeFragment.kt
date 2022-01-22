@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
@@ -27,6 +30,8 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
     private lateinit var rvLatestHistory: RecyclerView
     private lateinit var routesArrayList: MutableList<Route>
     private lateinit var routesAdapter: LatHisAdapter
+    private lateinit var sorryTv: TextView
+    private lateinit var logoContainer: CardView
 
     private lateinit var routePoints: MutableList<Location>
 
@@ -47,6 +52,8 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         rvLatestHistory = homeView.findViewById(R.id.rvLatestHistory)
         rvLatestHistory.layoutManager = LinearLayoutManager(activity)
         rvLatestHistory.setHasFixedSize(true)
+        sorryTv = homeView.findViewById(R.id.sorry__tv)
+        logoContainer = homeView.findViewById(R.id.logoContainer)
 
         routesArrayList = mutableListOf<Route>()
 
@@ -85,10 +92,19 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                         }
                     }
 
-                    routesAdapter = LatHisAdapter(routesArrayList, this@HomeFragment)
-                    rvLatestHistory.adapter = routesAdapter
+                    if (routesArrayList.size > 0) {
+                        rvLatestHistory.visibility = View.VISIBLE
+                        sorryTv.visibility = View.GONE
+                        logoContainer.visibility = View.GONE
+                        routesAdapter = LatHisAdapter(routesArrayList, this@HomeFragment)
+                        rvLatestHistory.adapter = routesAdapter
 
-                    routesAdapter.notifyDataSetChanged()
+                        routesAdapter.notifyDataSetChanged()
+                    } else {
+                        rvLatestHistory.visibility = View.GONE
+                        sorryTv.visibility = View.VISIBLE
+                        logoContainer.visibility = View.VISIBLE
+                    }
 
                 }
             })

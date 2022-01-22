@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +34,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
     private lateinit var rvLatestHistory: RecyclerView
     private lateinit var routesArrayList: MutableList<Route>
     private lateinit var routesAdapter: LatHisAdapter
+    private lateinit var sorryTv: TextView
+    private lateinit var logoContainer: CardView
 
     private lateinit var routePoints: MutableList<Location>
 
@@ -53,6 +57,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
         rvLatestHistory = historyView.findViewById(R.id.rvLatestHistory)
         rvLatestHistory.layoutManager = LinearLayoutManager(activity)
         rvLatestHistory.setHasFixedSize(true)
+        sorryTv = historyView.findViewById(R.id.sorry__tv2)
+        logoContainer = historyView.findViewById(R.id.logoContainer)
 
         routesArrayList = mutableListOf<Route>()
 
@@ -90,10 +96,19 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                         }
                     }
 
-                    routesAdapter = LatHisAdapter(routesArrayList, this@HistoryFragment)
-                    rvLatestHistory.adapter = routesAdapter
+                    if (routesArrayList.size > 0) {
+                        rvLatestHistory.visibility = View.VISIBLE
+                        sorryTv.visibility = View.GONE
+                        logoContainer.visibility = View.GONE
+                        routesAdapter = LatHisAdapter(routesArrayList, this@HistoryFragment)
+                        rvLatestHistory.adapter = routesAdapter
 
-                    routesAdapter.notifyDataSetChanged()
+                        routesAdapter.notifyDataSetChanged()
+                    } else {
+                        rvLatestHistory.visibility = View.GONE
+                        sorryTv.visibility = View.VISIBLE
+                        logoContainer.visibility = View.VISIBLE
+                    }
 
                 }
             })
