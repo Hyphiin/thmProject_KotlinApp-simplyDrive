@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.google.zxing.WriterException
 import de.thm.mow.felixwegener.simplydrive.Constants
 import de.thm.mow.felixwegener.simplydrive.Constants.MAP_ZOOM
@@ -360,7 +361,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                                             Context.MODE_PRIVATE
                                         )
                                     )
-                                    outputStreamWriter.write(routePoints.toString())
+                                    val jsonString = Gson().toJson(routePoints)  // json string
+                                    outputStreamWriter.write(jsonString)
                                     outputStreamWriter.close()
                                     Toast.makeText(
                                         activity,
