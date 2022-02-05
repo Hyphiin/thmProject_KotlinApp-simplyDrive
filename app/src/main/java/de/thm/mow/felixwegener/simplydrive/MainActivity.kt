@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
-    private val driveFragment = CardDriveFragment()
+    private val cardDriveFragment = CardDriveFragment()
 
     //FAB Button(s)
     private val rotateOpen: Animation by lazy {
@@ -92,7 +92,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     @RequiresApi(Build.VERSION_CODES.P)
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -269,9 +268,15 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private fun navigateToTrackingFragmentIfNeeded(intent: Intent?) {
         if(intent?.action == ACTION_SHOW_CARD_FRAG) {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainer, driveFragment, "fragmentTag")
-            fragmentTransaction.commit()
+            if (intent.extras.toString() === "cardDriveFragment") {
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentContainer, cardDriveFragment, "fragmentTag")
+                fragmentTransaction.commit()
+            } else {
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentContainer, homeFragment, "fragmentTag")
+                fragmentTransaction.commit()
+            }
         }
     }
 

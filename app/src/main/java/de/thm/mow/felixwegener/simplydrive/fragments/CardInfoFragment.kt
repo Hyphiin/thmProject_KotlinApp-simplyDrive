@@ -37,17 +37,20 @@ import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.Route
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
+import kotlinx.android.synthetic.main.fragment_card_info.*
 import kotlinx.coroutines.awaitAll
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.lang.Exception
 import java.lang.StringBuilder
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.*
 
 private const val ARG_DATE = "date"
 private const val ARG_DEP = "departure"
 private const val ARG_DES = "destination"
 private const val ARG_STARTTIME = "departureTime"
-private const val ARG_ENDTIME = "destinationTime"
 private const val ARG_STARTLON = "startLon"
 private const val ARG_STARTLAT = "endLocation"
 private const val ARG_USERID = "userId"
@@ -60,6 +63,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var destination: String? = null
     private var startTime: String? = null
     private var endTime: String? = null
+    private var timerTime: String? = null
 
     private var mMap: GoogleMap? = null
     private var startLon: Double? = null
@@ -96,7 +100,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             departure = it.getString(ARG_DEP)
             destination = it.getString(ARG_DES)
             startTime = it.getString(ARG_STARTTIME)
-            endTime = it.getString(ARG_ENDTIME)
             startLon = it.getDouble(ARG_STARTLON)
             startLat = it.getDouble(ARG_STARTLAT)
             userId = it.getString(ARG_USERID)
@@ -116,7 +119,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         val tvDepInfo = view.findViewById<TextView>(R.id.tvDepInfo)
         val tvDesInfo = view.findViewById<TextView>(R.id.tvDesInfo)
         val tvStartTime = view.findViewById<TextView>(R.id.tvStartTime)
-        //val tvEndTime = view.findViewById<TextView>(R.id.tvEndTime)
         closeBtn = view.findViewById(R.id.btn__closeCard)
         exportBtnTxt = view.findViewById(R.id.btn__ExportTxt)
         deleteBtn = view.findViewById(R.id.deleteBTN)
@@ -126,9 +128,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
         tvDepInfo.text = departure
         tvDesInfo.text = destination
-        tvStartTime.text = startTime
         tvDate.text = date
-        //tvEndTime.text = endTime
+
 
         // for generating Ticket
         // below line is for getting
@@ -188,6 +189,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
         deleteBtn.setOnClickListener {
             deleteLocations()
+            activity?.onBackPressed()
         }
 
         exportBtnTxt.setOnClickListener {
@@ -197,7 +199,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         val manager = fragmentManager
         val transaction = manager!!.beginTransaction()
         val fragment = SupportMapFragment()
-        transaction.add(de.thm.mow.felixwegener.simplydrive.R.id.map, fragment)
+        transaction.add(R.id.map, fragment)
         transaction.commit()
         fragment.getMapAsync(this)
 
@@ -218,7 +220,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
 
     private fun addAllPolylines() {
         var oldPoly = pathPoints.first().first()
-        var newPoly = pathPoints.first().first()
+        var newPoly: LatLng
 
         for (polyline in pathPoints) {
             newPoly = LatLng(polyline.first().latitude, polyline.last().longitude)
@@ -285,10 +287,23 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                             Log.d(ContentValues.TAG, "$routePoints")
                             routePoints.sortBy { location: Location -> location.location?.lastLocation?.time }
 
-                            Log.d("TEST", "$routePoints")
+                            val firstPathPointObject = routePoints.first()
+                            val lastPathPointObject = routePoints.last()
+                            val firstTime = Timestamp(firstPathPointObject.location?.locations?.time!!)
+                            val lastTime = Timestamp(lastPathPointObject.location?.locations?.time!!)
+                            val tempTimerTime = Timestamp(lastTime.time - firstTime.time)
+
+                            startTime = "${firstTime.hours}:${firstTime.minutes}:${if(firstTime.seconds < 10) "0" else ""}${firstTime.seconds}"
+                            endTime = "${lastTime.hours}:${lastTime.minutes}:${if(lastTime.seconds < 10) "0" else ""}${lastTime.seconds}"
+                            timerTime = "${tempTimerTime.hours}:${tempTimerTime.minutes}:${if(tempTimerTime.seconds < 10) "0" else ""}${tempTimerTime.seconds}"
+
+                            tvStartTime.text = startTime
+                            tvEndTime.text = endTime
+                            tvTimerTime.text = timerTime
+
 
                             if (routePoints.isNotEmpty()) {
-                                val firstLoc = routePoints.first()?.location?.locations
+                                val firstLoc = routePoints.first().location?.locations
                                 lonArray = DoubleArray(routePoints.size)
                                 latArray = DoubleArray(routePoints.size)
 
@@ -310,7 +325,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                                 for (location in routePoints) {
                                     pathPoints.add(mutableListOf(LatLng(location.location?.locations?.latitude!!,location.location?.locations?.longitude!!)))
                                 }
-                                Log.d("TEST???", "$pathPoints")
                                 addAllPolylines()
                             }
                         }

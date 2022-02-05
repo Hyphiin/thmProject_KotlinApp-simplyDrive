@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.google.android.gms.common.api.internal.LifecycleCallback.getFragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.Module
 import dagger.Provides
@@ -11,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
+import de.thm.mow.felixwegener.simplydrive.fragments.HomeFragment
 
 
 @Module
@@ -34,6 +36,7 @@ object ServiceModule {
         it.action = Constants.ACTION_SHOW_CARD_FRAG
     },
         PendingIntent.FLAG_IMMUTABLE
+
     )
 
     @ServiceScoped

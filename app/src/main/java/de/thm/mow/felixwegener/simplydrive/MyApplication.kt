@@ -57,4 +57,29 @@ class MyApplication : Application() {
         this.currentLocation = location
     }
 
+
+    private var allMode: Boolean? = false
+    fun getAllMode(): Boolean? {
+        return allMode
+    }
+    fun setAllMode(boolean: Boolean) {
+        this.allMode = boolean
+    }
+
+    private var twoMode: Boolean? = false
+    fun getTwoMode(): Boolean? {
+        return twoMode
+    }
+    fun setTwoMode(boolean: Boolean) {
+        this.twoMode = boolean
+    }
+
+    private var cellOnlyMode: Boolean? = false
+    fun getCellOnlyMode(): Boolean? {
+        return cellOnlyMode
+    }
+    fun setCellOnlyMode(boolean: Boolean) {
+        this.cellOnlyMode = boolean
+    }
+
 }
