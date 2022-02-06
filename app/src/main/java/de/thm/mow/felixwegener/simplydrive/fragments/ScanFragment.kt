@@ -201,10 +201,6 @@ class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 db.collection("routes")
                     .add(route)
                     .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            ContentValues.TAG,
-                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                        )
                         driveId = documentReference.id
                         passData(driveId)
 

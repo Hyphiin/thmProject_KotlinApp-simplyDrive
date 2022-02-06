@@ -139,7 +139,6 @@ class TrackingService : LifecycleService() {
 
     private fun clearPathpoints() = pathPoints?.apply {
         pathPoints.postValue(null)
-        Log.d("NULL","${pathPoints.value}")
     }
 
     private fun startTimer() {
@@ -211,7 +210,6 @@ class TrackingService : LifecycleService() {
                         locationCallback,
                         Looper.getMainLooper()
                     )
-                    Log.d("TAG", "TRACKING WITH: PRIORITY_LOW_POWER")
                 } else if (((application as MyApplication).getTwoMode() == true)){
                     val request = LocationRequest().apply {
                         interval = LOCATION_UPDATE_INTERVAL
@@ -223,7 +221,6 @@ class TrackingService : LifecycleService() {
                         locationCallback,
                         Looper.getMainLooper()
                     )
-                    Log.d("TAG", "TRACKING WITH: PRIORITY_BALANCED_POWER_ACCURACY")
                 } else {
                     val request = LocationRequest().apply {
                         interval = LOCATION_UPDATE_INTERVAL
@@ -235,7 +232,6 @@ class TrackingService : LifecycleService() {
                         locationCallback,
                         Looper.getMainLooper()
                     )
-                    Log.d("TAG", "TRACKING WITH: PRIORITY_HIGH_ACCURACY")
                 }
             }
         } else {
@@ -251,7 +247,6 @@ class TrackingService : LifecycleService() {
                 result?.locations?.let { locations ->
                     for (location in locations){
                         addPathPoint(location)
-                        Log.d("TAG", "IS TRACKING: ${location.latitude} + ${location.longitude}")
                     }
                 }
             }
@@ -343,11 +338,7 @@ class TrackingService : LifecycleService() {
 
                 db.collection("locations")
                     .add(location)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            ContentValues.TAG,
-                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                        )
+                    .addOnSuccessListener {
 
                     }
                     .addOnFailureListener { e ->

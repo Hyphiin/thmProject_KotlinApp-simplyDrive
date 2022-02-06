@@ -187,31 +187,23 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun firebaseAuthWithGoogleAccount(account: GoogleSignInAccount?) {
-        Log.d(TAG, "firebaseAuthWithGoogleAccount: begin firebase auth with google account")
 
         val credential = GoogleAuthProvider.getCredential(account!!.idToken, null)
         firebaseAuth.signInWithCredential(credential)
             .addOnSuccessListener { authResult ->
-
-                Log.d(TAG, "firebaseAuthWithGoogleAccount: LoggedIn!")
 
                 val firebaseUser = firebaseAuth.currentUser
 
                 val uid = firebaseUser!!.uid
                 val email = firebaseUser!!.email
 
-                Log.d(TAG, "firebaseAuthWithGoogleAccount: Uid: $uid")
-                Log.d(TAG, "firebaseAuthWithGoogleAccount: Email: $email")
-
                 if (authResult.additionalUserInfo!!.isNewUser) {
-                    Log.d(TAG, "firebaseAuthWithGoogleAccount: Account created... \n\$email")
                     Toast.makeText(
                         this@RegisterActivity,
-                        "Account created... n$email",
+                        "Account created... \n$email",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    Log.d(TAG, "firebaseAuthWithGoogleAccount: Existing user... \n\$email")
                     Toast.makeText(
                         this@RegisterActivity,
                         "Welcome back:\n$email",
@@ -224,7 +216,6 @@ class RegisterActivity : AppCompatActivity() {
                 finish()
             }
             .addOnFailureListener { e ->
-                Log.d(TAG, "firebaseAuthWithGoogleAccount: Login failed due to ${e.message}")
                 Toast.makeText(
                     this@RegisterActivity,
                     "Login failed due to ${e.message}",

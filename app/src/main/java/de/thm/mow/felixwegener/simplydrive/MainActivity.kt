@@ -157,12 +157,10 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         TrackingService.activeRoute.observe(this, Observer {
             updateTrackingRoute(it)
         })
-        Log.d("TESTOOOBSERVER","$activeRoute")
     }
 
     private fun updateTrackingRoute(activeRoute: Boolean){
         this.activeRoute = activeRoute
-        Log.d("TESTOOO","$activeRoute")
         if (activeRoute){
             enableBottomBar(false)
             fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_stopp, this.theme));
@@ -187,11 +185,9 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
             val localFile = File.createTempFile("tempImage", "jpg")
             imageRef.getFile(localFile).addOnSuccessListener {
-                Log.d("Found User-Img:", imageRef.path)
                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                 img__currentUser.setImageBitmap(bitmap)
             }.addOnFailureListener {
-                Log.d("Failed finding User-Img", "Loading Fallback Image!")
                 val fallbackImage = storage.reference.child("images/maxe.png")
                 fallbackImage.getFile(localFile).addOnSuccessListener {
                     val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)

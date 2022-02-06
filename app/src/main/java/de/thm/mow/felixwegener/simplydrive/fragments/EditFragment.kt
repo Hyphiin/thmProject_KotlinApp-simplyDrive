@@ -137,7 +137,6 @@ class EditFragment : Fragment() {
 
     private fun updateTrackingRoute(activeRoute: Boolean){
         this.activeRoute = activeRoute
-        Log.d("TESTII","$activeRoute")
     }
 
     private fun getAllStations() {
@@ -219,7 +218,6 @@ class EditFragment : Fragment() {
             db.collection("stations").document(start)
                 .get()
                 .addOnSuccessListener { document ->
-                    Log.d("___________", document.toString())
 
                     if (document.exists()) {
                         success = true
@@ -262,10 +260,6 @@ class EditFragment : Fragment() {
                                 db.collection("routes")
                                     .add(route)
                                     .addOnSuccessListener { documentReference ->
-                                        Log.d(
-                                            ContentValues.TAG,
-                                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                                        )
                                         Toast.makeText(
                                             context,
                                             "Fahrt gestartet!",
@@ -327,7 +321,6 @@ class EditFragment : Fragment() {
             db.collection("stations").document(end)
                 .get()
                 .addOnSuccessListener { document ->
-                    Log.d("___________", document.toString())
 
                     if (document.exists()) {
                         success = true

@@ -89,7 +89,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
     }
 
     private fun moveCameraToUser() {
-        Log.d("VAR", "BEFORE: $manageVar")
         if (manageVar <= 2) {
             if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
                 mMap?.animateCamera(
@@ -102,7 +101,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
             manageVar ++
 
         }
-        Log.d("VAR", "AFTER: $manageVar")
 
     }
 
@@ -165,7 +163,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
                 .addOnSuccessListener { document ->
                     for (entry in document.documents) {
                         if (entry.data?.isNotEmpty() == true){
-                            Log.d("TEST!!!!!!","${entry.data!!.values.first()}")
                             station = Station(
                                 entry.data!!.values.first() as Double?,
                                 entry.data!!.values.last() as Double?

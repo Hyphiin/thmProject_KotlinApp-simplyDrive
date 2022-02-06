@@ -266,11 +266,9 @@ class ProfileFragment : Fragment() {
 
             val localFile = File.createTempFile("tempImage", "jpg")
             imageRef.getFile(localFile).addOnSuccessListener {
-                Log.d("Found User-Img:", imageRef.path)
                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                 img__ProfilePic.setImageBitmap(bitmap)
             }.addOnFailureListener {
-                Log.d("Failed finding User-Img", "Loading Fallback Image!")
                 val fallbackImage = storage.reference.child("images/maxe.png")
                 fallbackImage.getFile(localFile).addOnSuccessListener {
                     val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)

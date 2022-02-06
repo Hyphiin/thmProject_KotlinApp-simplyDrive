@@ -184,7 +184,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateTrackingRoute(activeRoute: Boolean){
         this.activeRoute = activeRoute
-        Log.d("TESTII","$activeRoute")
     }
 
     private fun moveCameraToUser() {
@@ -314,7 +313,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
                 .addOnSuccessListener { document ->
                     for (entry in document.documents) {
                         if (entry.data?.isNotEmpty() == true){
-                            Log.d("TEST!!!!!!","${entry.data!!.values.first()}")
                             station = Station(
                                 entry.data!!.values.first() as Double?,
                                 entry.data!!.values.last() as Double?

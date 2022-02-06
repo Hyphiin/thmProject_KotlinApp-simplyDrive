@@ -136,7 +136,6 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
                     foundItems.add(document.id)
                 }
 
@@ -148,11 +147,8 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                     .get()
                     .addOnSuccessListener { points ->
                         for (point in points) {
-                            Log.d(ContentValues.TAG, "$point => $point")
                             routePoints.add(point.toObject(Location::class.java))
                         }
-
-                        Log.d(ContentValues.TAG, "$routePoints")
                         routePoints.sortBy { location: Location -> location.location?.lastLocation?.time }
 
                         if (routePoints.isNotEmpty()) {

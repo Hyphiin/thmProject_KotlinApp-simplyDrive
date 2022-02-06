@@ -270,7 +270,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
                     foundItems.add(document.id)
                 }
                     currentRoute = foundItems.first()
@@ -281,11 +280,8 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                         .get()
                         .addOnSuccessListener { points ->
                             for (point in points) {
-                                Log.d("TEST", "$point => $point")
                                 routePoints.add(point.toObject(Location::class.java))
                             }
-
-                            Log.d(ContentValues.TAG, "$routePoints")
                             routePoints.sortBy { location: Location -> location.location?.lastLocation?.time }
 
                             val firstPathPointObject = routePoints.first()
@@ -351,7 +347,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                 .get()
                 .addOnSuccessListener { documents ->
                     for (document in documents) {
-                        Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
                         foundItems.add(document.id)
                     }
 
@@ -363,7 +358,6 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                         .get()
                         .addOnSuccessListener { points ->
                             for (point in points) {
-                                Log.d(ContentValues.TAG, "$point => $point")
                                 routePoints.add(point.toObject(Location::class.java))
                             }
 
@@ -417,9 +411,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         var docId: String? = "leer"
 
         db.collection("routes").whereEqualTo("date", date).whereEqualTo("time", startTime).get().addOnSuccessListener { result ->
-            Log.d("DELETE", "$result")
             for (document in result) {
-                Log.d("DELETE", "$document")
                 docId = document.id
                 document.reference.delete()
 

@@ -53,7 +53,6 @@ class GpsActivity : AppCompatActivity() {
         locationCallBack = object : LocationCallback() {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onLocationResult(locationResult: LocationResult?) {
-                Log.d("Tracked Location:", locationResult.toString());
                 if (locationResult != null) {
                     uploadLocation(locationResult)
                 }
@@ -123,11 +122,7 @@ class GpsActivity : AppCompatActivity() {
 
                 db.collection("locations")
                     .add(location)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            ContentValues.TAG,
-                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                        )
+                    .addOnSuccessListener {
 
                     }
                     .addOnFailureListener { e ->

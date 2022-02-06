@@ -138,11 +138,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
                     foundItems.add(document.id)
                 }
-
-                Log.d("----------->", foundItems.toString())
 
                 currentRoute = foundItems.first()
 
@@ -153,7 +150,6 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                     .addOnSuccessListener { points ->
                         val length = points.size()
                         for (point in points) {
-                            Log.d(ContentValues.TAG, "$point => $point")
                             routePoints.add(point.toObject(Location::class.java))
                         }
                         if (routePoints.isNotEmpty()) {
