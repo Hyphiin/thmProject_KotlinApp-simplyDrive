@@ -42,6 +42,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
     private var isTracking = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
 
+    private var manageVar = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +74,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
     private fun subscribeToObservers() {
         TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
             updateTracking(it)
+
         })
 
         TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
@@ -86,14 +89,21 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
     }
 
     private fun moveCameraToUser() {
-        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
-            mMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    pathPoints.last().last(),
-                    Constants.MAP_ZOOM
+        Log.d("VAR", "BEFORE: $manageVar")
+        if (manageVar <= 2) {
+            if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
+                mMap?.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        pathPoints.last().last(),
+                        Constants.MAP_ZOOM
+                    )
                 )
-            )
+            }
+            manageVar ++
+
         }
+        Log.d("VAR", "AFTER: $manageVar")
+
     }
 
     private fun addLatestMarker() {
