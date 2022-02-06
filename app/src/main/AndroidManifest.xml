@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.thm.mow.felixwegener.simplydrive" >
+    package="de.thm.mow.felixwegener.simplydrive">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -39,22 +39,6 @@
 
         <service android:name=".services.TrackingService"
             android:foregroundServiceType="location"/>
-
-        <activity
-            android:name=".MapsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_maps" />
-        <activity
-            android:name=".ShowSavedLocationsListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".GpsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_gps"
-            android:theme="@style/Theme.SimplyDrive.NoActionBar" />
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
         <activity
             android:name=".RegisterActivity"
             android:exported="true" >
@@ -64,9 +48,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
