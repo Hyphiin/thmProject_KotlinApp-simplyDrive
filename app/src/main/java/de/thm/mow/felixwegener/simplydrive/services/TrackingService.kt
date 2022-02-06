@@ -105,6 +105,7 @@ class TrackingService : LifecycleService() {
         intent?.let {
             when(it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
+                    clearPathpoints()
                     if (isFirstRun) {
                         startForegroundService()
                         isFirstRun = false
@@ -133,6 +134,12 @@ class TrackingService : LifecycleService() {
     private var timeRoute = 0L
     private var timeStarted = 0L
     private var lastSecondTimestamp = 0L
+
+
+    private fun clearPathpoints() = pathPoints?.apply {
+        pathPoints.postValue(null)
+        Log.d("NULL","${pathPoints.value}")
+    }
 
     private fun startTimer() {
         addEmptyPolyline()
