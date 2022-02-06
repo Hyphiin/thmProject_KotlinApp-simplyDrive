@@ -8,13 +8,6 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class MyApplication : Application() {
     private var myLocations: List<Location>? = null
-    fun getMyLocations(): List<Location>? {
-        return myLocations
-    }
-
-    fun setMyLocation(myLocations: List<Location>?) {
-        this.myLocations = myLocations
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -59,9 +52,6 @@ class MyApplication : Application() {
 
 
     private var allMode: Boolean? = false
-    fun getAllMode(): Boolean? {
-        return allMode
-    }
     fun setAllMode(boolean: Boolean) {
         this.allMode = boolean
     }

@@ -4,8 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
-import android.location.Address
-import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -16,7 +14,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
-import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -35,17 +32,10 @@ import de.thm.mow.felixwegener.simplydrive.Constants
 import de.thm.mow.felixwegener.simplydrive.Constants.MAP_ZOOM
 import de.thm.mow.felixwegener.simplydrive.Location
 import de.thm.mow.felixwegener.simplydrive.R
-import de.thm.mow.felixwegener.simplydrive.Route
-import de.thm.mow.felixwegener.simplydrive.services.TrackingService
 import kotlinx.android.synthetic.main.fragment_card_info.*
-import kotlinx.coroutines.awaitAll
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.lang.Exception
-import java.lang.StringBuilder
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.*
 
 private const val ARG_DATE = "date"
 private const val ARG_DEP = "departure"
@@ -326,11 +316,11 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                             }
                         }
                         .addOnFailureListener { exception ->
-                            Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                            Log.e(ContentValues.TAG, "Error getting documents: ", exception)
                         }
             }
             .addOnFailureListener { exception ->
-                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                Log.e(ContentValues.TAG, "Error getting documents: ", exception)
             }
     }
 
@@ -384,12 +374,12 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                             }
                         }
                         .addOnFailureListener { exception ->
-                            Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                            Log.e(ContentValues.TAG, "Error getting documents: ", exception)
                         }
 
                 }
                 .addOnFailureListener { exception ->
-                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                    Log.e(ContentValues.TAG, "Error getting documents: ", exception)
                 }
         }
     }

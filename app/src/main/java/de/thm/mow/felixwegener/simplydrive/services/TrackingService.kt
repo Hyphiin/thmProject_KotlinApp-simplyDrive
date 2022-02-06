@@ -342,7 +342,7 @@ class TrackingService : LifecycleService() {
 
                     }
                     .addOnFailureListener { e ->
-                        Log.w(ContentValues.TAG, "Error adding document", e)
+                        Log.e(ContentValues.TAG, "Error adding document", e)
 
                     }
             }

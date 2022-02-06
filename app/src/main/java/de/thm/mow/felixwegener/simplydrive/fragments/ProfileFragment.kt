@@ -2,13 +2,11 @@ package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.app.Activity.RESULT_OK
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +19,6 @@ import com.google.firebase.storage.ktx.storage
 import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.RegisterActivity
-import kotlinx.android.synthetic.main.fragment_profile.*
 import java.io.File
 import java.io.IOException
 

@@ -4,20 +4,16 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -43,7 +39,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     //Fragments
     private val homeFragment = HomeFragment()
-    private val settingsFragment = SettingsFragment()
     private val historyFragment = HistoryFragment()
     private val editFragment = EditFragment()
     private val scanFragment = ScanFragment()
@@ -52,18 +47,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     private val cardDriveFragment = CardDriveFragment()
 
     //FAB Button(s)
-    private val rotateOpen: Animation by lazy {
-        AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_open_anim
-        )
-    }
-    private val rotateClose: Animation by lazy {
-        AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_close_anim
-        )
-    }
     private val fromBottom: Animation by lazy {
         AnimationUtils.loadAnimation(
             this,
@@ -248,12 +231,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
             fab_scan.isClickable = false
             fab_edit.isClickable = false
         }
-    }
-
-    private lateinit var currentDrive: String
-
-    private fun setDrive(d: String) {
-        currentDrive = d
     }
 
     private fun sendCommandToService(action: String) =

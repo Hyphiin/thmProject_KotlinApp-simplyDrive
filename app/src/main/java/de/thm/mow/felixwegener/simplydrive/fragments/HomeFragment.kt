@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import android.view.*
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import de.thm.mow.felixwegener.simplydrive.*
@@ -115,8 +114,6 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
         //ToDo
         val time = route.time
         val date = route.date
-        val start = route.start
-        val line = route.line
         var currentRoute: String
         routePoints = mutableListOf()
 
@@ -187,19 +184,18 @@ class HomeFragment : Fragment(), LatHisAdapter.ClickListener {
                             )
                             val transaction =
                                 activity?.supportFragmentManager!!.beginTransaction()
-                            //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
                             transaction.add(R.id.fragmentContainer, fragment)
                             transaction.addToBackStack(null)
                             transaction.commit()
                         }
                     }
                     .addOnFailureListener { exception ->
-                        Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                        Log.e(ContentValues.TAG, "Error getting documents: ", exception)
                     }
 
             }
             .addOnFailureListener { exception ->
-                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                Log.e(ContentValues.TAG, "Error getting documents: ", exception)
             }
 
     }

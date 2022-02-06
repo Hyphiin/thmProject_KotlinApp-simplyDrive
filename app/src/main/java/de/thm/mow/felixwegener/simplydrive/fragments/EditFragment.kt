@@ -23,14 +23,11 @@ import com.google.firebase.ktx.Firebase
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.Constants.ACTION_STOP_SERVICE
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.withTimeout
 import java.util.*
 import kotlin.math.abs
 
 class EditFragment : Fragment() {
 
-    //lateinit var stationInput: EditText
     lateinit var lineInput: EditText
     lateinit var insertBtn: Button
     lateinit var stationSpinner: Spinner
@@ -75,7 +72,6 @@ class EditFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_edit, container, false)
 
         insertBtn = view.findViewById(R.id.btnInsert)
-        //stationInput = view.findViewById(R.id.stationInput)
         lineInput = view.findViewById(R.id.lineInput)
         stationSpinner = view.findViewById(R.id.stationSpinner)
 
@@ -88,12 +84,10 @@ class EditFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                //stationInput.setText(items[position])
                 startStation = items[position].toString()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                //stationInput.setText("Bitte eine Station auswählen")
                 startStation = "Bitte eine Station auswählen"
             }
 
@@ -166,7 +160,7 @@ class EditFragment : Fragment() {
 
                 }
                 .addOnFailureListener { exception ->
-                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                    Log.e(ContentValues.TAG, "Error getting documents: ", exception)
                 }
         }
     }
@@ -268,7 +262,6 @@ class EditFragment : Fragment() {
                                         driveId = documentReference.id
                                         insertBtn.text = "Fahrt beenden!"
                                         passData(driveId)
-                                        //stationInput.text.clear()
                                         lineInput.text.clear()
                                         lineInput.visibility = View.GONE
 
@@ -288,7 +281,7 @@ class EditFragment : Fragment() {
 
                                     }
                                     .addOnFailureListener { e ->
-                                        Log.w(ContentValues.TAG, "Error adding document", e)
+                                        Log.e(ContentValues.TAG, "Error adding document", e)
 
                                     }
                             } else {
@@ -302,7 +295,7 @@ class EditFragment : Fragment() {
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
+                    Log.e(TAG, "get failed with ", exception)
                 }
         }
     }
@@ -358,7 +351,6 @@ class EditFragment : Fragment() {
                                 insertBtn.text = "Fahrt starten!"
                                 (requireActivity().application as MyApplication).setStartDrive(true)
                                 (requireActivity().application as MyApplication).setDriveId("null")
-                                //stationInput.text.clear()
                                 lineInput.visibility = View.VISIBLE
                                 val fragment: Fragment = HomeFragment()
                                 val transaction =
@@ -377,7 +369,7 @@ class EditFragment : Fragment() {
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
+                    Log.e(TAG, "get failed with ", exception)
                 }
         }
     }

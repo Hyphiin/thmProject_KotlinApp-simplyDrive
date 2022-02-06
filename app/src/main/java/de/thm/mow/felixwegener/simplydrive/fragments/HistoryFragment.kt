@@ -1,8 +1,6 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.content.ContentValues
-import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,8 +18,6 @@ import com.google.firebase.firestore.DocumentChange.*
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
-import java.io.IOException
-import java.io.OutputStreamWriter
 
 
 class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.ClickListener {
@@ -148,7 +144,6 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                     .whereEqualTo("routeId", currentRoute)
                     .get()
                     .addOnSuccessListener { points ->
-                        val length = points.size()
                         for (point in points) {
                             routePoints.add(point.toObject(Location::class.java))
                         }
@@ -188,19 +183,18 @@ class HistoryFragment : Fragment(R.layout.fragment_history), LatHisAdapter.Click
                             )
                             val transaction =
                                 activity?.supportFragmentManager!!.beginTransaction()
-                            //transaction.hide(activity?.supportFragmentManager!!.findFragmentByTag("fragmentTag")!!)
                             transaction.add(R.id.fragmentContainer, fragment)
                             transaction.addToBackStack(null)
                             transaction.commit()
                         }
                     }
                     .addOnFailureListener { exception ->
-                        Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                        Log.e(ContentValues.TAG, "Error getting documents: ", exception)
                     }
 
             }
             .addOnFailureListener { exception ->
-                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                Log.e(ContentValues.TAG, "Error getting documents: ", exception)
             }
     }
 }

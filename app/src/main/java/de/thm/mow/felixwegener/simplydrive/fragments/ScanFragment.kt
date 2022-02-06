@@ -79,7 +79,6 @@ class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
                 createDialog(it.text)
-                //Toast.makeText(activity, it.text, Toast.LENGTH_LONG).show()
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
@@ -216,7 +215,7 @@ class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
                     }
                     .addOnFailureListener { e ->
-                        Log.w(ContentValues.TAG, "Error adding document", e)
+                        Log.e(ContentValues.TAG, "Error adding document", e)
 
                     }
             }

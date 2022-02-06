@@ -17,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -86,6 +85,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
 
     private fun updateTracking(isTracking: Boolean){
         this.isTracking = isTracking
+        manageVar = 0
     }
 
     private fun moveCameraToUser() {
@@ -181,19 +181,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                    Log.e(ContentValues.TAG, "get failed with ", exception)
                 }
         }
-    }
-
-    companion object {
-        fun newInstance(start: DoubleArray, end: DoubleArray) =
-            HistoryDetailView().apply {
-                arguments = Bundle().apply {
-                    putDoubleArray(ARG_START, start)
-                    putDoubleArray(ARG_END, end)
-                }
-            }
     }
 
     private fun getMarkerIcon(color: String?): BitmapDescriptor? {

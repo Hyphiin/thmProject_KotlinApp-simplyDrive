@@ -17,7 +17,6 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -156,12 +155,6 @@ class RegisterActivity : AppCompatActivity() {
             startActivityForResult(intent, RC__Sign__IN)
 
         }
-        /*
-        registerLoginField.setOnClickListener {
-            startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
-            finish()
-        }
-         */
     }
 
     private fun checkUser() {
@@ -181,7 +174,7 @@ class RegisterActivity : AppCompatActivity() {
                 val account = accountTask.getResult(ApiException::class.java)
                 firebaseAuthWithGoogleAccount(account)
             } catch (e: Exception) {
-                Log.d(TAG, "OnActivityResult: ${e.message}")
+                Log.e(TAG, "OnActivityResult: ${e.message}")
             }
         }
     }
@@ -193,8 +186,6 @@ class RegisterActivity : AppCompatActivity() {
             .addOnSuccessListener { authResult ->
 
                 val firebaseUser = firebaseAuth.currentUser
-
-                val uid = firebaseUser!!.uid
                 val email = firebaseUser!!.email
 
                 if (authResult.additionalUserInfo!!.isNewUser) {
