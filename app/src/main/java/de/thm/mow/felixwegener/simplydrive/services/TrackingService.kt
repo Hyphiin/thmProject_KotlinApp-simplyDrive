@@ -21,7 +21,7 @@ import androidx.lifecycle.Observer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+import com.google.android.gms.location.LocationRequest.*
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
@@ -105,43 +105,24 @@ class TrackingService : LifecycleService() {
         intent?.let {
             when(it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
+                    clearPathpoints()
                     if (isFirstRun) {
-                        Toast.makeText(
-                            this@TrackingService,
-                            "FirstStart",
-                            Toast.LENGTH_SHORT
-                        ).show()
                         startForegroundService()
                         isFirstRun = false
                     } else {
-                        Toast.makeText(
-                            this@TrackingService,
-                            "Start Timer again",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        //has to be changed
                         startTimer()
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
-                    Toast.makeText(
-                        this@TrackingService,
-                        "Paused",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    clearPathpoints()
                     pauseService()
                 }
                 ACTION_STOP_SERVICE -> {
-                    Toast.makeText(
-                        this@TrackingService,
-                        "Stopped Tracking",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     killService()
                 }
                 else -> Toast.makeText(
                     this@TrackingService,
-                    "Upsi",
+                    "Service konnte nicht richtig gestartet werden.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -154,6 +135,11 @@ class TrackingService : LifecycleService() {
     private var timeRoute = 0L
     private var timeStarted = 0L
     private var lastSecondTimestamp = 0L
+
+
+    private fun clearPathpoints() = pathPoints?.apply {
+        pathPoints.postValue(null)
+    }
 
     private fun startTimer() {
         addEmptyPolyline()
@@ -182,7 +168,7 @@ class TrackingService : LifecycleService() {
     }
 
     private fun updateNotificationTrackingState(isTracking: Boolean) {
-        val notificationActionText = if(isTracking) "Stop" else ""
+        val notificationActionText = if(isTracking) "Stop" else "Resume"
         val pendingIntent = if(isTracking) {
             val pauseIntent = Intent(this, TrackingService::class.java).apply {
                 action = ACTION_PAUSE_SERVICE
@@ -213,16 +199,40 @@ class TrackingService : LifecycleService() {
     private fun updateLocationTracking(isTracking: Boolean) {
         if(isTracking) {
             if(TrackingUtility.hasLocationPermissions(this)){
-                val request = LocationRequest().apply {
-                    interval = LOCATION_UPDATE_INTERVAL
-                    fastestInterval = FASTEST_LOCATION_INTERVAL
-                    priority = PRIORITY_HIGH_ACCURACY
+                if ((application as MyApplication).getCellOnlyMode() == true){
+                    val request = LocationRequest().apply {
+                        interval = LOCATION_UPDATE_INTERVAL
+                        fastestInterval = FASTEST_LOCATION_INTERVAL
+                        priority = PRIORITY_LOW_POWER
+                    }
+                    fusedLocationProviderClient.requestLocationUpdates(
+                        request,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
+                } else if (((application as MyApplication).getTwoMode() == true)){
+                    val request = LocationRequest().apply {
+                        interval = LOCATION_UPDATE_INTERVAL
+                        fastestInterval = FASTEST_LOCATION_INTERVAL
+                        priority = PRIORITY_BALANCED_POWER_ACCURACY
+                    }
+                    fusedLocationProviderClient.requestLocationUpdates(
+                        request,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
+                } else {
+                    val request = LocationRequest().apply {
+                        interval = LOCATION_UPDATE_INTERVAL
+                        fastestInterval = FASTEST_LOCATION_INTERVAL
+                        priority = PRIORITY_HIGH_ACCURACY
+                    }
+                    fusedLocationProviderClient.requestLocationUpdates(
+                        request,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
                 }
-                fusedLocationProviderClient.requestLocationUpdates(
-                    request,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
             }
         } else {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
@@ -237,7 +247,6 @@ class TrackingService : LifecycleService() {
                 result?.locations?.let { locations ->
                     for (location in locations){
                         addPathPoint(location)
-                        Log.d("TAG", "IS TRACKING: ${location.latitude} + ${location.longitude}")
                     }
                 }
             }
@@ -329,15 +338,11 @@ class TrackingService : LifecycleService() {
 
                 db.collection("locations")
                     .add(location)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            ContentValues.TAG,
-                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                        )
+                    .addOnSuccessListener {
 
                     }
                     .addOnFailureListener { e ->
-                        Log.w(ContentValues.TAG, "Error adding document", e)
+                        Log.e(ContentValues.TAG, "Error adding document", e)
 
                     }
             }

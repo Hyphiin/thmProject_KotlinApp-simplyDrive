@@ -1,29 +1,26 @@
 package de.thm.mow.felixwegener.simplydrive.fragments
 
 import android.app.Activity.RESULT_OK
+import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import de.thm.mow.felixwegener.simplydrive.MyApplication
 import de.thm.mow.felixwegener.simplydrive.R
 import de.thm.mow.felixwegener.simplydrive.RegisterActivity
-import android.provider.MediaStore
-import java.io.IOException
-import android.widget.Toast
-import com.google.firebase.storage.StorageReference
-import android.app.ProgressDialog
-import android.graphics.BitmapFactory
-import android.util.Log
 import java.io.File
+import java.io.IOException
 
 
 class ProfileFragment : Fragment() {
@@ -32,10 +29,13 @@ class ProfileFragment : Fragment() {
     private lateinit var user_id__View: TextView
     private lateinit var user_email__View: TextView
     private lateinit var logOut__btn: Button
-    private lateinit var tv__MainActivity: TextView
     private lateinit var btn__ImgSelect: Button
     private lateinit var btn__ImgUpload: Button
     private lateinit var img__ProfilePic: ImageView
+    private lateinit var radioGroup: RadioGroup
+    private lateinit var radioBtn__ALL: RadioButton
+    private lateinit var radioBtn__TWO: RadioButton
+    private lateinit var radioBtn__CELL: RadioButton
 
     // Uri indicates, where the image will be picked from
     private var filePath: Uri? = null
@@ -50,17 +50,18 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.activity_profile, container, false)
+        val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         user_id__View = view.findViewById(R.id.user_id__View)
         user_email__View = view.findViewById(R.id.user_email__View)
         logOut__btn = view.findViewById(R.id.logOut__btn)
-        tv__MainActivity = view.findViewById(R.id.tv__MainActivity)
         btn__ImgSelect = view.findViewById(R.id.btn__ImgSelect)
         btn__ImgUpload = view.findViewById(R.id.btn__ImgUpload)
         img__ProfilePic = view.findViewById(R.id.img__ProfilePic)
-
-        tv__MainActivity.visibility = View.GONE
+        radioGroup = view.findViewById(R.id.radioGroup)
+        radioBtn__ALL = view.findViewById(R.id.radioButtonALL)
+        radioBtn__TWO = view.findViewById(R.id.radioButtonTWO)
+        radioBtn__CELL = view.findViewById(R.id.radioButtonCELL)
 
         firebaseAuth = FirebaseAuth.getInstance()
         checkUser()
@@ -80,8 +81,55 @@ class ProfileFragment : Fragment() {
             uploadImage()
         }
 
+        radioGroup.setOnCheckedChangeListener { _, checkedId -> // find which radio button is selected
+            if (checkedId == R.id.radioButtonALL) {
+                (requireActivity().application as MyApplication).setAllMode(true)
+                (requireActivity().application as MyApplication).setTwoMode(false)
+                (requireActivity().application as MyApplication).setCellOnlyMode(false)
+                radioBtn__ALL.isChecked = true
+                radioBtn__TWO.isChecked = false
+                radioBtn__CELL.isChecked = false
+                Toast
+                    .makeText(
+                        activity,
+                        "Tracking Mode: GPS, WIFI + CELL-TOWER",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            } else if (checkedId == R.id.radioButtonTWO) {
+                (requireActivity().application as MyApplication).setAllMode(false)
+                (requireActivity().application as MyApplication).setTwoMode(true)
+                (requireActivity().application as MyApplication).setCellOnlyMode(false)
+                radioBtn__ALL.isChecked = false
+                radioBtn__TWO.isChecked = true
+                radioBtn__CELL.isChecked = false
+                Toast
+                    .makeText(
+                        activity,
+                        "Tracking Mode: WIFI + CELL-TOWER",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            } else {
+                (requireActivity().application as MyApplication).setAllMode(false)
+                (requireActivity().application as MyApplication).setTwoMode(false)
+                (requireActivity().application as MyApplication).setCellOnlyMode(true)
+                radioBtn__TWO.isChecked = false
+                radioBtn__CELL.isChecked = false
+                radioBtn__CELL.isChecked = true
+                Toast
+                    .makeText(
+                        activity,
+                        "Tracking Mode: CELL-TOWER ONLY",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            }
+        }
+
         return view
     }
+
 
     private fun uploadImage() {
         val firebaseUser = firebaseAuth.currentUser
@@ -215,11 +263,9 @@ class ProfileFragment : Fragment() {
 
             val localFile = File.createTempFile("tempImage", "jpg")
             imageRef.getFile(localFile).addOnSuccessListener {
-                Log.d("Found User-Img:", imageRef.path)
                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                 img__ProfilePic.setImageBitmap(bitmap)
             }.addOnFailureListener {
-                Log.d("Failed finding User-Img", "Loading Fallback Image!")
                 val fallbackImage = storage.reference.child("images/maxe.png")
                 fallbackImage.getFile(localFile).addOnSuccessListener {
                     val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)

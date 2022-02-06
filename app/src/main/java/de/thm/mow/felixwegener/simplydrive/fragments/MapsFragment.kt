@@ -17,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -41,6 +40,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
 
     private var isTracking = true
     private var pathPoints= mutableListOf<MutableList<LatLng>>()
+
+    private var manageVar = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +73,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
     private fun subscribeToObservers() {
         TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
             updateTracking(it)
+
         })
 
         TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
@@ -83,17 +85,23 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
 
     private fun updateTracking(isTracking: Boolean){
         this.isTracking = isTracking
+        manageVar = 0
     }
 
     private fun moveCameraToUser() {
-        if(pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
-            mMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    pathPoints.last().last(),
-                    Constants.MAP_ZOOM
+        if (manageVar <= 2) {
+            if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
+                mMap?.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        pathPoints.last().last(),
+                        Constants.MAP_ZOOM
+                    )
                 )
-            )
+            }
+            manageVar ++
+
         }
+
     }
 
     private fun addLatestMarker() {
@@ -155,7 +163,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
                 .addOnSuccessListener { document ->
                     for (entry in document.documents) {
                         if (entry.data?.isNotEmpty() == true){
-                            Log.d("TEST!!!!!!","${entry.data!!.values.first()}")
                             station = Station(
                                 entry.data!!.values.first() as Double?,
                                 entry.data!!.values.last() as Double?
@@ -174,19 +181,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback{
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                    Log.e(ContentValues.TAG, "get failed with ", exception)
                 }
         }
-    }
-
-    companion object {
-        fun newInstance(start: DoubleArray, end: DoubleArray) =
-            HistoryDetailView().apply {
-                arguments = Bundle().apply {
-                    putDoubleArray(ARG_START, start)
-                    putDoubleArray(ARG_END, end)
-                }
-            }
     }
 
     private fun getMarkerIcon(color: String?): BitmapDescriptor? {

@@ -22,27 +22,18 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.zxing.WriterException
 import de.thm.mow.felixwegener.simplydrive.*
 import de.thm.mow.felixwegener.simplydrive.services.TrackingService
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_card_drive.*
 import java.lang.Exception
 
 private const val ARG_DATE = "date"
 private const val ARG_DEP = "departure"
 private const val ARG_STARTTIME = "departureTime"
-private const val ARG_TRAVELTIME = "travelTime"
-private const val ARG_STARTLON = "startLon"
-private const val ARG_STARTLAT = "endLocation"
-private const val ARG_LONARRAY = "LonArray"
-private const val ARG_LATARRAY = "LatArray"
-
 
 class CardDriveFragment : Fragment(), OnMapReadyCallback {
     private var currentLocation: android.location.Location? = null
@@ -184,7 +175,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateTrackingRoute(activeRoute: Boolean){
         this.activeRoute = activeRoute
-        Log.d("TESTII","$activeRoute")
     }
 
     private fun moveCameraToUser() {
@@ -314,7 +304,6 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
                 .addOnSuccessListener { document ->
                     for (entry in document.documents) {
                         if (entry.data?.isNotEmpty() == true){
-                            Log.d("TEST!!!!!!","${entry.data!!.values.first()}")
                             station = Station(
                                 entry.data!!.values.first() as Double?,
                                 entry.data!!.values.last() as Double?
@@ -333,7 +322,7 @@ class CardDriveFragment : Fragment(), OnMapReadyCallback {
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                    Log.e(ContentValues.TAG, "get failed with ", exception)
                 }
         }
     }

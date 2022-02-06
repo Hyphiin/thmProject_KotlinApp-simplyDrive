@@ -79,7 +79,6 @@ class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
                 createDialog(it.text)
-                //Toast.makeText(activity, it.text, Toast.LENGTH_LONG).show()
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
@@ -201,10 +200,6 @@ class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 db.collection("routes")
                     .add(route)
                     .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            ContentValues.TAG,
-                            "DocumentSnapshot added with ID: ${documentReference.id}"
-                        )
                         driveId = documentReference.id
                         passData(driveId)
 
@@ -220,7 +215,7 @@ class ScanFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
                     }
                     .addOnFailureListener { e ->
-                        Log.w(ContentValues.TAG, "Error adding document", e)
+                        Log.e(ContentValues.TAG, "Error adding document", e)
 
                     }
             }

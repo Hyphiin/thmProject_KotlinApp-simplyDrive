@@ -4,20 +4,16 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -43,27 +39,14 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     //Fragments
     private val homeFragment = HomeFragment()
-    private val settingsFragment = SettingsFragment()
     private val historyFragment = HistoryFragment()
     private val editFragment = EditFragment()
     private val scanFragment = ScanFragment()
     private val mapsFragment = MapsFragment()
     private val profileFragment = ProfileFragment()
-    private val driveFragment = CardDriveFragment()
+    private val cardDriveFragment = CardDriveFragment()
 
     //FAB Button(s)
-    private val rotateOpen: Animation by lazy {
-        AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_open_anim
-        )
-    }
-    private val rotateClose: Animation by lazy {
-        AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_close_anim
-        )
-    }
     private val fromBottom: Animation by lazy {
         AnimationUtils.loadAnimation(
             this,
@@ -92,7 +75,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
     @RequiresApi(Build.VERSION_CODES.P)
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -158,12 +140,10 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         TrackingService.activeRoute.observe(this, Observer {
             updateTrackingRoute(it)
         })
-        Log.d("TESTOOOBSERVER","$activeRoute")
     }
 
     private fun updateTrackingRoute(activeRoute: Boolean){
         this.activeRoute = activeRoute
-        Log.d("TESTOOO","$activeRoute")
         if (activeRoute){
             enableBottomBar(false)
             fab_main.setImageDrawable(resources.getDrawable(R.drawable.ic_stopp, this.theme));
@@ -188,11 +168,9 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
             val localFile = File.createTempFile("tempImage", "jpg")
             imageRef.getFile(localFile).addOnSuccessListener {
-                Log.d("Found User-Img:", imageRef.path)
                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                 img__currentUser.setImageBitmap(bitmap)
             }.addOnFailureListener {
-                Log.d("Failed finding User-Img", "Loading Fallback Image!")
                 val fallbackImage = storage.reference.child("images/maxe.png")
                 fallbackImage.getFile(localFile).addOnSuccessListener {
                     val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
@@ -255,12 +233,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
         }
     }
 
-    private lateinit var currentDrive: String
-
-    private fun setDrive(d: String) {
-        currentDrive = d
-    }
-
     private fun sendCommandToService(action: String) =
         Intent(baseContext, TrackingService::class.java).also {
             it.action = action
@@ -269,9 +241,15 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private fun navigateToTrackingFragmentIfNeeded(intent: Intent?) {
         if(intent?.action == ACTION_SHOW_CARD_FRAG) {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainer, driveFragment, "fragmentTag")
-            fragmentTransaction.commit()
+            if ((this.application as MyApplication).getStartDrive() == false) {
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentContainer, cardDriveFragment, "fragmentTag")
+                fragmentTransaction.commit()
+            } else {
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentContainer, homeFragment, "fragmentTag")
+                fragmentTransaction.commit()
+            }
         }
     }
 

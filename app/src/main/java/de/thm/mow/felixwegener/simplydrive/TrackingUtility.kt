@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import pub.devrel.easypermissions.EasyPermissions
-import java.sql.Time
 import java.util.concurrent.TimeUnit
 
 object TrackingUtility {
@@ -25,12 +24,6 @@ object TrackingUtility {
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
             )
         }
-
-    fun hasCameraPermissions(context: Context) =
-        EasyPermissions.hasPermissions(
-            context,
-            Manifest.permission.CAMERA,
-        )
 
     fun getFormattedStopWatchTime(ms: Long, includeMillis: Boolean = false): String {
         var milliseconds = ms
