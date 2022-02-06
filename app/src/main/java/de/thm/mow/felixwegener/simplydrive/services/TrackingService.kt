@@ -114,6 +114,7 @@ class TrackingService : LifecycleService() {
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
+                    clearPathpoints()
                     pauseService()
                 }
                 ACTION_STOP_SERVICE -> {

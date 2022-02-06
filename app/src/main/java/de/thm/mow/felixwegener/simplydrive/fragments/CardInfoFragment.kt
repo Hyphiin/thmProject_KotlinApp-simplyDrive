@@ -64,6 +64,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
     private var startTime: String? = null
     private var endTime: String? = null
     private var timerTime: String? = null
+    private var startLocTime: String? = null
 
     private var mMap: GoogleMap? = null
     private var startLon: Double? = null
@@ -293,7 +294,7 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                             val lastTime = Timestamp(lastPathPointObject.location?.locations?.time!!)
                             val tempTimerTime = Timestamp(lastTime.time - firstTime.time)
 
-                            startTime = "${firstTime.hours}:${firstTime.minutes}:${if(firstTime.seconds < 10) "0" else ""}${firstTime.seconds}"
+                            startLocTime = "${firstTime.hours}:${firstTime.minutes}:${if(firstTime.seconds < 10) "0" else ""}${firstTime.seconds}"
                             endTime = "${lastTime.hours}:${lastTime.minutes}:${if(lastTime.seconds < 10) "0" else ""}${lastTime.seconds}"
                             timerTime = "${tempTimerTime.hours}:${tempTimerTime.minutes}:${if(tempTimerTime.seconds < 10) "0" else ""}${tempTimerTime.seconds}"
 
@@ -410,13 +411,15 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = user!!.uid
 
-        Log.d("TAG", "clearDB")
+
         val db = Firebase.firestore
 
         var docId: String? = "leer"
 
         db.collection("routes").whereEqualTo("date", date).whereEqualTo("time", startTime).get().addOnSuccessListener { result ->
+            Log.d("DELETE", "$result")
             for (document in result) {
+                Log.d("DELETE", "$document")
                 docId = document.id
                 document.reference.delete()
 

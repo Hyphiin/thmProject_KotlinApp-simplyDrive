@@ -36,7 +36,6 @@ object ServiceModule {
         it.action = Constants.ACTION_SHOW_CARD_FRAG
     },
         PendingIntent.FLAG_IMMUTABLE
-
     )
 
     @ServiceScoped

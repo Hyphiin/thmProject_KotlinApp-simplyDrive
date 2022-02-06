@@ -268,7 +268,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.OnDataPass, EditFragment.
 
     private fun navigateToTrackingFragmentIfNeeded(intent: Intent?) {
         if(intent?.action == ACTION_SHOW_CARD_FRAG) {
-            if (intent.extras.toString() === "cardDriveFragment") {
+            if ((this.application as MyApplication).getStartDrive() == false) {
                 val fragmentTransaction = supportFragmentManager.beginTransaction()
                 fragmentTransaction.replace(R.id.fragmentContainer, cardDriveFragment, "fragmentTag")
                 fragmentTransaction.commit()
