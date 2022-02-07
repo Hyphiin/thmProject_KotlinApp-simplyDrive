@@ -35,6 +35,7 @@ import de.thm.mow.felixwegener.simplydrive.R
 import kotlinx.android.synthetic.main.fragment_card_info.*
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.sql.Time
 import java.sql.Timestamp
 
 private const val ARG_DATE = "date"
@@ -278,13 +279,13 @@ class CardInfoFragment : Fragment(), OnMapReadyCallback {
                             val lastPathPointObject = routePoints.last()
                             val firstTime = Timestamp(firstPathPointObject.location?.locations?.time!!)
                             val lastTime = Timestamp(lastPathPointObject.location?.locations?.time!!)
-                            val tempTimerTime = Timestamp(lastTime.time - firstTime.time)
-
+                            val tempTime = Timestamp(3600000)
+                            val tempTimerTime = Timestamp((lastTime.time - firstTime.time) - tempTime.time)
                             startLocTime = "${firstTime.hours}:${firstTime.minutes}:${if(firstTime.seconds < 10) "0" else ""}${firstTime.seconds}"
                             endTime = "${lastTime.hours}:${lastTime.minutes}:${if(lastTime.seconds < 10) "0" else ""}${lastTime.seconds}"
                             timerTime = "${tempTimerTime.hours}:${tempTimerTime.minutes}:${if(tempTimerTime.seconds < 10) "0" else ""}${tempTimerTime.seconds}"
 
-                            tvStartTime.text = startTime
+                            tvStartTime.text = startLocTime
                             tvEndTime.text = endTime
                             tvTimerTime.text = timerTime
 
